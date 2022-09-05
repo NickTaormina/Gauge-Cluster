@@ -17,215 +17,323 @@ Window{
     visible:true
 
 
-Rectangle {
-    width: 1920
-    height: 720
-    color: "#181719"
-
-    Image {
-        id: tach
-        x: 0
-        y: 0
-        width: 620
-        height: 720
-        source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/tach.png"
-        sourceSize.width: 620
-        mipmap: true
-        antialiasing: true
-        rotation: 0
-        transformOrigin: Item.Bottom
-        fillMode: Image.PreserveAspectCrop
-
-        Rectangle {
-            id: tachneedle
-            objectName: "tachneedle"
-            x: 260
-            y: 60
-            width: 100
-            height: 600
-            visible: true
-            color: "#005d2d2d"
-            rotation: 270
-
-
-
-            Image {
-                id: needlePic
-                x: 0
-                y: 51
-                width: 100
-                height: 285
-                horizontalAlignment: Image.AlignHCenter
-                verticalAlignment: Image.AlignTop
-                source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/needle.svg"
-                rotation: 0
-                transformOrigin: Item.Bottom
-                sourceSize.width: 100
-                sourceSize.height: 300
-                fillMode: Image.PreserveAspectCrop
-            }
-        }
-    }
-
-    Image {
-        id: speedo
-        x: 1300
-        width: 620
-        height: 720
-        visible: true
-        source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/speedo.png"
-        sourceSize.height: 720
-        sourceSize.width: 620
-        antialiasing: true
-        mipmap: true
-        fillMode: Image.PreserveAspectCrop
-
-        Rectangle {
-            id: speedoNeedle
-            objectName: "speedoneedle"
-            x: 260
-            y: 60
-            width: 100
-            height: 600
-            visible: true
-            color: "#005d2d2d"
-            rotation: 300
-            Image {
-                id: needlePic1
-                x: 0
-                y: 51
-                width: 100
-                height: 285
-                horizontalAlignment: Image.AlignHCenter
-                verticalAlignment: Image.AlignTop
-                source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/needle.svg"
-                rotation: 0
-                fillMode: Image.PreserveAspectCrop
-                sourceSize.width: 100
-                transformOrigin: Item.Bottom
-                sourceSize.height: 300
-            }
-        }
-
-        Rectangle {
-            id: fuelNeedle
-            objectName: "fuelneedle"
-            x: 170
-            y: 200
-            width: 100
-            height: 500
-            visible: true
-            color: "#005d2d2d"
-            scale: 1
-            rotation: -90
-            Image {
-                id: fuelNeedlePic
-                x: 0
-                y: 120
-                width: 100
-                height: 130
-                horizontalAlignment: Image.AlignHCenter
-                verticalAlignment: Image.AlignTop
-                source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/needle.svg"
-                rotation: 0
-                sourceSize.width: 100
-                fillMode: Image.PreserveAspectCrop
-                transformOrigin: Item.Bottom
-                sourceSize.height: 300
-            }
-
-            Rectangle {
-                id: fuelAlignment
-                width: 100
-                height: 1
-                color: "#ffffff"
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: false
-            }
-        }
-
-    }
     Rectangle {
-            id: rectangle1
-            x: 626
-            y: 86
-            width: 668
-            height: 550
-            color: "#0021202c"
+        id: rectangle
+        width: 1920
+        height: 720
+        color: "#131313"
+
+        Image {
+            id: tach
+            x: 0
+            y: 0
+            width: 720
+            height: 720
+            source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/tach.png"
+            sourceSize.width: 620
+            mipmap: true
+            antialiasing: true
+            rotation: 0
+            transformOrigin: Item.Bottom
+            fillMode: Image.PreserveAspectCrop
 
             Rectangle {
-                id: textbox
-                y: 298
-                width: 500
-                height: 250
-                color: "#181719"
-                border.color: "#b4811e1e"
-                border.width: 2
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 2
+                id: tachneedle
+                objectName: "tachneedle"
+                width: 100
+                height: 600
+                visible: true
+                color: "#005d2d2d"
+                anchors.verticalCenter: parent.verticalCenter
+                scale: 1.1
                 anchors.horizontalCenter: parent.horizontalCenter
+                rotation: 270
 
-                TextArea {
-                    id: paramText
-                    x: 61
-                    y: -148
-                    width: 500
-                    height: 250
-                    readOnly: true
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    placeholderText: qsTr("")
+
+
+                Image {
+                    id: needlePic
+                    x: 0
+                    y: 51
+                    width: 100
+                    height: 285
+                    horizontalAlignment: Image.AlignHCenter
+                    verticalAlignment: Image.AlignTop
+                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/needle.svg"
+                    rotation: 0
+                    transformOrigin: Item.Bottom
+                    sourceSize.width: 100
+                    sourceSize.height: 300
+                    fillMode: Image.PreserveAspectCrop
+                }
+            }
+
+            Label {
+                id: rpmText
+                objectName: "rpmText"
+                y: 420
+                width: 172
+                height: 72
+                color: "#c8c8c8"
+                text: qsTr("0")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.family: "NI7SEG"
+                font.bold: true
+                font.pointSize: 44
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+
+        Image {
+            id: speedo
+            x: 1200
+            y: -8
+            width: 720
+            height: 720
+            visible: true
+            anchors.right: parent.right
+            source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/speedo.png"
+            anchors.rightMargin: 0
+            sourceSize.height: 720
+            sourceSize.width: 620
+            antialiasing: true
+            mipmap: true
+            fillMode: Image.PreserveAspectCrop
+
+            Rectangle {
+                id: speedoNeedle
+                objectName: "speedoneedle"
+                width: 100
+                height: 600
+                visible: true
+                color: "#005d2d2d"
+                anchors.verticalCenter: parent.verticalCenter
+                scale: 1.1
+                anchors.horizontalCenter: parent.horizontalCenter
+                rotation: 270
+                Image {
+                    id: needlePic1
+                    x: 0
+                    y: 51
+                    width: 100
+                    height: 285
+                    horizontalAlignment: Image.AlignHCenter
+                    verticalAlignment: Image.AlignTop
+                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/needle.svg"
+                    rotation: 0
+                    fillMode: Image.PreserveAspectCrop
+                    sourceSize.width: 100
+                    transformOrigin: Item.Bottom
+                    sourceSize.height: 300
                 }
             }
 
             Rectangle {
-                id: textbox1
-                y: 298
+                id: fuelNeedle
+                objectName: "fuelneedle"
+                x: 210
+                y: 207
+                width: 100
+                height: 500
+                visible: true
+                color: "#005d2d2d"
+                scale: 1
+                rotation: -90
+
+                Rectangle {
+                    id: fuelAlignment
+                    x: 143
+                    y: 340
+                    width: 100
+                    height: 1
+                    color: "#ffffff"
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: false
+                }
+
+                Image {
+                    id: fuelNeedlePic
+                    x: 0
+                    y: 120
+                    width: 100
+                    height: 130
+                    horizontalAlignment: Image.AlignHCenter
+                    verticalAlignment: Image.AlignTop
+                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/needle.svg"
+                    scale: 1.2
+                    rotation: 0
+                    sourceSize.width: 100
+                    fillMode: Image.PreserveAspectCrop
+                    transformOrigin: Item.Bottom
+                    sourceSize.height: 300
+                }
+            }
+
+        }
+        Rectangle {
+            id: rectangle1
+            width: 500
+            height: 550
+            color: "#0021202c"
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            Rectangle {
+                id: centerBoxMain
+                x: 84
+                y: -86
                 width: 500
-                height: 250
-                color: "#181719"
-                border.color: "#b4811e1e"
+                height: parent.height
+                radius:10
+                color: "#131313"
+                border.color: "#3b3b3b"
                 border.width: 2
                 anchors.top: parent.top
                 anchors.topMargin: 0
                 anchors.horizontalCenter: parent.horizontalCenter
-                TextArea {
-                    id: frameText
-                    x: 61
-                    y: -148
-                    width: 500
-                    height: 250
-                    readOnly:true
-                    anchors.verticalCenter: parent.verticalCenter
-                    enabled: true
+
+                Image {
+                    id: bottomRedBox
+                    width: 490
+                    height: 170
+                    y: 375
+                    clip:true
+                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/centerRedBox.png"
                     anchors.horizontalCenter: parent.horizontalCenter
-                    placeholderText: qsTr("")
+
+                    sourceSize.width: 550
+                    fillMode: Image.Stretch
+                }
+
+                Image {
+                    id: topRedBox
+                    y: 5
+                    width: 490
+                    height: 170
+                    clip:true
+                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/centerRedBox.png"
+                    rotation: 180
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    sourceSize.width: 550
+                    fillMode: Image.Stretch
+
+                    Rectangle {
+                        id: speedoHandler
+                        width: 480
+                        rotation: 180
+                        height: 150
+                        color: "#00ffffff"
+                        border.color: "#00000000"
+                        border.width: 0
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        Label {
+                            id: speedText
+                            x: 182
+                            y: 39
+                            objectName: "speedText"
+                            width: speedText.paintedWidth
+                            height: 72
+                            color: "#c8c8c8"
+                            text: qsTr("0")
+                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+
+                            font.bold: true
+                            font.pointSize: 72
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.family: "NI7SEG"
+                        }
+
+                        Label {
+                            id: mphText
+                            x: 162
+                            y: 39
+                            width: 80
+                            height: 30
+                            color: "#c8c8c8"
+                            text: qsTr("MPH")
+                            anchors.bottom: speedText.bottom
+                            anchors.left: speedText.right
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+
+
+                            objectName: "speedText"
+                            font.pointSize: 26
+                            font.family: "NI7SEG"
+                            font.bold: true
+                        }
+                    }
+                }
+
+                Text {
+                    id: statusText
+                    width: 453
+                    height: 140
+                    visible: false
+                    color: "#c8c8c8"
+                    text: qsTr("Error Message")
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 55
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    lineHeightMode: Text.ProportionalHeight
+                    wrapMode: Text.WordWrap
+                    fontSizeMode: Text.VerticalFit
+                    font.family: "NI7SEG"
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
         }
 
         Button {
             id: defButton
-            x: 706
-            y: 32
+            x: 710
+            y: 44
             width: 118
-            height: 48
+            height: 40
             background: Rectangle{
-            radius: 10
+                radius: 10
+                color: "#5c5c5c"
             }
             text: qsTr("Defs")
+            icon.color: "#000000"
+            flat: false
+            highlighted: false
             onClicked:{
                 var component = Qt.createComponent("DefinitionWindow.qml")
                 var win = component.createObject(root)
                 win.show
 
             }
+
+
+        }
+
+        Button {
+            id: logBtn
+            x: 1090
+            y: 44
+            width: 118
+            height: 40
+            text: qsTr("Start Logging")
+            background: Rectangle {
+                radius: 10
+                color: "#5c5c5c"
+            }
+            onClicked: {
+                logger.startLogging()
+            }
         }
 
         Image {
             id: rightSignal
-            x: 1320
+            x: 1216
             y: 125
             width: 64
             height: 64
@@ -239,7 +347,7 @@ Rectangle {
 
         Image {
             id: leftSignal
-            x: 556
+            x: 640
             y: 125
             width: 64
             height: 64
@@ -266,27 +374,15 @@ Rectangle {
             sourceSize.width: 64
             fillMode: Image.PreserveAspectFit
         }
-}
 
-Button {
-    id: logBtn
-    x: 1094
-    y: 34
-    width: 118
-    height: 48
-    text: qsTr("Start Logging")
-    background: Rectangle {
-        radius: 10
+
+
+
     }
-    onClicked: {
-        logger.startLogging()
-        console.log("logging")
-    }
-}
 }
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.75}D{i:9;invisible:true}D{i:19}
+    D{i:0;formeditorZoom:0.9}D{i:3}D{i:7}D{i:17}D{i:18}D{i:15}D{i:12}
 }
 ##^##*/
 

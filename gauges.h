@@ -2,7 +2,6 @@
 #define GAUGES_H
 
 #include <QObject>
-#include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "parameter.h"
 #include <QTimer>
@@ -13,7 +12,7 @@ class gauges : public QObject
 public:
     explicit gauges(QObject *parent = nullptr);
 
-    gauges(QObject *parent, QQmlApplicationEngine *engine);
+    gauges(QObject *parent, QObject * main);
 
 signals:
 
@@ -22,6 +21,8 @@ public slots:
     void setSpeed();
     Q_INVOKABLE void setParamPointer(parameter * parameter, int length);
     void startTimer();
+    void updateValue();
+    void startTest();
 
 private:
 
@@ -38,6 +39,8 @@ private:
     parameter * par;
     int paramLength;
     int currRPM;
+    int currSpeed;
+    int speed;
     double currRPMPos;
     double currSpeedPos;
 
@@ -47,11 +50,17 @@ private:
     QObject * tachNeedle;
     QObject * speedoNeedle;
     QObject * fuelNeedle;
+    QObject * rpmtext;
+    QObject * speedtext;
+    QTimer* timer;
     QTimer* testtimer;
+    QTimer* speedTime;
 
     int rpmval;
     int speedval;
     void changeValues();
+    void updateSpeedText();
+    int animDuration;
 };
 
 #endif // GAUGES_H

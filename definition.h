@@ -11,6 +11,7 @@ class Definition
 public:
     Definition();
 
+    int getNumParams();
 
     int getPID(int i);
     void setPID(QList<int> p);
@@ -27,6 +28,7 @@ public:
     void setRxBytes(QList<int> rx);
     void appendRx(int rx);
     int getRxLength();
+    int getRxMessageLength();
 
     QString getParamNames(int pos);
     QString getNameFromPID(int id);

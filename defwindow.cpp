@@ -4,6 +4,12 @@ defWindow::defWindow(QObject *parent)
     : QObject{parent}
 {
     _defPath = "C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/GaugeCluster/cobb2.xml";
+    _selectedParams.append("AF Correction 1");
+    _selectedParams.append("AF Learning 1");
+    _selectedParams.append("AF Ratio");
+    _selectedParams.append("Engine Speed");
+    _selectedParams.append("Vehicle Speed");
+
 }
 
 QString defWindow::defPath(){
@@ -20,7 +26,7 @@ void defWindow::setDefPath(QString path){
 void defWindow::parseDefs()
 {
     QDomDocument xml;
-    qDebug() << "parse called";
+    qDebug() << "reading definition file";
     QFile defFile(_defPath);
     xml.setContent(&defFile);
     defFile.close();
@@ -47,68 +53,69 @@ void defWindow::parseDefs()
 
 void defWindow::fillDefs(){
     QDomDocument xml;
-    qDebug() << "parse called";
     QFile defFile(_defPath);
     xml.setContent(&defFile);
     defFile.close();
     QDomElement root = xml.documentElement();
     QDomElement param = root.firstChild().toElement();
+    def->clearAll();
     def->appendTx(QByteArray::fromHex(QString("A800").toLatin1()));
-    int i = 0;
-    while(!param.isNull()){
-        if(i >= _selectedParams.size()){
-            qDebug() << "break";
-            break;
-        }
-        qDebug() << _selectedParams.size();
-
-        if(param.attribute("name") == _selectedParams.at(i)){
-            def->appendParamNames(param.attribute("name"));
-            def->appendPID(param.attribute("id").toInt(nullptr, 10));
-            QDomElement child = param.firstChild().toElement();
-            qDebug() << child.tagName();
-            if(child.tagName() == "address"){
-                qDebug() << "found addr " << param.attribute("name");
-                QString addr = child.text();
-                addr.remove(' ');
-                qDebug() << addr.toLatin1();
-                def->appendTx(QByteArray::fromHex(addr.toLatin1()));
-                child = child.nextSibling().toElement();
-                if(child.tagName() == "response"){
-                    qDebug() << "Response length " << child.attribute("length").toInt(nullptr, 10);
-                    def->appendRx(child.attribute("length").toInt(nullptr, 10));
-                }
-                child = child.nextSibling().toElement();
-                qDebug() << "going to conv element";
-                if(child.tagName() == "conversions"){
-                    QDomElement conversion = child.firstChild().toElement();
-                    while(!conversion.isNull()){
-                        if(conversion.tagName()=="conversion"){
-                            def->appendConv(conversion.attribute("expr").toDouble(nullptr));
-                            def->appendUnits(conversion.attribute("units"));
-                            if(conversion.attribute("format").length() > 1){
-                                def->appendFormat(conversion.attribute("format").length()-1);
-                            } else{
-                                def->appendFormat(conversion.attribute("format").length());
-                            }
-                            if(conversion.hasAttribute("invert")){
-                                def->appendInvert(1);
-                            } else {
-                                def->appendInvert(0);
-                            }
-                            qDebug() <<"conv: " << conversion.attribute("expr").toDouble(nullptr);
-                        } else if(conversion.tagName() == "offset"){
-                            def->appendOffset(conversion.text().toFloat(nullptr));
-                            qDebug() << "offset: " << conversion.text().toFloat(nullptr);
-                        }
-                        conversion = conversion.nextSibling().toElement();
-                    }
-                }
-                i++;
+    for(int i = 0; i < _selectedParams.size(); i++){
+        param = root.firstChild().toElement();
+        while(!param.isNull()){
+            if(i >= _selectedParams.size()){
+                qDebug() << "break";
+                break;
             }
+            if(param.attribute("name") == _selectedParams.at(i)){
+                def->appendParamNames(param.attribute("name"));
+                def->appendPID(param.attribute("id").toInt(nullptr, 10));
+                QDomElement child = param.firstChild().toElement();
+                if(child.tagName() == "address"){
+                    qDebug() << "found param: " << param.attribute("name");
+                    QString addr = child.text();
+                    addr.remove(' ');
+                    qDebug() << "address: " << addr.toLatin1();
+                    def->appendTx(QByteArray::fromHex(addr.toLatin1()));
+                    child = child.nextSibling().toElement();
+                    if(child.tagName() == "response"){
+                        qDebug() << "Response length: " << child.attribute("length").toInt(nullptr, 10);
+                        def->appendRx(child.attribute("length").toInt(nullptr, 10));
+                    }
+                    child = child.nextSibling().toElement();
+                    if(child.tagName() == "conversions"){
+                        QDomElement conversion = child.firstChild().toElement();
+                        while(!conversion.isNull()){
+                            if(conversion.tagName()=="conversion"){
+                                def->appendConv(conversion.attribute("expr").toDouble(nullptr));
+                                def->appendUnits(conversion.attribute("units"));
+                                if(conversion.attribute("format").length() > 1){
+                                    def->appendFormat(conversion.attribute("format").length()-1);
+                                } else{
+                                    def->appendFormat(conversion.attribute("format").length());
+                                }
+                                if(conversion.hasAttribute("invert")){
+                                    def->appendInvert(1);
+                                } else {
+                                    def->appendInvert(0);
+                                }
+                                qDebug() <<"conv: " << conversion.attribute("expr").toDouble(nullptr);
+                            } else if(conversion.tagName() == "offset"){
+                                def->appendOffset(conversion.text().toFloat(nullptr));
+                                qDebug() << "offset: " << conversion.text().toFloat(nullptr);
+                            }
+                            conversion = conversion.nextSibling().toElement();
+                        }
+                    }
+
+                }
+                break;
+            }
+            param = param.nextSibling().toElement();
         }
-        param = param.nextSibling().toElement();
     }
+    qDebug() << "defs filled";
+    qDebug() << "raw tx message: " << def->getTxBytes().toHex();
     emit defsFilled();
 
 }

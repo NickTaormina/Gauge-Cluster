@@ -1,5 +1,5 @@
 #include "parameter.h"
-
+#include <qDebug>
 parameter::parameter(QObject *parent)
     : QObject{parent}
 {
@@ -35,7 +35,7 @@ QString parameter::getUnit(){
 }
 void parameter::setValue(double val){
     value = val;
-    emit valueChanged(name);
+    emit valueChanged();
 }
 double parameter::getValue(){
     return value;

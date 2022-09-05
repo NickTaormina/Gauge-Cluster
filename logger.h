@@ -28,6 +28,7 @@ private:
     frames fr;
     canbus* can;
     QTimer * timer;
+    int paramLength;
 };
 
 #endif // LOGGER_H

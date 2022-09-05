@@ -9,12 +9,13 @@ logger::logger(QObject *parent)
 logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : QObject{parent}
 {
     parent = nullptr;
-    qDebug() << "logger const";
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &logger::log);
     res = par;
     can = bus;
     definition = def;
+    paramLength = 0;
+    qDebug() << "logger object initialized";
 }
 
 
@@ -23,38 +24,34 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
 void logger::log(){
     if(!can->isConnected()){
         qDebug() << "can't log. no device";
+        timer->stop();
         return;
 
-    } else {
-        qDebug() << "balls";
     }
-    qDebug() << "rx array: " << definition->getRxLength();
-    //res = new parameter[definition->getRxLength()];
     if(definition->getTxLength() > 0){
-        qDebug() << "receive tx format";
-        qDebug() << "bytes" << definition->getTxBytes();
-        qDebug() << "rx array: " << definition->getRxLength();
+        qDebug() << "tx bytes" << definition->getTxBytes().toHex();
+        qDebug() << "rx array size: " << definition->getRxLength();
 
-                //send the bytes
+            //send the bytes
             can->writeFrames(QString("000007E0").toUInt(nullptr, 16), definition->getTxBytes());
-                //read the received bytes. filter out acknowledge message
-            QByteArray rxmsg = can->readFrames(QString("000007E0").toUInt(nullptr, 16), QString("48").toUInt(nullptr, 16));
+            //read the received bytes. filter out acknowledge message
+            QByteArray rxmsg = can->readFrames(QString("000007E8").toUInt(nullptr, 16), QString("48").toUInt(nullptr, 16));
 
-                qDebug() << "rxbytes " <<rxmsg;
+                //look for the starting point of the actual useful data. after the first "E8" byte
                 if(!rxmsg.isEmpty()){
-                    qDebug() << "rx not empty";
                     int pos = -1;
                     for(int i = 0; i < rxmsg.size(); i++){
                         if(fr.base10Value(rxmsg.at(i)) == 232){
-                            qDebug() << "found 232: " << i;
+                            qDebug() << "found E8 byte at: " << i;
                             pos = i+1;
                             break;
                         }
                     }
 
+                    //iterates through each of the received bytes and uses definitoin to convert them to a usable value. //TODO: make this work with more than 2 byte params
                     if(pos>-1){
                         int calcpos = 0;
-                        for(int i = pos; i<rxmsg.length(); i++){
+                        for(int i = pos; i<rxmsg.length();){
                             qDebug() << "calcpos: " <<calcpos << "rx: " << definition->getRxBytes(calcpos);
                             if(definition->getRxBytes(calcpos) == 1){
                                 qDebug() << "conv" << definition->getConv(calcpos);
@@ -62,62 +59,72 @@ void logger::log(){
                                 qDebug() << "raw value" << fr.base10Value(rxmsg.at(i));
                                 if(definition->getInvert(calcpos) == 1){
                                     res[calcpos].setValue(fr.base10Value(rxmsg.at(i)), definition->getConv(calcpos), definition->getOffset(calcpos), definition->getInvert(calcpos));
-                                }else {
-                                res[calcpos].setValue(fr.base10Value(rxmsg.at(i)), definition->getConv(calcpos), definition->getOffset(calcpos));
+                                } else {
+                                    res[calcpos].setValue(fr.base10Value(rxmsg.at(i)), definition->getConv(calcpos), definition->getOffset(calcpos));
                                 }
+                                i = i + 1;
                             } else if (definition->getRxBytes(calcpos) == 2){
                                 QByteArray tmp = rxmsg.mid(i,2);
                                 int val = fr.base10Value(tmp);
-                                qDebug() << "tmp: " << val;
+                                qDebug() << "raw 2 byte val: " << val;
                                 if(definition->getInvert(calcpos) == 1){
                                     res[calcpos].setValue(val, definition->getConv(calcpos), definition->getOffset(calcpos), definition->getInvert(calcpos));
                                 }else{
                                     res[calcpos].setValue(val, definition->getConv(calcpos), definition->getOffset(calcpos));
                                 }
+                                i = i + 2;
                             }
                             res[calcpos].setName(definition->getParamNames(calcpos));
                             res[calcpos].setUnit(definition->getUnit(calcpos));
-                            qDebug() << "converted: " << res[calcpos].getName() + ": " << res[calcpos].getValue();
+                            qDebug() << res[calcpos].getName() + ": " << res[calcpos].getValue();
                             calcpos++;
-                            if(calcpos >= definition->getRxLength()){
+                            //break when all required params are converted, even if there are extra bytes at the end
+                            if(calcpos >= definition->getNumParams()){
                                 break;
                             }
+
                         }
                     }
                 }
 
             rxmsg.clear();
 
-        }else {
+        } else {
             qDebug() << "error: no device or message";
         }
 
 }
 
+//starts the timer responsible for requesting ecu data
 void logger::startLogging()
 {
     if(!timer->isActive()){
-        timer->start(1000);
+        timer->start(100);
     } else {
         stopLogging();
     }
 }
 
+//stop request ecu data
 void logger::stopLogging()
 {
     timer->stop();
     qDebug() << "logging stopped";
 }
 
+//create the parameter objects needed to store the received information
 void logger::createParamArray()
 {
-    res = new parameter[definition->getRxLength()];
-    for(int i = 0; i < definition->getRxLength(); i++){
+    qDebug() << "create param array: " << definition->getNumParams();
+    res = new parameter[definition->getNumParams()];
+    for(int i = 0; i < definition->getNumParams(); i++){
+        qDebug() << "setting par: " << i << " : " << definition->getParamNames(i);
         res[i].setName(definition->getParamNames(i));
         res[i].setFormat(definition->getFormat(i));
         res[i].setUnit(definition->getUnit(i));
         res[i].setPID(definition->getPID(i));
     }
-    qDebug() << "create param array";
-    emit setParams(res, definition->getRxLength());
+    paramLength = definition->getNumParams();
+
+    emit setParams(res, paramLength);
 }

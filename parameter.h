@@ -28,7 +28,7 @@ public:
     void setFormat(int i);
     int getFormat();
 signals:
-    void valueChanged(QString name);
+    void valueChanged();
 private:
     int pID;
     QString name;

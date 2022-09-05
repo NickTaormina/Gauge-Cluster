@@ -95,8 +95,9 @@ QByteArray canbus::readFrames(uint frameID, char filter)
             const QCanBusFrame frame = _dev->readFrame();
             if(frame.frameId() == frameID && frame.payload().at(0) != filter){
                 rxmsg.append(frame.payload());
+                qDebug() << "filtered payload: " << frame.payload().toHex();
             }
-            qDebug() << "payload: " << frame.payload();
+
         }
     } else {
         printf("no can device");

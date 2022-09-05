@@ -5,6 +5,11 @@ Definition::Definition()
 {
 }
 
+int Definition::getNumParams()
+{
+return paramNames.length();
+}
+
 void Definition::clearAll(){
     txBytes.clear();
     rxBytes.clear();
@@ -57,6 +62,15 @@ void Definition::appendRx(int rx){
 }
 int Definition::getRxLength(){
     return rxBytes.length();
+}
+
+int Definition::getRxMessageLength()
+{
+    int count = 0;
+    for(int i = 0; i<rxBytes.length(); i++){
+        count = count + rxBytes.at(i);
+    }
+    return count;
 }
 
 QString Definition::getParamNames(int pos){
