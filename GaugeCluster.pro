@@ -10,8 +10,10 @@ SOURCES += main.cpp \
     defwindow.cpp \
     frames.cpp \
     gauges.cpp \
+    gear.cpp \
     logger.cpp \
-    parameter.cpp
+    parameter.cpp \
+    trip.cpp
 
 RESOURCES += qml.qrc
 
@@ -32,5 +34,7 @@ HEADERS += \
     defwindow.h \
     frames.h \
     gauges.h \
+    gear.h \
     logger.h \
-    parameter.h
+    parameter.h \
+    trip.h

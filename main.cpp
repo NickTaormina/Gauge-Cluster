@@ -60,17 +60,5 @@ int main(int argc, char *argv[])
     qDebug() << "reponse length: " << def.getRxMessageLength();
 
 
-
-
-
-    //rootContext->setContextProperty("gaugeHandle", gauge);
-
-
-
-
-
-
-
-
     return app.exec();
 }

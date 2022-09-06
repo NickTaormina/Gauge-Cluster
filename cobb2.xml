@@ -167,4 +167,12 @@
 		<offset>0</offset>
 	</conversions>
 </ecuparam>
+<ecuparam id="22" name="Odometer" desc="P22">
+	<address length="9">00 01 0E</address>
+	<response length="2">06</response>
+	<conversions>
+		<conversion units="miles" expr="1.242742384" format="0"/>
+		<offset>0</offset>
+	</conversions>
+</ecuparam>
 </definitions>

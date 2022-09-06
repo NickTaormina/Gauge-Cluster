@@ -5,6 +5,7 @@
 #include <QQmlContext>
 #include "parameter.h"
 #include <QTimer>
+#include "gear.h"
 
 class gauges : public QObject
 {
@@ -23,6 +24,7 @@ public slots:
     void startTimer();
     void updateValue();
     void startTest();
+    void setOdometer();
 
 private:
 
@@ -36,6 +38,7 @@ private:
     int minSpeedoRot;
     int rpmIndex;
     int speedIndex;
+    int odoIndex;
     parameter * par;
     int paramLength;
     int currRPM;
@@ -46,21 +49,25 @@ private:
 
     void findSpeedIndex();
     void findRPMIndex();
+    void findOdoIndex();
 
     QObject * tachNeedle;
     QObject * speedoNeedle;
     QObject * fuelNeedle;
     QObject * rpmtext;
     QObject * speedtext;
+    QObject * odotext;
     QTimer* timer;
     QTimer* testtimer;
     QTimer* speedTime;
 
     int rpmval;
+    int odoval;
     int speedval;
     void changeValues();
     void updateSpeedText();
     int animDuration;
+    gear* g;
 };
 
 #endif // GAUGES_H

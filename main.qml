@@ -72,15 +72,15 @@ Window{
                 id: rpmText
                 objectName: "rpmText"
                 y: 420
-                width: 172
+                width: 189
                 height: 72
                 color: "#c8c8c8"
                 text: qsTr("0")
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                font.family: "NI7SEG"
+                font.family: "Michroma"
                 font.bold: true
-                font.pointSize: 44
+                font.pointSize: 36
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -205,6 +205,135 @@ Window{
 
                     sourceSize.width: 550
                     fillMode: Image.Stretch
+
+                    Rectangle {
+                        id: gearIndicatorBox
+                        x: 213
+                        width: 96
+                        height: 72
+                        color: "#00ffffff"
+                        radius: 10
+                        border.color: "#c8c8c8"
+                        border.width: 3
+                        anchors.top: parent.top
+                        anchors.topMargin: 5
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        Text {
+                            id: gearText
+                            width: 81
+                            height: 58
+                            color: "#c8c8c8"
+                            text: qsTr("N")
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.pixelSize: 70
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            anchors.verticalCenterOffset: -3
+                            fontSizeMode: Text.FixedSize
+                            font.family: "Exo ExtraBold"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+
+                    Rectangle {
+                        id: bottomBoxSep
+                        width: 480
+                        height: 1
+                        color: "#ffffff"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenterOffset: -5
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Rectangle {
+                        id: warningBox
+                        width: 56
+                        height: 56
+                        visible: false
+                        color: "#00ffffff"
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        anchors.leftMargin: 12
+                        anchors.bottomMargin: 16
+
+                        Image {
+                            id: warningImage
+                            width: 56
+                            height: 56
+                            source: "qrc:/qtquickplugin/images/template_image.png"
+                            sourceSize.width: 56
+                            fillMode: Image.PreserveAspectFit
+                        }
+                    }
+
+                    Text {
+                        id: odoNum
+                        objectName: "odoNum"
+                        x: 143
+                        y: 134
+                        width: 166
+                        height: 36
+                        color: "#c8c8c8"
+                        text: qsTr("077500")
+                        font.pixelSize: 28
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.family: "Michroma"
+                        fontSizeMode: Text.FixedSize
+                    }
+
+                    Text {
+                        id: odoUnitText
+                        x: 190
+                        y: 135
+                        width: 80
+                        height: 24
+                        color: "#c8c8c8"
+                        text: qsTr("miles")
+                        anchors.bottom: parent.bottom
+                        font.pixelSize: 24
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.bottomMargin: 0
+                        anchors.left: odoNum.right
+                        fontSizeMode: Text.HorizontalFit
+                        font.family: "Exo ExtraBold"
+                    }
+
+                    Text {
+                        id: tripText
+                        y: 98
+                        width: 198
+                        height: 36
+                        color: "#c8c8c8"
+                        text: qsTr("0.0")
+                        anchors.bottom: parent.bottom
+                        font.pixelSize: 28
+                        horizontalAlignment: Text.AlignRight
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.horizontalCenterOffset: -2
+                        anchors.bottomMargin: 36
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        fontSizeMode: Text.FixedSize
+                        font.family: "Michroma"
+
+                        Image {
+                            id: tripImage
+                            width: 28
+                            height: 28
+                            visible: true
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/tripImage.png"
+                            anchors.leftMargin: 0
+                            anchors.verticalCenterOffset: 2
+                            sourceSize.height: 26
+                            sourceSize.width: 26
+                            fillMode: Image.PreserveAspectCrop
+                        }
+                    }
+
                 }
 
                 Image {
@@ -236,7 +365,7 @@ Window{
                             y: 39
                             objectName: "speedText"
                             width: speedText.paintedWidth
-                            height: 72
+                            height: 78
                             color: "#c8c8c8"
                             text: qsTr("0")
                             anchors.verticalCenter: parent.verticalCenter
@@ -244,9 +373,9 @@ Window{
                             verticalAlignment: Text.AlignVCenter
 
                             font.bold: true
-                            font.pointSize: 72
+                            font.pointSize: 64
                             anchors.horizontalCenter: parent.horizontalCenter
-                            font.family: "NI7SEG"
+                            font.family: "Michroma"
                         }
 
                         Label {
@@ -265,7 +394,7 @@ Window{
 
                             objectName: "speedText"
                             font.pointSize: 26
-                            font.family: "NI7SEG"
+                            font.family: "Exo ExtraBold"
                             font.bold: true
                         }
                     }
@@ -382,7 +511,7 @@ Window{
 }
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.9}D{i:3}D{i:7}D{i:17}D{i:18}D{i:15}D{i:12}
+    D{i:0;formeditorZoom:0.9}D{i:15}D{i:21}D{i:22}
 }
 ##^##*/
 

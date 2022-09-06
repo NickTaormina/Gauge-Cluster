@@ -30,14 +30,16 @@ gauges::gauges(QObject *parent, QObject *main)
     currSpeedPos = minSpeedoRot;
     animDuration = 100;
     currSpeed = 0;
+    odoval = 0;
     speed = 0;
-
+    g = new gear;
 
     tachNeedle = main->findChild<QObject*>("tachneedle", Qt::FindChildrenRecursively);  
     speedoNeedle = main->findChild<QObject*>("speedoneedle", Qt::FindChildrenRecursively);
     fuelNeedle = main->findChild<QObject*>("fuelneedle", Qt::FindChildrenRecursively);
     speedtext = main->findChild<QObject*>("speedText", Qt::FindChildrenRecursively);
     rpmtext = main->findChild<QObject*>("rpmText", Qt::FindChildrenRecursively);
+    odotext = main->findChild<QObject*>("odoNum", Qt::FindChildrenRecursively);
 }
 
 void gauges::setRPM()
@@ -125,6 +127,8 @@ void gauges::setParamPointer(parameter *parameter, int length)
     qDebug() << "speed index: " << speedIndex;
     findRPMIndex();
     qDebug() << "rpm index: " << rpmIndex;
+    findOdoIndex();
+    qDebug() << "odo index: " << odoIndex;
     QObject::connect(&par[rpmIndex], &parameter::valueChanged, this, &gauges::updateValue);
 
 
@@ -137,6 +141,16 @@ void gauges::findRPMIndex()
     for(int i = 0; i < paramLength; i++){
         if(par[i].getName().toUpper() == "ENGINE SPEED"){
             rpmIndex = i;
+            break;
+        }
+    }
+}
+
+void gauges::findOdoIndex()
+{
+    for(int i = 0; i < paramLength; i++){
+        if(par[i].getName().toUpper() == "ODOMETER"){
+            odoIndex = i;
             break;
         }
     }
@@ -176,30 +190,52 @@ void gauges::startTest(){
     }
 }
 
+void gauges::setOdometer()
+{
+    qDebug() << "set odo";
+    int digits = 6;
+    int val = par[odoIndex].getValue();
+    qDebug() << "val: " << val;
+    QString str = QString::number(val);
+    qDebug() << "str: " << str;
+    int length = str.length();
+    qDebug() << "str length: " << length;
+    if(length < digits){
+        int mult = digits-length;
+        qDebug() << "mult: " << mult;
+        for(int i = 0; i<mult; i++){
+            str.prepend("0");
+            qDebug() << "str: " <<str;
+        }
+    }
+    odotext->setProperty("text", (QVariant)str);
+}
+
 void gauges::updateValue()
 {
     if(speedIndex > -1){
         setRPM();
-
         setSpeed();
+        setOdometer();
     }
 }
 
 
 void gauges::changeValues(){
     par[rpmIndex].setValue(rpmval);
-        //setRPM();
     if(rpmval < maxRPM){
     rpmval = rpmval + 100;
     } else {
         rpmval = 0;
     }
     par[speedIndex].setValue(speedval);
-    //setSpeed();
     if(speedval < maxSpeed-2){
         speedval = speedval + 2;
     } else {
         speedval = 0;
     }
+    par[odoIndex].setValue(odoval);
+    odoval = odoval + 2;
+
 
 }

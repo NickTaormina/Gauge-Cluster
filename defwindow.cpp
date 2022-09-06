@@ -9,6 +9,7 @@ defWindow::defWindow(QObject *parent)
     _selectedParams.append("AF Ratio");
     _selectedParams.append("Engine Speed");
     _selectedParams.append("Vehicle Speed");
+    _selectedParams.append("Odometer");
 
 }
 
