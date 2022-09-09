@@ -37,7 +37,6 @@ int main(int argc, char *argv[])
 
     Definition def;
     defWindow defWin(nullptr, &def);
-    //defWin.setDefPointer(&def);
     defWin.parseDefs();
     qDebug() << defWin.params();
 
@@ -85,5 +84,6 @@ int main(int argc, char *argv[])
     trip* tr = new trip(nullptr, &xml, "tripA");
     configHandler hand;
     qDebug() <<"test: " <<hand.getParams();
+    gauge->gaugeSweep();
     return app.exec();
 }

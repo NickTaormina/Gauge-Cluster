@@ -4,7 +4,9 @@ configHandler::configHandler(QObject *parent)
     : QObject{parent}
 {
     applicationDir = QCoreApplication::applicationDirPath();
-    _defPath = applicationDir + "/config/cobb2.xml";
+    configPath = applicationDir + "/config/config.xml";
+    setDefPath();
+    //_defPath = applicationDir + "/config/cobb2.xml";
 
 }
 
@@ -164,22 +166,34 @@ void configHandler::clearConfigXml()
 
 void configHandler::setDefPath()
 {
+
     QFile f(configPath);
+    if(f.exists()){
     configXml.setContent(&f);
     f.close();
     QDomElement root = configXml.documentElement();
     QDomElement category = root.firstChild().toElement();
-
+    qDebug() << category.tagName();
     while(!category.isNull()){
+        qDebug() << category.tagName();
         if(category.tagName() == "defs"){
             category = category.firstChild().toElement();
+            qDebug() << category.tagName();
             while(!category.isNull()){
                 if(category.tagName() == "defFile"){
-                    _defPath = category.text();
+                    qDebug() << category.text();
+                    _defPath = applicationDir + category.text();
+                    break;
                 }
+                category = category.nextSibling().toElement();
             }
         }
+        category = category.nextSibling().toElement();
     }
+    } else {
+        qDebug() << "no config.xml";
+    }
+
     qDebug() << "set def path";
 }
 

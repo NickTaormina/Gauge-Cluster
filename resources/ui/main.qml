@@ -221,6 +221,7 @@ Window{
 
                         Text {
                             id: gearText
+                            objectName: "gearText"
                             width: 81
                             height: 58
                             color: "#c8c8c8"
@@ -303,6 +304,7 @@ Window{
 
                     Text {
                         id: tripText
+                        objectName: "tripNum"
                         y: 98
                         width: 198
                         height: 36

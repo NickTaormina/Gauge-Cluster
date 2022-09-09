@@ -6,6 +6,7 @@
 #include "parameter.h"
 #include <QTimer>
 #include "gear.h"
+#include "trip.h"
 
 class gauges : public QObject
 {
@@ -25,6 +26,9 @@ public slots:
     void updateValue();
     void startTest();
     void setOdometer();
+    void gaugeSweep();
+    void sweepForward();
+    void sweepBack();
 
 private:
 
@@ -50,16 +54,29 @@ private:
     void findSpeedIndex();
     void findRPMIndex();
     void findOdoIndex();
+    void updateGear();
 
+    void updateTrip();
+
+
+
+    //ui objects
     QObject * tachNeedle;
     QObject * speedoNeedle;
     QObject * fuelNeedle;
     QObject * rpmtext;
     QObject * speedtext;
     QObject * odotext;
+    QObject * geartext;
+    QObject * tripNum;
+
+    //timers
     QTimer* timer;
     QTimer* testtimer;
     QTimer* speedTime;
+    QTimer* sweepTimer;
+    QElapsedTimer elapsedTimer;
+    qint64 elapsed;
 
     int rpmval;
     int odoval;
@@ -67,7 +84,14 @@ private:
     void changeValues();
     void updateSpeedText();
     int animDuration;
+    int sweepFinished;
+
+
+    //class objects
     gear* g;
+    trip _trip;
+signals:
+    void sweepDone();
 };
 
 #endif // GAUGES_H

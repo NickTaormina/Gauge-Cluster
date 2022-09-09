@@ -22,8 +22,9 @@ gear::gear(QObject *parent, QString path)
     numGears = 6;
 }
 
-int gear::calcGear(int rpm, int speed)
+QString gear::calcGear(int rpm, int speed)
 {
+    int found = 0;
     if(ratios.length()>0){
         float circumference = (float)(tireDiameter/12)*(M_PI);
         float speedInFPM = (speed*5280)/(60);
@@ -33,12 +34,16 @@ int gear::calcGear(int rpm, int speed)
         for(int i = 0; i<ratios.length(); i++){
 
             if(ratios.at(i)/gear >0.99 && ratios.at(i)/gear <1.01){
-                return i + 1;
+                i = i+1;
+                return QString::number(i);
             }
+        }
+        if(ratioR/gear > .99 && ratioR/gear < 1.01){ //TODO: fix reverrse indicator
+            return "N";
         }
 
     }
-    return 0;
+    return "N";
 }
 
 QList<float> gear::getRatios()

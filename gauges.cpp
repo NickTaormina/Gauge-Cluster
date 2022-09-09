@@ -9,6 +9,11 @@ gauges::gauges(QObject *parent)
 
 gauges::gauges(QObject *parent, QObject *main, gear *gear)
 {
+    timer = new QTimer(this);
+    g = gear;
+    sweepFinished = 0;
+    gaugeSweep();
+
 
 }
 
@@ -18,6 +23,7 @@ gauges::gauges(QObject *parent, QObject *main)
     timer = new QTimer(this);
     testtimer = new QTimer(this);
     speedTime = new QTimer(this);
+    sweepTimer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &gauges::updateValue);
     connect(testtimer, &QTimer::timeout, this, &gauges::changeValues);
     connect(speedTime, &QTimer::timeout, this, &gauges::updateSpeedText);
@@ -45,11 +51,16 @@ gauges::gauges(QObject *parent, QObject *main)
     speedtext = main->findChild<QObject*>("speedText", Qt::FindChildrenRecursively);
     rpmtext = main->findChild<QObject*>("rpmText", Qt::FindChildrenRecursively);
     odotext = main->findChild<QObject*>("odoNum", Qt::FindChildrenRecursively);
+    geartext = main->findChild<QObject*>("gearText", Qt::FindChildrenRecursively);
+    tripNum = main->findChild<QObject*>("tripNum", Qt::FindChildrenRecursively);
+
+    sweepFinished = 0;
+    gaugeSweep();
 }
 
 void gauges::setRPM()
 {
-    if(rpmIndex > -1){
+    if(rpmIndex > -1 && sweepFinished == 1){
         int rpm = (int)par[rpmIndex].getValue();
 
 
@@ -72,7 +83,9 @@ void gauges::setRPM()
         rpmAnim->setStartValue(currRPMPos);
         rpmAnim->setEndValue(pos);
         rpmAnim->start();
-        rpmtext->setProperty("text", rpm);
+        if(rpm < maxRPM){
+            rpmtext->setProperty("text", rpm);
+        }
 
         currRPMPos = pos;
     } else {
@@ -82,7 +95,7 @@ void gauges::setRPM()
 
 void gauges::setSpeed()
 {
-    if(speedIndex > -1){
+    if(speedIndex > -1 && sweepFinished == 1){
         if(speedTime->isActive()){
             speedTime->setInterval(5);
         }
@@ -115,12 +128,14 @@ void gauges::setSpeed()
 }
 
 void gauges::updateSpeedText(){
-    int s = speedtext->property("text").toInt(nullptr);
-    if(s >= speed){
-        speedTime->stop();
-        speedtext->setProperty("text", speed);
-    } else{
-        speedtext->setProperty("text", (s + 1));
+    if(speed < maxSpeed){
+        int s = speedtext->property("text").toInt(nullptr);
+        if(s >= speed){
+            speedTime->stop();
+            speedtext->setProperty("text", speed);
+        } else{
+            speedtext->setProperty("text", (s + 1));
+        }
     }
 }
 
@@ -161,6 +176,74 @@ void gauges::findOdoIndex()
     }
 }
 
+//TODO: trigger this on clutch in. neutral detection
+void gauges::updateGear()
+{
+    if(g){
+        QString currgear = g->calcGear(par[rpmIndex].getValue(), speed);
+        geartext->setProperty("text", currgear);
+
+    }
+}
+
+void gauges::updateTrip()
+{
+    _trip.updateTripDistance(speed, elapsedTimer.elapsed());
+    elapsedTimer.restart();
+    tripNum->setProperty("text", _trip.getTrip());
+
+
+}
+
+void gauges::sweepForward()
+{
+    QPropertyAnimation *speedAnim = new QPropertyAnimation(speedoNeedle, "rotation");
+    QPropertyAnimation *rpmAnim = new QPropertyAnimation(tachNeedle, "rotation");
+
+    sweepTimer->setInterval(1100);
+    speedAnim->setDuration(1000);
+    speedAnim->setStartValue(minSpeedoRot);
+    speedAnim->setEndValue(maxSpeedoRot+360);
+    speedAnim->start();
+    sweepTimer->start();
+    rpmAnim->setDuration(1000);
+    rpmAnim->setStartValue(minTach);
+    rpmAnim->setEndValue(maxTach + 360);
+    rpmAnim->start();
+
+    connect(sweepTimer, &QTimer::timeout, this, &gauges::sweepBack);
+
+
+}
+
+void gauges::sweepBack()
+{
+    sweepTimer->stop();
+    disconnect(sweepTimer, &QTimer::timeout, this, &gauges::sweepBack);
+    QPropertyAnimation *speedAnim = new QPropertyAnimation(speedoNeedle, "rotation");
+    speedAnim->setDuration(1000);
+    speedAnim->setStartValue(maxSpeedoRot+360);
+    speedAnim->setEndValue(minSpeedoRot);
+    speedAnim->start();
+    QPropertyAnimation *rpmAnim = new QPropertyAnimation(tachNeedle, "rotation");
+    rpmAnim->setDuration(1000);
+    rpmAnim->setStartValue(maxTach+360);
+    rpmAnim->setEndValue(minTach);
+    rpmAnim->start();
+    sweepFinished = 1;
+}
+
+void gauges::gaugeSweep()
+{
+    sweepForward();
+
+
+
+
+
+
+}
+
 void gauges::findSpeedIndex()
 {
     for(int i = 0; i < paramLength; i++){
@@ -189,6 +272,7 @@ void gauges::startTest(){
         speedval = 0;
         changeValues();
         testtimer->start(animDuration);
+        elapsedTimer.start();
 
     } else {
         testtimer->stop();
@@ -216,6 +300,8 @@ void gauges::updateValue()
         setRPM();
         setSpeed();
         setOdometer();
+        updateGear();
+        updateTrip();
     }
 }
 

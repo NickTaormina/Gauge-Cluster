@@ -1,4 +1,5 @@
 #include "trip.h"
+#include <QString>
 
 trip::trip(QObject *parent)
     : QObject{parent}
@@ -11,11 +12,19 @@ trip::trip(QObject *parent, QDomDocument* x, QString tr)
     xml = x;
     tripNum = tr;
     readXML();
+    milesTraveled = 0;
+
 }
 
-void trip::updateTripDistance(int speed, float time)
+void trip::updateTripDistance(int speed, qint64 time)
 {
-    float delta = speed*(time/(1000*60*60));
+    float delta;
+    float convSpeed = speed*0.000277778; //mph to miles/sec
+    if(time < 1000){
+    delta = convSpeed*((float)time/1000);
+    } else{
+        delta = 0;
+    }
     milesTraveled = milesTraveled + delta;
 }
 
@@ -32,6 +41,15 @@ void trip::resetTrip()
 QString trip::getTripNum()
 {
     return tripNum;
+}
+
+QString trip::getTrip()
+{
+    if(milesTraveled > 0 && milesTraveled < 10000){
+        return QString::number(milesTraveled, 'f', 1);
+    } else {
+        return "0.0";
+    }
 }
 
 void trip::readXML()

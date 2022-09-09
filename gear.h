@@ -16,7 +16,7 @@ public:
 
 signals:
 public slots:
-    int calcGear(int rpm, int speed);
+    QString calcGear(int rpm, int speed);
     QList<float> getRatios();
     float getFinalDrive();
     float getDiameter();

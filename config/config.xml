@@ -1,0 +1,11 @@
+<config>
+	<cluster>
+	</cluster>
+	<defs>
+		<defFile>C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/GaugeCluster/cobb2.xml</defFile>
+	</defs>
+	<trip>
+		<tripA>0.24</tripA>
+		<tripB>0</tripB>
+	</trip>
+</config>
