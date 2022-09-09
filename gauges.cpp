@@ -7,6 +7,11 @@ gauges::gauges(QObject *parent)
     timer = new QTimer(this);
 }
 
+gauges::gauges(QObject *parent, QObject *main, gear *gear)
+{
+
+}
+
 gauges::gauges(QObject *parent, QObject *main)
     : QObject{parent}
 {
@@ -192,20 +197,14 @@ void gauges::startTest(){
 
 void gauges::setOdometer()
 {
-    qDebug() << "set odo";
     int digits = 6;
     int val = par[odoIndex].getValue();
-    qDebug() << "val: " << val;
     QString str = QString::number(val);
-    qDebug() << "str: " << str;
     int length = str.length();
-    qDebug() << "str length: " << length;
     if(length < digits){
         int mult = digits-length;
-        qDebug() << "mult: " << mult;
         for(int i = 0; i<mult; i++){
             str.prepend("0");
-            qDebug() << "str: " <<str;
         }
     }
     odotext->setProperty("text", (QVariant)str);

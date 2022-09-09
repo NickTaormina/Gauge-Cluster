@@ -12,8 +12,8 @@ class gauges : public QObject
     Q_OBJECT
 public:
     explicit gauges(QObject *parent = nullptr);
-
     gauges(QObject *parent, QObject * main);
+    gauges(QObject *parent, QObject * main, gear* gear);
 
 signals:
 

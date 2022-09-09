@@ -4,7 +4,7 @@
 gear::gear(QObject *parent)
     : QObject{parent}
 {
-    QFile f("C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/GaugeCluster/ratios.xml");
+    QFile f("C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/GaugeCluster/config/ratios.xml");
     xml.setContent(&f);
     f.close();
     parseRatios();
@@ -54,6 +54,26 @@ float gear::getFinalDrive()
 float gear::getDiameter()
 {
     return tireDiameter;
+}
+
+void gear::setRatios(QList<float> ratios)
+{
+
+}
+
+void gear::setRatioR(float r)
+{
+
+}
+
+void gear::setFinalDrive(float fd)
+{
+
+}
+
+void gear::setTireDiameter(float td)
+{
+
 }
 
 void gear::parseRatios()

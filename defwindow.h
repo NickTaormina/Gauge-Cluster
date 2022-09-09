@@ -6,6 +6,7 @@
 #include <QtXml>
 #include <QList>
 #include "definition.h"
+#include "configHandler.h"
 
 
 class defWindow : public QObject
@@ -16,6 +17,8 @@ class defWindow : public QObject
     Q_PROPERTY(QStringList selectedParams READ selectedParams NOTIFY selectedParamsChanged)
 public:
     explicit defWindow(QObject *parent = nullptr);
+    defWindow(QObject *parent, Definition * d);
+
     QString defPath(); // returns defpath
     QStringList params();
     QStringList selectedParams();
@@ -48,6 +51,7 @@ private:
     //QDomDocument xml;
     QStringList _selectedParams;
     Definition* def;
+    configHandler handle;
 
 };
 

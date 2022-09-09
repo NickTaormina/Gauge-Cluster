@@ -29,7 +29,7 @@ Window{
             y: 0
             width: 720
             height: 720
-            source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/tach.png"
+            source: "file:///" + applicationDirPath + "/resources/images/tach.png"
             sourceSize.width: 620
             mipmap: true
             antialiasing: true
@@ -59,7 +59,7 @@ Window{
                     height: 285
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignTop
-                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/needle.svg"
+                    source: "file:///" + applicationDirPath + "/resources/images/needle.svg"
                     rotation: 0
                     transformOrigin: Item.Bottom
                     sourceSize.width: 100
@@ -93,7 +93,7 @@ Window{
             height: 720
             visible: true
             anchors.right: parent.right
-            source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/speedo.png"
+            source: "file:///" + applicationDirPath + "/resources/images/speedo.png"
             anchors.rightMargin: 0
             sourceSize.height: 720
             sourceSize.width: 620
@@ -120,7 +120,7 @@ Window{
                     height: 285
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignTop
-                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/needle.svg"
+                    source: "file:///" + applicationDirPath + "/resources/images/needle.svg"
                     rotation: 0
                     fillMode: Image.PreserveAspectCrop
                     sourceSize.width: 100
@@ -161,7 +161,7 @@ Window{
                     height: 130
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignTop
-                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/needle.svg"
+                    source: "file:///" + applicationDirPath + "/resources/images/needle.svg"
                     scale: 1.2
                     rotation: 0
                     sourceSize.width: 100
@@ -200,7 +200,7 @@ Window{
                     height: 170
                     y: 375
                     clip:true
-                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/centerRedBox.png"
+                    source: "file:///" + applicationDirPath + "/resources/images/centerRedBox.png"
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     sourceSize.width: 550
@@ -325,7 +325,7 @@ Window{
                             visible: true
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left: parent.left
-                            source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/tripImage.png"
+                            source: "file:///" + applicationDirPath + "/resources/images/tripImage.png"
                             anchors.leftMargin: 0
                             anchors.verticalCenterOffset: 2
                             sourceSize.height: 26
@@ -342,7 +342,7 @@ Window{
                     width: 490
                     height: 170
                     clip:true
-                    source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/centerRedBox.png"
+                    source: "file:///" + applicationDirPath + "/resources/images/centerRedBox.png"
                     rotation: 180
                     anchors.horizontalCenter: parent.horizontalCenter
                     sourceSize.width: 550
@@ -466,7 +466,7 @@ Window{
             y: 125
             width: 64
             height: 64
-            source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/offSignal.svg"
+            source: "file:///" + applicationDirPath + "/resources/images/offSignal.svg"
             antialiasing: true
             mipmap: true
             sourceSize.height: 64
@@ -480,7 +480,7 @@ Window{
             y: 125
             width: 64
             height: 64
-            source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/offSignal.svg"
+            source: "file:///" + applicationDirPath + "/resources/images/offSignal.svg"
             mirror: true
             fillMode: Image.PreserveAspectFit
             antialiasing: true
@@ -495,7 +495,7 @@ Window{
             y: 76
             width: 64
             height: 64
-            source: "file:///C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/lightsOn.svg"
+            source: "file:///" + applicationDirPath + "/resources/images/lightsOn.svg"
             scale: 0.7
             antialiasing: true
             mipmap: true

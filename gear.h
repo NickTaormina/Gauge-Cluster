@@ -20,6 +20,10 @@ public slots:
     QList<float> getRatios();
     float getFinalDrive();
     float getDiameter();
+    void setRatios(QList<float> ratios);
+    void setRatioR(float r);
+    void setFinalDrive(float fd);
+    void setTireDiameter(float td);
 private:
     QDomDocument xml;
     QList<float> ratios;

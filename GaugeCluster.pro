@@ -6,8 +6,10 @@ QT += quick core xml serialbus
 
 SOURCES += main.cpp \
     canbus.cpp \
+    confighandler.cpp \
     definition.cpp \
     defwindow.cpp \
+    filehandler.cpp \
     frames.cpp \
     gauges.cpp \
     gear.cpp \
@@ -30,8 +32,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     canbus.h \
+    confighandler.h \
     definition.h \
     defwindow.h \
+    filehandler.h \
     frames.h \
     gauges.h \
     gear.h \
