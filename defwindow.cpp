@@ -4,12 +4,7 @@ defWindow::defWindow(QObject *parent)
     : QObject{parent}
 {
     //_defPath = "C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/GaugeCluster/config/cobb2.xml";
-    _selectedParams.append("AF Correction 1");
-    _selectedParams.append("AF Learning 1");
-    _selectedParams.append("AF Ratio");
-    _selectedParams.append("Engine Speed");
-    _selectedParams.append("Vehicle Speed");
-    _selectedParams.append("Odometer");
+
 
 }
 
@@ -22,6 +17,9 @@ defWindow::defWindow(QObject *parent, Definition *d)
      _selectedParams.append("Engine Speed");
      _selectedParams.append("Vehicle Speed");
      _selectedParams.append("Odometer");
+     _selectedParams.append("Feedback Knock Correction");
+     _selectedParams.append("Fine Knock Learn");
+     _selectedParams.append("Dynamic Advance Multiplier");
 
 }
 

@@ -7,6 +7,7 @@
 #include "string.h"
 #include "definition.h"
 #include "gear.h"
+#include "trip.h"
 
 class configHandler : public QObject
 {
@@ -25,6 +26,7 @@ public slots:
     QStringList getParams();
     void fillDefs(QStringList _selectedParams, Definition* def);
     void fillGear(gear* g);
+    void fillTrip(trip* tr);
 
 private:
     QString applicationDir;

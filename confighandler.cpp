@@ -159,6 +159,21 @@ void configHandler::fillGear(gear *g)
     g->setRatios(ratios);
 }
 
+void configHandler::fillTrip(trip *tr)
+{
+
+    QDomElement xt = configXml.firstChild().firstChild().toElement();
+    while(!xt.isNull()){
+        if(xt.tagName() == "trip"){
+            xt = xt.firstChild().toElement();
+            tr->setMilesTraveled(xt.text().toFloat(nullptr));
+            qDebug() << "trip: xt.text().toFloat(nullptr)";
+            break;
+        }
+        xt = xt.nextSibling().toElement();
+    }
+}
+
 void configHandler::clearConfigXml()
 {
     configXml.clear();

@@ -14,7 +14,7 @@ class gauges : public QObject
 public:
     explicit gauges(QObject *parent = nullptr);
     gauges(QObject *parent, QObject * main);
-    gauges(QObject *parent, QObject * main, gear* gear);
+    gauges(QObject *parent, QObject * main, gear* gear, trip* tr);
 
 signals:
 
@@ -51,12 +51,18 @@ private:
     double currRPMPos;
     double currSpeedPos;
 
+    int fbkIndex;
+    int fklIndex;
+    int damIndex;
+
     void findSpeedIndex();
     void findRPMIndex();
     void findOdoIndex();
     void updateGear();
+    void getKnockIndexes();
 
     void updateTrip();
+    void showKnock();
 
 
 
@@ -69,6 +75,7 @@ private:
     QObject * odotext;
     QObject * geartext;
     QObject * tripNum;
+    QObject * statustext;
 
     //timers
     QTimer* timer;
@@ -89,7 +96,7 @@ private:
 
     //class objects
     gear* g;
-    trip _trip;
+    trip* _trip;
 signals:
     void sweepDone();
 };

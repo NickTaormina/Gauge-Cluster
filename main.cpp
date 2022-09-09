@@ -7,7 +7,7 @@
 #include "gauges.h"
 #include "trip.h"
 #include <QtXml>
-#include "configHandler.h"
+#include "confighandler.h"
 
 
 
@@ -35,8 +35,15 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.load(url);
 
+    configHandler hand;
+    qDebug() <<"test: " <<hand.getParams();
+    gear gr;
+    hand.fillGear(&gr);
+    trip tr;
+    hand.fillTrip(&tr);
     Definition def;
     defWindow defWin(nullptr, &def);
+
     defWin.parseDefs();
     qDebug() << defWin.params();
 
@@ -60,7 +67,7 @@ int main(int argc, char *argv[])
     QObject* main = obj.at(0);
     QObject * statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
-    gauges* gauge = new gauges(nullptr, main);
+    gauges* gauge = new gauges(nullptr, main, &gr, &tr);
     QObject::connect(log, &logger::setParams, gauge, &gauges::setParamPointer);
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
 
@@ -81,9 +88,8 @@ int main(int argc, char *argv[])
         }
         x = x.nextSibling().toElement();
     }
-    trip* tr = new trip(nullptr, &xml, "tripA");
-    configHandler hand;
-    qDebug() <<"test: " <<hand.getParams();
+
+
     gauge->gaugeSweep();
     return app.exec();
 }

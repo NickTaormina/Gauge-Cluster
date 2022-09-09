@@ -7,13 +7,46 @@ gauges::gauges(QObject *parent)
     timer = new QTimer(this);
 }
 
-gauges::gauges(QObject *parent, QObject *main, gear *gear)
+gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr)
 {
     timer = new QTimer(this);
+    testtimer = new QTimer(this);
+    speedTime = new QTimer(this);
+    sweepTimer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &gauges::updateValue);
+    connect(testtimer, &QTimer::timeout, this, &gauges::changeValues);
+    connect(speedTime, &QTimer::timeout, this, &gauges::updateSpeedText);
+    minRPM = 0;
+    minSpeed = 0;
+    maxRPM = 7500;
+    maxSpeed = 180;
+    minTach = 270;
+    maxTach = 135;
+    minSpeedoRot = 270;
+    maxSpeedoRot = 135;
+    rpmval = 0;
+    speedval = 0;
+    currRPMPos = minTach;
+    currSpeedPos = minSpeedoRot;
+    animDuration = 100;
+    currSpeed = 0;
+    odoval = 0;
+    speed = 0;
     g = gear;
+    _trip = tr;
+
+    tachNeedle = main->findChild<QObject*>("tachneedle", Qt::FindChildrenRecursively);
+    speedoNeedle = main->findChild<QObject*>("speedoneedle", Qt::FindChildrenRecursively);
+    fuelNeedle = main->findChild<QObject*>("fuelneedle", Qt::FindChildrenRecursively);
+    speedtext = main->findChild<QObject*>("speedText", Qt::FindChildrenRecursively);
+    rpmtext = main->findChild<QObject*>("rpmText", Qt::FindChildrenRecursively);
+    odotext = main->findChild<QObject*>("odoNum", Qt::FindChildrenRecursively);
+    geartext = main->findChild<QObject*>("gearText", Qt::FindChildrenRecursively);
+    tripNum = main->findChild<QObject*>("tripNum", Qt::FindChildrenRecursively);
+    statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
+
     sweepFinished = 0;
     gaugeSweep();
-
 
 }
 
@@ -53,6 +86,7 @@ gauges::gauges(QObject *parent, QObject *main)
     odotext = main->findChild<QObject*>("odoNum", Qt::FindChildrenRecursively);
     geartext = main->findChild<QObject*>("gearText", Qt::FindChildrenRecursively);
     tripNum = main->findChild<QObject*>("tripNum", Qt::FindChildrenRecursively);
+    statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
     sweepFinished = 0;
     gaugeSweep();
@@ -149,7 +183,11 @@ void gauges::setParamPointer(parameter *parameter, int length)
     qDebug() << "rpm index: " << rpmIndex;
     findOdoIndex();
     qDebug() << "odo index: " << odoIndex;
+    getKnockIndexes();
+    qDebug() << "fkl index: " << fklIndex << "fbk index: " << fbkIndex << "dam index: " << damIndex;
+
     QObject::connect(&par[rpmIndex], &parameter::valueChanged, this, &gauges::updateValue);
+    par[fbkIndex].setValue(-1.41);
 
 
 
@@ -186,13 +224,51 @@ void gauges::updateGear()
     }
 }
 
+void gauges::getKnockIndexes()
+{
+    for(int i = 0; i < paramLength; i++){
+        if(par[i].getName().toUpper() == "FINE KNOCK LEARN"){
+            fklIndex = i;
+        } else if(par[i].getName().toUpper() == "FEEDBACK KNOCK CORRECTION"){
+            fbkIndex = i;
+        } else if(par[i].getName().toUpper() == "DYNAMIC ADVANCE MULTIPLIER"){
+            damIndex = i;
+        }
+    }
+}
+
 void gauges::updateTrip()
 {
-    _trip.updateTripDistance(speed, elapsedTimer.elapsed());
+    _trip->updateTripDistance(speed, elapsedTimer.elapsed());
     elapsedTimer.restart();
-    tripNum->setProperty("text", _trip.getTrip());
+    tripNum->setProperty("text", _trip->getTrip());
 
 
+}
+
+void gauges::showKnock()
+{
+    if(par[fklIndex].getValue() == 0 && par[fbkIndex].getValue() == 0 && par[damIndex].getValue() == 1){
+        statustext->setProperty("text", "");
+        statustext->setProperty("visible", false);
+        return;
+    } else {
+        QString str;
+        if(par[fbkIndex].getValue() != 0){
+            str.append("FBK: ");
+            str.append(QString::number(par[fbkIndex].getValue()));
+            str.append("\n");
+        }
+        if(par[fklIndex].getValue() != 0){
+            str.append("FKL: " + QString::number(par[fklIndex].getValue()) + "\n");
+        }
+        if(par[damIndex].getValue() != 1){
+            str.append("DAM: " + QString::number(par[damIndex].getValue()) + "\n");
+        }
+        statustext->setProperty("text", (QVariant)str);
+        statustext->setProperty("visible", true);
+
+    }
 }
 
 void gauges::sweepForward()
@@ -302,6 +378,7 @@ void gauges::updateValue()
         setOdometer();
         updateGear();
         updateTrip();
+        showKnock();
     }
 }
 
@@ -320,6 +397,21 @@ void gauges::changeValues(){
         speedval = 0;
     }
     par[odoIndex].setValue(odoval);
+
+
+    if(rpmval > 2000){
+        double fbk = par[fbkIndex].getValue();
+        if(fbk < 0){
+            par[fbkIndex].setValue(fbk + 0.35);
+            qDebug() << fbk;
+        }
+        if(fbk < 0.1 && fbk >-0.1){
+            fbk = 0;
+            par[fbkIndex].setValue(fbk);
+        }
+    }
+    par[fklIndex].setValue(0);
+    par[damIndex].setValue(1.0);
     odoval = odoval + 2;
 
 

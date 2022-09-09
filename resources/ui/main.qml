@@ -404,6 +404,7 @@ Window{
 
                 Text {
                     id: statusText
+                    objectName: "statusText"
                     width: 453
                     height: 140
                     visible: false
