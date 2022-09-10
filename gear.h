@@ -12,7 +12,7 @@ class gear : public QObject
     Q_OBJECT
 public:
     explicit gear(QObject *parent = nullptr);
-    gear(QObject *parent, QString path);
+
 
 signals:
 public slots:
@@ -20,7 +20,7 @@ public slots:
     QList<float> getRatios();
     float getFinalDrive();
     float getDiameter();
-    void setRatios(QList<float> ratios);
+    void setRatios(QList<float> r);
     void setRatioR(float r);
     void setFinalDrive(float fd);
     void setTireDiameter(float td);
@@ -30,10 +30,7 @@ private:
     float ratioR;
     float finalDrive;
     float tireDiameter;
-
-
     int numGears;
-
     void parseRatios();
 
 };

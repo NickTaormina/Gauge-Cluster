@@ -1,12 +1,16 @@
 #include "confighandler.h"
 
+
+/*
+Reads xmls and passes values where needed
+*/
 configHandler::configHandler(QObject *parent)
     : QObject{parent}
 {
     applicationDir = QCoreApplication::applicationDirPath();
     configPath = applicationDir + "/config/config.xml";
+    ratioPath = applicationDir + "/config/ratios.xml"; //TODO: put this in the config instead of here
     setDefPath();
-    //_defPath = applicationDir + "/config/cobb2.xml";
 
 }
 
@@ -133,10 +137,12 @@ void configHandler::fillGear(gear *g)
     f.close();
     QDomElement root = ratioXml.documentElement();
     QDomElement ratio = root.firstChild().toElement();
+    qDebug() << "ratio" << ratio.tagName();
     QList<float> ratios;
     while(!ratio.isNull()){
         if(ratio.tagName() == "one"){
             ratios.append(ratio.text().toFloat(nullptr));
+            qDebug() << "1st ratio: " << ratio.text().toFloat(nullptr);
         } else if(ratio.tagName() == "two"){
             ratios.append(ratio.text().toFloat(nullptr));
         } else if(ratio.tagName() == "three"){
@@ -167,7 +173,7 @@ void configHandler::fillTrip(trip *tr)
         if(xt.tagName() == "trip"){
             xt = xt.firstChild().toElement();
             tr->setMilesTraveled(xt.text().toFloat(nullptr));
-            qDebug() << "trip: xt.text().toFloat(nullptr)";
+            qDebug() << "trip:" << xt.text().toFloat(nullptr);
             break;
         }
         xt = xt.nextSibling().toElement();

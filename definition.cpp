@@ -1,15 +1,19 @@
 #include "definition.h"
 
-
+/*
+ECU definition object that stores all parameter def information
+*/
 Definition::Definition()
 {
 }
 
+//get total number of defined parameters
 int Definition::getNumParams()
 {
 return paramNames.length();
 }
 
+//remove all defined parameters
 void Definition::clearAll(){
     txBytes.clear();
     rxBytes.clear();
@@ -20,16 +24,23 @@ void Definition::clearAll(){
     invert.clear();
     units.clear();
 }
+
+//returns parameter's PID
 int Definition::getPID(int i){
     return pID.at(i);
 }
+
+//set PIDs for all parameters
 void Definition::setPID(QList<int> p){
     pID = p;
 }
+
+//add PID
 void Definition::appendPID(int i){
     pID.append(i);
 }
 
+//returns the transmit payload to log defined parameters
 QByteArray Definition::getTxBytes(){
     if(static_cast<quint8>(txBytes.at(0)) != 16){
         txBytes.insert(0, txBytes.length()).toHex();
@@ -37,20 +48,26 @@ QByteArray Definition::getTxBytes(){
     }
     return txBytes;
 }
+
+//set transmission payload
 void Definition::setTxBytes(QByteArray bytes){
     txBytes = bytes;
 }
+//add to the end of transmission payload
 void Definition::appendTx(QByteArray bytes){
     txBytes.append(bytes);
 }
+//add to beginning of transmission payload (for message number)
 void Definition::insertTxBytes(int byte){
     txBytes.insert(0, byte).toHex();
 }
 
+//returns length of transmission payload
 int Definition::getTxLength(){
     return txBytes.length();
 }
 
+//returns the response length for given parameter
 int Definition::getRxBytes(int pos){
     return rxBytes.at(pos);
 }

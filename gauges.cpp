@@ -4,11 +4,12 @@
 gauges::gauges(QObject *parent)
     : QObject{parent}
 {
-    timer = new QTimer(this);
 }
 
 gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr)
 {
+    parent = nullptr;
+    //timers
     timer = new QTimer(this);
     testtimer = new QTimer(this);
     speedTime = new QTimer(this);
@@ -16,6 +17,8 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr)
     connect(timer, &QTimer::timeout, this, &gauges::updateValue);
     connect(testtimer, &QTimer::timeout, this, &gauges::changeValues);
     connect(speedTime, &QTimer::timeout, this, &gauges::updateSpeedText);
+
+    //initialize values. TODO: read these from config
     minRPM = 0;
     minSpeed = 0;
     maxRPM = 7500;
@@ -35,6 +38,7 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr)
     g = gear;
     _trip = tr;
 
+    //find ui elements to control. should probably move these to QML
     tachNeedle = main->findChild<QObject*>("tachneedle", Qt::FindChildrenRecursively);
     speedoNeedle = main->findChild<QObject*>("speedoneedle", Qt::FindChildrenRecursively);
     fuelNeedle = main->findChild<QObject*>("fuelneedle", Qt::FindChildrenRecursively);
@@ -45,53 +49,15 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr)
     tripNum = main->findChild<QObject*>("tripNum", Qt::FindChildrenRecursively);
     statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
+    //TODO: don't start requesting data until gauge sweep done
     sweepFinished = 0;
     gaugeSweep();
 
 }
 
-gauges::gauges(QObject *parent, QObject *main)
-    : QObject{parent}
-{
-    timer = new QTimer(this);
-    testtimer = new QTimer(this);
-    speedTime = new QTimer(this);
-    sweepTimer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &gauges::updateValue);
-    connect(testtimer, &QTimer::timeout, this, &gauges::changeValues);
-    connect(speedTime, &QTimer::timeout, this, &gauges::updateSpeedText);
-    minRPM = 0;
-    minSpeed = 0;
-    maxRPM = 7500;
-    maxSpeed = 180;
-    minTach = 270;
-    maxTach = 135;
-    minSpeedoRot = 270;
-    maxSpeedoRot = 135;
-    rpmval = 0;
-    speedval = 0;
-    currRPMPos = minTach;
-    currSpeedPos = minSpeedoRot;
-    animDuration = 100;
-    currSpeed = 0;
-    odoval = 0;
-    speed = 0;
-    g = new gear;
 
-    tachNeedle = main->findChild<QObject*>("tachneedle", Qt::FindChildrenRecursively);  
-    speedoNeedle = main->findChild<QObject*>("speedoneedle", Qt::FindChildrenRecursively);
-    fuelNeedle = main->findChild<QObject*>("fuelneedle", Qt::FindChildrenRecursively);
-    speedtext = main->findChild<QObject*>("speedText", Qt::FindChildrenRecursively);
-    rpmtext = main->findChild<QObject*>("rpmText", Qt::FindChildrenRecursively);
-    odotext = main->findChild<QObject*>("odoNum", Qt::FindChildrenRecursively);
-    geartext = main->findChild<QObject*>("gearText", Qt::FindChildrenRecursively);
-    tripNum = main->findChild<QObject*>("tripNum", Qt::FindChildrenRecursively);
-    statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
-    sweepFinished = 0;
-    gaugeSweep();
-}
-
+//updates the tach
 void gauges::setRPM()
 {
     if(rpmIndex > -1 && sweepFinished == 1){
@@ -127,6 +93,7 @@ void gauges::setRPM()
     }
 }
 
+//updates the speed analog gauge
 void gauges::setSpeed()
 {
     if(speedIndex > -1 && sweepFinished == 1){
@@ -161,6 +128,7 @@ void gauges::setSpeed()
     }
 }
 
+//updates the middle speed readout
 void gauges::updateSpeedText(){
     if(speed < maxSpeed){
         int s = speedtext->property("text").toInt(nullptr);
@@ -173,6 +141,7 @@ void gauges::updateSpeedText(){
     }
 }
 
+//sets parameter object for the cluster to read from
 void gauges::setParamPointer(parameter *parameter, int length)
 {
     paramLength = length;
@@ -193,7 +162,7 @@ void gauges::setParamPointer(parameter *parameter, int length)
 
 }
 
-
+//finds the rpm parameter
 void gauges::findRPMIndex()
 {
     for(int i = 0; i < paramLength; i++){
@@ -204,6 +173,7 @@ void gauges::findRPMIndex()
     }
 }
 
+//finds the odometer reading parameter
 void gauges::findOdoIndex()
 {
     for(int i = 0; i < paramLength; i++){
@@ -224,6 +194,7 @@ void gauges::updateGear()
     }
 }
 
+//finds index in parameter array for each of the knock params
 void gauges::getKnockIndexes()
 {
     for(int i = 0; i < paramLength; i++){
@@ -237,6 +208,7 @@ void gauges::getKnockIndexes()
     }
 }
 
+//updates the trip value in cluster
 void gauges::updateTrip()
 {
     _trip->updateTripDistance(speed, elapsedTimer.elapsed());
@@ -246,6 +218,7 @@ void gauges::updateTrip()
 
 }
 
+//displays knock message if there is a knock event (fbk/fkl/dam not normal)
 void gauges::showKnock()
 {
     if(par[fklIndex].getValue() == 0 && par[fbkIndex].getValue() == 0 && par[damIndex].getValue() == 1){
@@ -271,6 +244,7 @@ void gauges::showKnock()
     }
 }
 
+//forward step of initial gauge sweep. had to split into 2 functions + timer because no signal
 void gauges::sweepForward()
 {
     QPropertyAnimation *speedAnim = new QPropertyAnimation(speedoNeedle, "rotation");
@@ -292,6 +266,7 @@ void gauges::sweepForward()
 
 }
 
+//second step of initial gauge sweep. Brings back to start location
 void gauges::sweepBack()
 {
     sweepTimer->stop();

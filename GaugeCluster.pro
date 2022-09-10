@@ -9,7 +9,6 @@ SOURCES += main.cpp \
     confighandler.cpp \
     definition.cpp \
     defwindow.cpp \
-    filehandler.cpp \
     frames.cpp \
     gauges.cpp \
     gear.cpp \
@@ -35,7 +34,6 @@ HEADERS += \
     confighandler.h \
     definition.h \
     defwindow.h \
-    filehandler.h \
     frames.h \
     gauges.h \
     gear.h \

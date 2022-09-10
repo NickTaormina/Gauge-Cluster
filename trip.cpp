@@ -1,21 +1,17 @@
 #include "trip.h"
 #include <QString>
 
+/*
+Handles trip computer calculations
+*/
 trip::trip(QObject *parent)
     : QObject{parent}
 {
 
 }
 
-trip::trip(QObject *parent, QDomDocument* x, QString tr)
-{
-    xml = x;
-    tripNum = tr;
-    readXML();
-    milesTraveled = 0;
 
-}
-
+//uses avg speed and elapsed time since last call to determine trip distance
 void trip::updateTripDistance(int speed, qint64 time)
 {
     float delta;
@@ -52,24 +48,3 @@ QString trip::getTrip()
     }
 }
 
-void trip::readXML()
-{
-    QDomElement xt = xml->firstChild().firstChild().toElement();
-    while(!xt.isNull()){
-        if(xt.tagName() == "trip"){
-            milesTraveled = xt.text().toFloat(nullptr);
-            qDebug() << milesTraveled;
-            xt = xt.firstChild().toElement();
-            qDebug() << xt.tagName();
-            //QDomElement newValue = xml->createElement(xt.tagName());
-            //QDomText text = xml->createTextNode("balls");
-            //newValue.appendChild(text);
-            //xt = xml->firstChild().firstChild().toElement();
-            //xt.replaceChild()
-            xt.setNodeValue("balls");
-            qDebug() << xt.text();
-            break;
-        }
-        xt = xt.nextSibling().toElement();
-    }
-}

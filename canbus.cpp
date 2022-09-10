@@ -1,5 +1,9 @@
 #include "canbus.h"
 
+/*
+handles canbus operations for tactrix & cobb specific stuff
+*/
+
 canbus::canbus(QObject *parent)
     : QObject{parent}
 {
@@ -15,6 +19,7 @@ QCanBusDevice *canbus::dev()
     }
 }
 
+//connects to j2534 device. only supports a single device rn
 void canbus::connectToCanDevice()
 {
     if(QCanBus::instance()->plugins().contains(QStringLiteral("passthrucan"))){
@@ -86,6 +91,7 @@ QByteArray canbus::readFrames(uint frameID)
     return rxmsg;
 }
 
+//reads queued rx frames from the j2534
 QByteArray canbus::readFrames(uint frameID, char filter)
 {
     QByteArray rxmsg;
@@ -138,6 +144,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
     }
 }
 
+//returns true if connected to a j2534 device
 bool canbus::isConnected()
 {
     if(_dev){
