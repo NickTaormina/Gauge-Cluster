@@ -6,7 +6,7 @@ gauges::gauges(QObject *parent)
 {
 }
 
-gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr)
+gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg)
 {
     parent = nullptr;
     //timers
@@ -18,25 +18,34 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr)
     connect(testtimer, &QTimer::timeout, this, &gauges::changeValues);
     connect(speedTime, &QTimer::timeout, this, &gauges::updateSpeedText);
 
-    //initialize values. TODO: read these from config
-    minRPM = 0;
-    minSpeed = 0;
-    maxRPM = 7500;
-    maxSpeed = 180;
-    minTach = 270;
-    maxTach = 135;
-    minSpeedoRot = 270;
-    maxSpeedoRot = 135;
-    rpmval = 0;
-    speedval = 0;
+    //initialize config values
+    qDebug() << "gauge values set: ";
+    minRPM = cfg->getValue("tachMinValue").toInt(nullptr, 10);
+    minSpeed = cfg->getValue("speedoMinValue").toInt(nullptr, 10);
+    maxRPM = cfg->getValue("tachMaxValue").toInt(nullptr, 10);
+    maxSpeed = cfg->getValue("speedoMaxValue").toInt(nullptr, 10);
+    minTach = cfg->getValue("tachMinRot").toInt(nullptr, 10);
+    maxTach = cfg->getValue("tachMaxRot").toInt(nullptr, 10);
+    minSpeedoRot = cfg->getValue("speedoMinRot").toInt(nullptr, 10);
+    maxSpeedoRot = cfg->getValue("speedoMaxRot").toInt(nullptr, 10);
+    animDuration = cfg->getValue("generalAnimationDuration").toInt(nullptr, 10);
+    showAllSpeedNumbers = cfg->getValue("generalShowAllSpeedDigits").toInt(nullptr, 10);
+    initialGaugeSweep = cfg->getValue("generalStartupGaugeSweep").toInt(nullptr, 10);
+    qDebug() << "gauge sweep: " << initialGaugeSweep;
+
+
+
     currRPMPos = minTach;
     currSpeedPos = minSpeedoRot;
-    animDuration = 100;
     currSpeed = 0;
+    rpmval = 0;
+    speedval = 0;
     odoval = 0;
     speed = 0;
+
     g = gear;
     _trip = tr;
+    activeTrip = "tripA";
 
     //find ui elements to control. should probably move these to QML
     tachNeedle = main->findChild<QObject*>("tachneedle", Qt::FindChildrenRecursively);
@@ -49,9 +58,12 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr)
     tripNum = main->findChild<QObject*>("tripNum", Qt::FindChildrenRecursively);
     statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
+
     //TODO: don't start requesting data until gauge sweep done
     sweepFinished = 0;
-    gaugeSweep();
+    if(initialGaugeSweep == 1){
+        gaugeSweep();
+    }
 
 }
 
@@ -162,6 +174,17 @@ void gauges::setParamPointer(parameter *parameter, int length)
 
 }
 
+//resets the active trip
+void gauges::resetTrip() //TODO: multiple trips
+{
+    if(activeTrip == "tripA"){
+        _trip->resetTrip();
+    } else if (activeTrip == "tripB"){
+        _trip->resetTrip();
+    }
+
+}
+
 //finds the rpm parameter
 void gauges::findRPMIndex()
 {
@@ -214,6 +237,8 @@ void gauges::updateTrip()
     _trip->updateTripDistance(speed, elapsedTimer.elapsed());
     elapsedTimer.restart();
     tripNum->setProperty("text", _trip->getTrip());
+    emit tripUpdated("tripA", _trip->getTrip());
+
 
 
 }
@@ -243,6 +268,7 @@ void gauges::showKnock()
 
     }
 }
+
 
 //forward step of initial gauge sweep. had to split into 2 functions + timer because no signal
 void gauges::sweepForward()

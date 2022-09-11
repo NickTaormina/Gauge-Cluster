@@ -13,9 +13,11 @@ public:
     void connectToCanDevice();
     QByteArray readFrames();
     QByteArray readFrames(uint frameID);
-    QByteArray readFrames(uint frameID, char filter);
+    QByteArray readFrames(uint frameID, char filter, int ignore);
     void writeFrames(uint frameID, QByteArray bytes);
+    void writeFrames(uint frameID, QByteArray bytes, uint override);
     bool isConnected();
+
 signals:
 
 private:

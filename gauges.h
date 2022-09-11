@@ -7,20 +7,22 @@
 #include <QTimer>
 #include "gear.h"
 #include "trip.h"
+#include "config.h"
 
 class gauges : public QObject
 {
     Q_OBJECT
 public:
     explicit gauges(QObject *parent = nullptr);
-    gauges(QObject *parent, QObject * main, gear* gear, trip* tr);
+    gauges(QObject *parent, QObject * main, gear* gear, trip* tr, config* cfg);
 
 signals:
-
+void tripUpdated(QString trip, QString val);
 public slots:
     void setRPM();
     void setSpeed();
     Q_INVOKABLE void setParamPointer(parameter * parameter, int length);
+    Q_INVOKABLE void resetTrip();
     void startTimer();
     void updateValue();
     void startTest();
@@ -91,6 +93,13 @@ private:
     void updateSpeedText();
     int animDuration;
     int sweepFinished;
+
+    QString activeTrip;
+
+    //booleans
+    int showAllSpeedNumbers;
+    int initialGaugeSweep;
+
 
 
     //class objects

@@ -11,6 +11,7 @@ public:
     int base10Value(char c);
     QString bytes2String(QByteArray bytes);
     QByteArray string2Bytes(QString str);
+    uint string2Uint(QString str);
 };
 
 #endif // FRAMES_H

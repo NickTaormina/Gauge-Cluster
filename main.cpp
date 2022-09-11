@@ -8,6 +8,8 @@
 #include "trip.h"
 #include <QtXml>
 #include "confighandler.h"
+#include "config.h"
+#include "cel.h"
 
 
 
@@ -34,8 +36,9 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
-
-    configHandler hand;
+    config* cfg = new config[5];
+    configHandler hand(nullptr, cfg);
+    hand.parseConfig();
     qDebug() <<"test: " <<hand.getParams();
     gear gr;
     hand.fillGear(&gr);
@@ -53,6 +56,7 @@ int main(int argc, char *argv[])
     parameter* par;
     can.connectToCanDevice();
     logger* log= new logger(nullptr, &can, par, &def);
+    cel c(nullptr, &can, &cfg[config::LOGGER]);
     QObject::connect(&defWin, &defWindow::defsFilled, log, &logger::createParamArray);
 
 
@@ -63,16 +67,18 @@ int main(int argc, char *argv[])
     rootContext->setContextProperty("logger", log);
 
 
+
     QList<QObject*> obj = engine.rootObjects();
     QObject* main = obj.at(0);
     QObject * statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
-    gauges* gauge = new gauges(nullptr, main, &gr, &tr);
+    gauges* gauge = new gauges(nullptr, main, &gr, &tr, &cfg[config::GAUGES]);
     QObject::connect(log, &logger::setParams, gauge, &gauges::setParamPointer);
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
-
+    QObject::connect(gauge, &gauges::tripUpdated, &hand, &configHandler::storeTrip);
     defWin.fillDefs();
     qDebug() << "reponse length: " << def.getRxMessageLength();
+    rootContext->setContextProperty("gauge", gauge);
 
 
     QDomDocument xml;
@@ -90,6 +96,6 @@ int main(int argc, char *argv[])
     }
 
 
-    gauge->gaugeSweep();
+    //gauge->gaugeSweep();
     return app.exec();
 }

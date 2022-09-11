@@ -333,6 +333,13 @@ Window{
                             sourceSize.height: 26
                             sourceSize.width: 26
                             fillMode: Image.PreserveAspectCrop
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    gauge.resetTrip()
+
+                                }
+                            }
                         }
                     }
 

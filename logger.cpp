@@ -33,9 +33,9 @@ void logger::log(){
         qDebug() << "rx array size: " << definition->getRxLength();
 
             //send the bytes
-            can->writeFrames(QString("000007E0").toUInt(nullptr, 16), definition->getTxBytes());
+            can->writeFrames(fr.string2Uint("000007E0"), definition->getTxBytes());
             //read the received bytes. filter out acknowledge message
-            QByteArray rxmsg = can->readFrames(QString("000007E8").toUInt(nullptr, 16), QString("48").toUInt(nullptr, 16));
+            QByteArray rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("48"), 1);
 
                 //look for the starting point of the actual useful data. after the first "E8" byte
                 if(!rxmsg.isEmpty()){

@@ -28,3 +28,9 @@ QByteArray frames::string2Bytes(QString str){
     str.remove('\n');
     return QByteArray::fromHex(str.toLatin1());
 }
+
+uint frames::string2Uint(QString str)
+{
+    return str.toUInt(nullptr, 16);
+}
+

@@ -14,6 +14,15 @@ configHandler::configHandler(QObject *parent)
 
 }
 
+configHandler::configHandler(QObject *parent, config *c)
+{
+    applicationDir = QCoreApplication::applicationDirPath();
+    configPath = applicationDir + "/config/config.xml";
+    ratioPath = applicationDir + "/config/ratios.xml"; //TODO: put this in the config instead of here
+    setDefPath();
+    cfg = c;
+}
+
 
 QString configHandler::getResourcesPath()
 {
@@ -180,6 +189,83 @@ void configHandler::fillTrip(trip *tr)
     }
 }
 
+void configHandler::storeTrip(QString trip, QString val)
+{
+    QFile f(configPath);
+    f.open(QIODevice::ReadWrite);
+    QDomElement xt = configXml.firstChild().firstChild().toElement();
+    QDomElement tr;
+    while(!xt.isNull()){
+        if(xt.tagName() == "trip"){
+            tr = xt.firstChild().toElement();
+            QDomElement newNode = configXml.createElement(trip);
+            QDomText newText = configXml.createTextNode(val);
+            newNode.appendChild(newText);
+            xt.replaceChild(newNode, tr);
+            break;
+        }
+        xt = xt.nextSibling().toElement();
+    }
+    f.resize(0);
+    QTextStream stream;
+    stream.setDevice(&f);
+    configXml.save(stream, 4);
+    f.close();
+
+}
+
+//reads the config xml and stores into config map
+void configHandler::parseConfig()
+{
+    QFile f(configPath);
+     if(f.exists()){
+     configXml.setContent(&f);
+     f.close();
+     }
+     QDomElement root = configXml.documentElement();
+     QDomElement category = root.firstChild().toElement();
+     qDebug() << "category: " << category.tagName();
+     while(!category.isNull()){
+         int cat;
+         if(category.tagName() == "defs"){
+             cat = config::DEFS;
+         } else if (category.tagName() == "logger"){
+            cat = config::LOGGER;
+         } else if (category.tagName() == "trip"){
+            cat = config::TRIP;
+         } else if (category.tagName() == "gauges"){
+            cat = config::GAUGES;
+         }
+         QDomElement sub = category.firstChild().toElement();
+         qDebug() << "sub: " << sub.tagName();
+         qDebug() << "childNodes: " << sub.childNodes().count();
+         while(!sub.isNull()){
+             if(sub.childNodes().count() < 2){
+                 qDebug() << "configs[" << cat << "]: " << sub.tagName() << " val: " <<sub.text();
+                 cfg[cat].setValue(sub.tagName(), sub.text());
+             } else {
+                 QDomElement child = sub.firstChild().toElement();
+                 while(!child.isNull()){
+                     if(child.childNodes().count() < 2){
+                         QString tmp = child.tagName();
+                         tmp.replace(0, 1, tmp[0].toUpper());
+                         tmp.prepend(sub.tagName());
+                         qDebug() << "configc: " << tmp << " val: " <<child.text();
+                        cfg[cat].setValue(tmp, child.text());
+                     } else {
+                         qDebug() << "config xml error: too many layers";
+                         break;
+                     }
+                     child = child.nextSibling().toElement();
+                 }
+             }
+             sub = sub.nextSibling().toElement();
+         }
+         category = category.nextSibling().toElement();
+     }
+
+}
+
 void configHandler::clearConfigXml()
 {
     configXml.clear();
@@ -188,7 +274,7 @@ void configHandler::clearConfigXml()
 void configHandler::setDefPath()
 {
 
-    QFile f(configPath);
+   QFile f(configPath);
     if(f.exists()){
     configXml.setContent(&f);
     f.close();

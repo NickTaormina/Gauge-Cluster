@@ -8,12 +8,14 @@
 #include "definition.h"
 #include "gear.h"
 #include "trip.h"
+#include "config.h"
 
 class configHandler : public QObject
 {
     Q_OBJECT
 public:
     explicit configHandler(QObject *parent = nullptr);
+    configHandler(QObject * parent, config *c);
 
 
 
@@ -27,6 +29,8 @@ public slots:
     void fillDefs(QStringList _selectedParams, Definition* def);
     void fillGear(gear* g);
     void fillTrip(trip* tr);
+    void storeTrip(QString trip, QString val);
+    void parseConfig();
 
 private:
     QString applicationDir;
@@ -38,8 +42,10 @@ private:
     QDomDocument configXml;
     QDomDocument defXml;
 
+
     void clearConfigXml();
     void setDefPath();
+    config * cfg;
 
 
 

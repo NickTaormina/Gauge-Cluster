@@ -91,29 +91,67 @@ QByteArray canbus::readFrames(uint frameID)
     return rxmsg;
 }
 
-//reads queued rx frames from the j2534
-QByteArray canbus::readFrames(uint frameID, char filter)
+
+//message with given filter. ignore flag determines if if keeps or ignores msg starting with filter
+QByteArray canbus::readFrames(uint frameID, char filter, int ignore)
 {
     QByteArray rxmsg;
-    _dev->waitForFramesReceived(100);
-    if(_dev){
-        while(_dev->framesAvailable()){
-            const QCanBusFrame frame = _dev->readFrame();
-            if(frame.frameId() == frameID && frame.payload().at(0) != filter){
-                rxmsg.append(frame.payload());
-                qDebug() << "filtered payload: " << frame.payload().toHex();
-            }
+    if(ignore == 1){
+        _dev->waitForFramesReceived(100);
+        if(_dev){
+            while(_dev->framesAvailable()){
+                const QCanBusFrame frame = _dev->readFrame();
+                if(ignore == 1 && frame.frameId() == frameID && frame.payload().at(0) != filter){
+                    rxmsg.append(frame.payload());
+                    qDebug() << "filtered payload: " << frame.payload().toHex();
+                } else if (ignore == 0 && frame.frameId() == frameID && frame.payload().at(0) == filter){
+                    rxmsg.append(frame.payload());
+                    qDebug() << "filtered payload: " << frame.payload().toHex();
+                }
 
+            }
+        } else {
+            printf("no can device");
         }
-    } else {
-        printf("no can device");
+        qDebug() << "rxmsg" << rxmsg;
+
     }
-    qDebug() << "rxmsg" << rxmsg;
     return rxmsg;
 }
 
 //formats tx bytes and sends to ecu
 void canbus::writeFrames(uint frameID, QByteArray bytes)
+{
+    int numFrames = bytes.length()/7; //TODO: separate single frame message better. look if first byte is page#
+    if(_dev){
+        if(numFrames <= 1){
+            QCanBusFrame frame = QCanBusFrame(frameID, bytes);
+            qDebug() << frame.toString();
+            _dev->writeFrame(frame);
+        } else {
+            int count = 0;
+            while(count <= numFrames){
+                QByteArray payload = bytes.mid(1+(7*count), 7);
+                if(count == 0){
+                    payload.insert(0,16).toHex();
+                } else {
+                    payload.insert(0, 33+(count-1)).toHex();
+                }
+
+                QCanBusFrame frame = QCanBusFrame(frameID, payload);
+                _dev->writeFrame(frame);
+                _dev->waitForFramesWritten(50);
+                count ++;
+            }
+        }
+        _dev->waitForFramesWritten(1000);
+        qDebug() << "frames written";
+    } else {
+        printf("failed to send");
+    }
+}
+
+void canbus::writeFrames(uint frameID, QByteArray bytes, uint override)
 {
     int numFrames = bytes.length()/7;
     if(_dev){
