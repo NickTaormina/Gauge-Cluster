@@ -10,6 +10,9 @@
 #include "confighandler.h"
 #include "config.h"
 #include "cel.h"
+#include <QSerialPort>
+#include <QSerialPortInfo>
+#include "serialhandler.h"
 
 
 
@@ -94,6 +97,9 @@ int main(int argc, char *argv[])
         }
         x = x.nextSibling().toElement();
     }
+    serialHandler* shand = new serialHandler(nullptr);
+
+
 
 
     //gauge->gaugeSweep();

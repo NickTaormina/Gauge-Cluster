@@ -172,6 +172,7 @@ void gauges::setParamPointer(parameter *parameter, int length)
 
 
 
+
 }
 
 //resets the active trip
@@ -343,16 +344,16 @@ void gauges::startTimer(){
     }
 }
 void gauges::startTest(){
-    if(!testtimer->isActive()){
+    if(!timer->isActive()){
         qDebug() << "timer started";
         rpmval = 0;
         speedval = 0;
         changeValues();
-        testtimer->start(animDuration);
+        timer->start(animDuration);
         elapsedTimer.start();
 
     } else {
-        testtimer->stop();
+        timer->stop();
     }
 }
 
@@ -373,6 +374,7 @@ void gauges::setOdometer()
 
 void gauges::updateValue()
 {
+    qDebug() << "rpm" << par[rpmIndex].getValue();
     if(speedIndex > -1){
         setRPM();
         setSpeed();

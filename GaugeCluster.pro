@@ -1,4 +1,4 @@
-QT += quick core xml serialbus
+QT += quick core xml serialbus serialport
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -16,6 +16,7 @@ SOURCES += main.cpp \
     gear.cpp \
     logger.cpp \
     parameter.cpp \
+    serialhandler.cpp \
     trip.cpp
 
 RESOURCES += qml.qrc
@@ -43,4 +44,5 @@ HEADERS += \
     gear.h \
     logger.h \
     parameter.h \
+    serialhandler.h \
     trip.h

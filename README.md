@@ -7,7 +7,7 @@ Only tested on a 2018 usdm using cobb v361-based map.
 
 ------Hardware-----
 
--Requires a tactrix cable atm. Direct can connection will be implemented later
+-Requires a tactrix cable atm. Direct can connection will be implemented later (see: https://github.com/NickTaormina/ESP32-CAN)
 
 -Lg la123 or similar. Its a 12.3" 1920x720 display used in oem digital clusters. I got a vdisplay version from amazon that came with a controller board.
 
