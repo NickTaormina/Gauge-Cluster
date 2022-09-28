@@ -21,10 +21,8 @@ int frames::base10Value(char c){
 QString frames::bytes2String(QByteArray bytes){
     return QString(bytes.toHex()).toUpper();
 }
-QString frames::bytes2DecString(QByteArray bytes){
 
-}
-
+//returns the number of digits in input
 int frames::numDigits(int in)
 {
     int l = 1;

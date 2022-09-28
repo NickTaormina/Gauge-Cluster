@@ -59,6 +59,10 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
     statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
 
+    //set the trip indicator value on startup
+    tripNum->setProperty("text", _trip->getTrip());
+
+
     //TODO: don't start requesting data until gauge sweep done
     sweepFinished = 0;
     if(initialGaugeSweep == 1){

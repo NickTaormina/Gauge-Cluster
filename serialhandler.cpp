@@ -1,5 +1,6 @@
 #include "serialhandler.h"
-
+#include <QEventLoop>
+#include <QTimer>
 
 serialHandler::serialHandler(QObject *parent)
     : QObject{parent}
@@ -37,11 +38,64 @@ serialHandler::serialHandler(QObject *parent)
     serial->write("WRITE:[2016] [01] [170] [0] [0] [0] [0] [0] [0] /");
 
     serialString = "";
+
+    qDebug() << "processed frame test: " << uartToFrame("READ:[2016] [01] [170] [255] [4] [22] [39] [57] [02]").toString();
+}
+
+//returns true if message is received
+bool serialHandler::waitForFramesReceived(int msecs)
+{
+    enum {Received = 0, Error, Timeout};
+    QEventLoop loop;
+    QObject::connect(serial, &QSerialPort::readyRead, &loop, [&]() {loop.exit(Received);});
+    if(msecs >= 0){
+        QTimer::singleShot(msecs, &loop, [&]() {loop.exit(Timeout);});
+    }
+    int result = loop.exec(QEventLoop::ExcludeUserInputEvents);
+    if(result == Timeout){
+        qDebug() << "frame timed out";
+    }
+    return result;
+}
+
+//waits for ecu response and returns all responses if received. if multi part message, it'll keep adding payload
+//to array until it times out.
+//TODO: exit based on msg length from ecu
+QByteArray serialHandler::waitForEcuResponse(int msecs)
+{
+    int multiPartMsg = 0;
+    QByteArray rx;
+    enum {Received = 0, Error, Timeout};
+    QEventLoop loop;
+    //QObject::connect(this, &serialHandler::ecuResponse, &loop, [&]() {loop.exit(Received);});
+    QObject::connect(this, &serialHandler::ecuResponse, [&rx, &multiPartMsg, &loop] (QCanBusFrame lamFrame) {
+        if(lamFrame.payload().at(0) == 10){
+            qDebug() << "multi part msg";
+            multiPartMsg = 1;
+        }
+        qDebug() << "lam test: " << lamFrame.toString();
+        rx.append(lamFrame.payload());
+        qDebug() << "frame set test: " << QString(rx.toHex().toUpper());
+        if(multiPartMsg != 1){
+            loop.exit(Received);
+        }
+    } );
+    if(msecs >= 0){
+        QTimer::singleShot(msecs, &loop, [&]() {loop.exit(Timeout);});
+    }
+    int result = loop.exec(QEventLoop::ExcludeUserInputEvents);
+    if(result == Timeout){
+        qDebug() << "frame timed out";
+    }
+    return rx;
 }
 
 
+//processing for all received serial messages
+//if given READ: command, turn it into a frame
 void serialHandler::serialReceived()
 {
+
     rxbuffer = serial->readAll();
     serialString += QString::fromStdString(rxbuffer.toStdString());
     QStringList bufferSplit = serialString.split("\\");
@@ -51,7 +105,11 @@ void serialHandler::serialReceived()
                 qDebug() << "split: " << i << " : " << bufferSplit.at(i);
                 if(bufferSplit.at(i).contains("READ:")){
                     //do stuff with read message
-                    emit messageRead();
+                    currentFrame = uartToFrame(bufferSplit.at(i));
+                    if(currentFrame.frameId() == 2024){
+                        emit ecuResponse(currentFrame);
+                    }
+                    emit messageRead(currentFrame);
                     qDebug() << "READ: ";
                 }
                 rxbuffer.clear();
@@ -65,10 +123,53 @@ void serialHandler::serialReceived()
 
 }
 
-//fills in frame when messageRead is called
-QCanBusFrame serialHandler::readFrame()
+//returns a filled frame from given esp32 message
+QCanBusFrame serialHandler::uartToFrame(QString msg)
 {
+    QCanBusFrame frame;
+    int i = 0;
 
+    //loop for frame id
+    while(i < msg.length()){
+        if(msg.at(i) == "["){
+            QString tmp;
+            int x = 1;
+            while(x<6){
+                if(msg.at(i+x) != "]"){
+                    tmp.append(msg.at(i+x));
+                    x = x + 1;
+                } else {
+                    frame.setFrameId(fr.string2Uint(tmp));
+                    break;
+                }
+            }
+            i = i + x;
+            break;
+        }
+        i = i + 1;
+    }
+    QByteArray payload;
+    while(i < msg.length()){
+            if(msg.at(i) == "["){
+                QString tmp;
+                int x = 1;
+                while(x<5){
+                    if(msg.at(i+x) != "]"){
+                        tmp.append(msg.at(i+x));
+                        x = x + 1;
+                    } else {
+                        payload.append(tmp.toUInt(nullptr, 10));
+                        tmp.clear();
+                        break;
+                    }
+                }
+                i = i + x;
+            }
+            i = i + 1;
+        }
+    frame.setPayload(payload);
+    emit ecuResponse(frame);
+    return frame;
 }
 
 //creates and sends the write message to the esp32

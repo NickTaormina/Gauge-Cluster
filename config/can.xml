@@ -1,0 +1,102 @@
+<CAN>
+	<param name="Coolant Temp">
+		<id>864</id>
+		<byte length = "1">3</byte>
+		<conv>1</conv>
+		<offset>-40</offset>
+	</param>
+	<param name="Oil Temp">
+		<id>864</id>
+		<byte length = "1">2</byte>
+		<conv>1</conv>
+		<offset>-40</offset>
+	</param>
+	<param name="Accelerator Position">
+		<id>320</id>
+		<byte length = "1">0</byte>
+		<conv>0.39216</conv>
+		<offset>0</offset>
+	</param>
+	<param name="Brake Position">
+		<id>209</id>
+		<byte length = "1">2</byte>
+		<conv>1</conv>
+		<offset>0</offset>
+	</param>
+	<param name="Turn Signals">
+		<id>642</id>
+		<byte length = "1">5</byte>
+		<targets>
+			<target name="left">17</target>
+			<target name="right">33</target>
+			<target name="hazard">49</target>
+			<target name="off">1</target>
+		</targets>
+	</param>
+	<param name="Handbrake">
+		<id>338</id>
+		<byte length = "1">6</byte>
+		<targets>
+			<target name="engaged">8</target>
+			<target name="disengaged">0</target>
+		</targets>
+	</param>
+	<param name="Lights">
+		<id>338</id>
+		<byte length = "1">7</byte>
+		<targets>
+			<target name="off">128</target>
+			<target name="park">132</target>
+			<target name="on">140</target>
+		</targets>
+	</param>
+	<param name="Defrost">
+		<id>640</id>
+		<byte length = "1">0</byte>
+		<bits>3</bits>
+		<targets>
+			<target name="off">0</target>
+			<target name="on">1</target>
+		</targets>
+	</param>
+	<param name="AC Fan">
+		<id>640</id>
+		<byte length = "1">0</byte>
+		<targets>
+			<target name="off">1</target>
+			<target name="1">3</target>
+			<target name="2">5</target>
+			<target name="3">7</target>
+			<target name="4">9</target>
+			<target name="5">11</target>
+			<target name="6">13</target>
+			<target name="7">15</target>
+		</targets>
+	</param>
+	<param name="AC Temp">
+		<id>641</id>
+		<byte length = "1">2</byte>
+		<conv>1</conv>
+		<offset>0</offset>
+		<targets>
+			<target name="High">176</target>
+			<target name="Low">14</target>
+		</targets>
+	</param>
+	<param name="Neutral Switch">
+		<id>321</id>
+		<byte length = "1">6</byte>
+		<targets>
+			<target name="Neutral">27</target>
+			<target name="Gear">20</target>
+		</targets>
+	</param>
+	<param name="Reverse Switch">
+		<id>338</id>
+		<byte length = "1">6</byte>
+		<targets>
+			<target name="Reverse">12</target>
+			<target name="Gear">8</target>
+		</targets>
+	</param>
+</CAN>

@@ -80,10 +80,8 @@ QByteArray canbus::readFrames()
             printf("no can device");
         }
     } else {
-        const QCanBusFrame frame = serial->readFrame();
-        rxmsg.append(frame.payload());
-        qDebug() << "payload: " << frame.payload();
-
+        rxmsg = serial->waitForEcuResponse(100);
+        qDebug() << "tried to read from esp32:";
     }
     qDebug() << "rxmsg" << rxmsg;
     return rxmsg;
@@ -103,6 +101,8 @@ QByteArray canbus::readFrames(uint frameID)
             qDebug() << "payload: " << frame.payload();
         }
     } else {
+
+
         printf("no can device");
     }
     qDebug() << "rxmsg" << rxmsg;

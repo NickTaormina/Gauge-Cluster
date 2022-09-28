@@ -6,6 +6,8 @@ QT += quick core xml serialbus serialport
 
 SOURCES += main.cpp \
     canbus.cpp \
+    candata.cpp \
+    candef.cpp \
     cel.cpp \
     config.cpp \
     confighandler.cpp \
@@ -34,6 +36,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     canbus.h \
+    candata.h \
+    candef.h \
     cel.h \
     config.h \
     confighandler.h \
