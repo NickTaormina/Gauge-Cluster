@@ -13,7 +13,7 @@ public:
     void setValue(QString key, QString val);
     QString getValue(QString key);
     enum {
-        DEFS, LOGGER, TRIP, GAUGES
+        DEFS, CAN, LOGGER, TRIP, GAUGES
     };
 
 

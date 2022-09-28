@@ -12,6 +12,9 @@ public:
     QString bytes2String(QByteArray bytes);
     QByteArray string2Bytes(QString str);
     uint string2Uint(QString str);
+    QString bytes2DecString(QByteArray bytes);
+
+    int numDigits(int in);
 };
 
 #endif // FRAMES_H

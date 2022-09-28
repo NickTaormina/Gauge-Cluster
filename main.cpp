@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
 
 
-    canbus can;
+    canbus can(nullptr, cfg);
     parameter* par;
     can.connectToCanDevice();
     logger* log= new logger(nullptr, &can, par, &def);
@@ -97,7 +97,6 @@ int main(int argc, char *argv[])
         }
         x = x.nextSibling().toElement();
     }
-    serialHandler* shand = new serialHandler(nullptr);
 
 
 

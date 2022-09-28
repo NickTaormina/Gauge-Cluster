@@ -34,6 +34,7 @@ void logger::log(){
 
             //send the bytes
             can->writeFrames(fr.string2Uint("000007E0"), definition->getTxBytes());
+            /*
             //read the received bytes. filter out acknowledge message
             QByteArray rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("48"), 1);
 
@@ -88,6 +89,7 @@ void logger::log(){
                 }
 
             rxmsg.clear();
+            */
 
         } else {
             qDebug() << "error: no device or message";
@@ -99,7 +101,7 @@ void logger::log(){
 void logger::startLogging()
 {
     if(!timer->isActive()){
-        timer->start(100);
+        timer->start(2000);
     } else {
         stopLogging();
     }

@@ -21,6 +21,19 @@ int frames::base10Value(char c){
 QString frames::bytes2String(QByteArray bytes){
     return QString(bytes.toHex()).toUpper();
 }
+QString frames::bytes2DecString(QByteArray bytes){
+
+}
+
+int frames::numDigits(int in)
+{
+    int l = 1;
+    //gets number of digits
+    while(in/=10){
+        l++;
+    }
+    return l;
+}
 
 //converts string to payload for user frame transmission
 QByteArray frames::string2Bytes(QString str){
@@ -29,6 +42,7 @@ QByteArray frames::string2Bytes(QString str){
     return QByteArray::fromHex(str.toLatin1());
 }
 
+//turns string to uint for frame id
 uint frames::string2Uint(QString str)
 {
     return str.toUInt(nullptr, 16);

@@ -315,11 +315,6 @@ void gauges::gaugeSweep()
 {
     sweepForward();
 
-
-
-
-
-
 }
 
 void gauges::findSpeedIndex()
@@ -349,11 +344,11 @@ void gauges::startTest(){
         rpmval = 0;
         speedval = 0;
         changeValues();
-        timer->start(animDuration);
+        testtimer->start(animDuration);
         elapsedTimer.start();
 
     } else {
-        timer->stop();
+        testtimer->stop();
     }
 }
 
