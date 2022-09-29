@@ -7,13 +7,10 @@ canData::canData(QObject *parent)
 }
 canData::canData(canDef *def, int count)
 {
+    qDebug() << "candata const";
     //populate local variables
     defCount = count;
-    _def = def;
-    for(int i = 0; i < defCount; i++){
-       nameList.append(_def[i].getName());
-       idList.append(_def[i].getFrameID());
-    }
+
 
     //signals
     connect(this, &canData::usefulFrameReceived, this, &canData::processUsefulFrame);
@@ -27,6 +24,18 @@ void canData::receiveCanData(QCanBusFrame frame)
         emit usefulFrameReceived(frame);
     } else {
         return;
+    }
+}
+
+void canData::fillData(canDef *def, int count)
+{
+    defCount = count;
+    _def = def;
+    qDebug() << "candata set";
+    for(int i = 0; i < defCount; i++){
+        qDebug() << "can name: " << _def[i].getName();
+       nameList.append(_def[i].getName());
+       idList.append(_def[i].getFrameID());
     }
 }
 
@@ -57,10 +66,11 @@ void canData::emitter(QString name, QString status)
 //TODO: processing for bit specific values like defrost
 void canData::targetProcess(QMap<uint, QString> t, QByteArray p, int index)
 {
-    QList<int> bytes = _def[index].getBytes();
+    QStringList bytes;
+    bytes.append(_def[index].getBytes());
     QByteArray tmp;
     for(int i = 0; i<bytes.length(); i++){
-        tmp.append(p.at(bytes.at(i)));
+        tmp.append(p.at(bytes.at(i).toUInt(nullptr, 10)));
     }
     uint x = tmp.toUInt(nullptr, 10); //can data assumed to be in base 10
     if(t.contains(x)){
@@ -74,10 +84,11 @@ void canData::targetProcess(QMap<uint, QString> t, QByteArray p, int index)
 //processes can info for def that acts like normal parameter (ex: oil temp)
 void canData::valueProcess(QByteArray p, int index)
 {
-    QList<int> bytes = _def[index].getBytes();
+    QStringList bytes;
+    bytes.append(_def[index].getBytes());
     QByteArray tmp;
     for(int i = 0; i<bytes.length(); i++){
-        tmp.append(p.at(bytes.at(i)));
+        tmp.append(p.at(bytes.at(i).toUInt(nullptr, 10)));
     }
     uint x = tmp.toUInt(nullptr, 10);
     double value;

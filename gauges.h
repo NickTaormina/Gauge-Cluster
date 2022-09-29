@@ -8,13 +8,14 @@
 #include "gear.h"
 #include "trip.h"
 #include "config.h"
+#include "candata.h"
 
 class gauges : public QObject
 {
     Q_OBJECT
 public:
     explicit gauges(QObject *parent = nullptr);
-    gauges(QObject *parent, QObject * main, gear* gear, trip* tr, config* cfg);
+    gauges(QObject *parent, QObject * main, gear* gear, trip* tr, config* cfg, canData *data);
 
 signals:
 void tripUpdated(QString trip, QString val);
@@ -31,6 +32,11 @@ public slots:
     void sweepForward();
     void sweepBack();
 
+    //can indicators
+    void updateLights(QString status);
+    void updateTurnSignals(QString status);
+    void updateNeutral(QString status);
+    void updateReverse(QString status);
 private:
 
     int minRPM;
@@ -67,7 +73,7 @@ private:
 
 
 
-    //ui objects
+    //ui gauge objects
     QObject * tachNeedle;
     QObject * speedoNeedle;
     QObject * fuelNeedle;
@@ -77,6 +83,11 @@ private:
     QObject * geartext;
     QObject * tripNum;
     QObject * statustext;
+
+    //ui status objects
+    QObject * leftSignal;
+    QObject * rightSignal;
+    QObject * lightIndicator;
 
     //timers
     QTimer* timer;

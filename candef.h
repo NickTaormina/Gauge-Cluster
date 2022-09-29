@@ -16,8 +16,8 @@ public:
     uint getFrameID() const;
     void setFrameID(uint newFrameID);
 
-    const QList<int> &getBytes() const;
-    void setBytes(const QList<int> &newBytes);
+    const QStringList &getBytes() const;
+    void setBytes(const QStringList &newBytes);
 
     float getConv() const;
     void setConv(float newConv);
@@ -33,7 +33,7 @@ signals:
 private:
     QString name;
     uint FrameID;
-    QList<int> bytes;
+    QStringList bytes;
     float conv;
     int offset;
     QMap<uint, QString> targets;

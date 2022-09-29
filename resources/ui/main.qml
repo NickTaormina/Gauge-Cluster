@@ -472,6 +472,7 @@ Window{
 
         Image {
             id: rightSignal
+            objectName:"rightSignal"
             x: 1216
             y: 125
             width: 64
@@ -486,6 +487,7 @@ Window{
 
         Image {
             id: leftSignal
+            objectName:"leftSignal"
             x: 640
             y: 125
             width: 64
@@ -501,6 +503,7 @@ Window{
 
         Image {
             id: lightIndicator
+            objectName:"lightIndicator"
             x: 1260
             y: 76
             width: 64

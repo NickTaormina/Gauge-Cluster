@@ -26,6 +26,7 @@ signals:
     void valueChanged(QString name, double value);
 public slots:
     void receiveCanData(QCanBusFrame frame);
+    void fillData(canDef* def, int count);
 private:
     QStringList nameList;
     QList<uint> idList;

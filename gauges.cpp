@@ -6,7 +6,7 @@ gauges::gauges(QObject *parent)
 {
 }
 
-gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg)
+gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg, canData * data)
 {
     parent = nullptr;
     //timers
@@ -47,7 +47,7 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
     _trip = tr;
     activeTrip = "tripA";
 
-    //find ui elements to control. should probably move these to QML
+    //find ui gauge elements to control. should probably move these to QML
     tachNeedle = main->findChild<QObject*>("tachneedle", Qt::FindChildrenRecursively);
     speedoNeedle = main->findChild<QObject*>("speedoneedle", Qt::FindChildrenRecursively);
     fuelNeedle = main->findChild<QObject*>("fuelneedle", Qt::FindChildrenRecursively);
@@ -57,6 +57,11 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
     geartext = main->findChild<QObject*>("gearText", Qt::FindChildrenRecursively);
     tripNum = main->findChild<QObject*>("tripNum", Qt::FindChildrenRecursively);
     statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
+
+    //finds ui status elements to control. ex: turn signals
+    leftSignal = main->findChild<QObject*>("leftSignal", Qt::FindChildrenRecursively);
+    rightSignal = main->findChild<QObject*>("rightSignal", Qt::FindChildrenRecursively);
+    lightIndicator = main->findChild<QObject*>("lightIndicator", Qt::FindChildrenRecursively);
 
 
     //set the trip indicator value on startup
@@ -315,12 +320,77 @@ void gauges::sweepBack()
     sweepFinished = 1;
 }
 
+//updates the light indicator based on light status
+void gauges::updateLights(QString status)
+{
+    if(status == "on"){
+        qDebug() << "lights on"; //icon visible
+        lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
+        lightIndicator->setProperty("opacity", 1.0);
+    } else if (status == "park"){
+        qDebug() << "parking lights on"; //icon visible (maybe dimmed)
+        lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
+        lightIndicator->setProperty("opacity", 0.7);
+    } else{
+        //off
+        qDebug() << "lights off"; //icon not visible
+        lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOff.svg");
+    }
+}
+
+//shows which turn signals are on/off
+void gauges::updateTurnSignals(QString status)
+{
+    if(status == "left"){
+        qDebug() << "left signal";
+        leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
+        rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
+    } else if (status == "right"){
+        qDebug() << "right signal";
+        leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
+        rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
+    } else if (status == "hazard"){
+        qDebug() << "hazards";
+        leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
+        rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
+    } else{
+        //off
+        qDebug() << "turn signals off";
+        leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
+        rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
+    }
+}
+
+//sets gear indicator to N when in neutral
+void gauges::updateNeutral(QString status)
+{
+    if(status == "Neutral"){
+        geartext->setProperty("text", "N");
+        qDebug() << "neutral";
+    } else {
+        updateGear();
+    }
+}
+
+//sets gear indicator to R when in reverse
+void gauges::updateReverse(QString status)
+{
+    if(status == "Reverse"){
+        geartext->setProperty("text", "R");
+        qDebug() << "Reverse";
+    } else {
+        updateGear();
+    }
+}
+
+
+//startup gauge sweep controller
 void gauges::gaugeSweep()
 {
     sweepForward();
-
 }
 
+//finds the parameter for vehicle speed
 void gauges::findSpeedIndex()
 {
     for(int i = 0; i < paramLength; i++){
@@ -342,6 +412,8 @@ void gauges::startTimer(){
         timer->stop();
     }
 }
+
+//starts/stops the test sweep
 void gauges::startTest(){
     if(!timer->isActive()){
         qDebug() << "timer started";
@@ -351,11 +423,13 @@ void gauges::startTest(){
         testtimer->start(animDuration);
         elapsedTimer.start();
 
+
     } else {
         testtimer->stop();
     }
 }
 
+//sets the odometer text
 void gauges::setOdometer()
 {
     int digits = 6;
@@ -371,9 +445,9 @@ void gauges::setOdometer()
     odotext->setProperty("text", (QVariant)str);
 }
 
+//updates all gauges based on ecu response data
 void gauges::updateValue()
 {
-    qDebug() << "rpm" << par[rpmIndex].getValue();
     if(speedIndex > -1){
         setRPM();
         setSpeed();
@@ -384,7 +458,7 @@ void gauges::updateValue()
     }
 }
 
-
+//controls the test sweep
 void gauges::changeValues(){
     par[rpmIndex].setValue(rpmval);
     if(rpmval < maxRPM){
@@ -412,6 +486,11 @@ void gauges::changeValues(){
             par[fbkIndex].setValue(fbk);
         }
     }
+
+    if(rpmval >= 2400 && rpmval <= 2800){
+        updateReverse("Reverse");
+    }
+
     par[fklIndex].setValue(0);
     par[damIndex].setValue(1.0);
     odoval = odoval + 2;

@@ -10,6 +10,7 @@ configHandler::configHandler(QObject *parent)
     applicationDir = QCoreApplication::applicationDirPath();
     configPath = applicationDir + "/config/config.xml";
     ratioPath = applicationDir + "/config/ratios.xml"; //TODO: put this in the config instead of here
+    canPath = applicationDir + "/config/can.xml";
     setDefPath();
 
 }
@@ -20,6 +21,7 @@ configHandler::configHandler(QObject *parent, config *c)
     configPath = applicationDir + "/config/config.xml";
     ratioPath = applicationDir + "/config/ratios.xml"; //TODO: put this in the config instead of here
     setDefPath();
+    canPath = applicationDir + "/config/can.xml";
     cfg = c;
 }
 
@@ -264,6 +266,91 @@ void configHandler::parseConfig()
          category = category.nextSibling().toElement();
      }
 
+}
+
+//fills the can def object from xml
+void configHandler::fillCan(canDef *d)
+{
+    qDebug() << "can path" << canPath;
+    QDomDocument canXml;
+    QFile f(canPath);
+     if(f.exists()){
+     canXml.setContent(&f);
+     f.close();
+     }
+     QDomElement root = canXml.documentElement();
+     qDebug() << "can root: " << root.tagName();
+     QDomElement param = root.firstChild().toElement();
+     qDebug() << "can param: " << param.tagName();
+
+     canCount = 0;
+     //gets number of params
+     while(!param.isNull()){
+         canCount = canCount + 1;
+         param = param.nextSibling().toElement();
+     }
+
+
+     param = root.firstChild().toElement();
+     int pos = 0;
+     while(!param.isNull()){
+         QDomElement sub = param.firstChild().toElement();
+         while(!sub.isNull()){
+             if(sub.tagName() == "id"){
+                 qDebug() << "setting can def: " << param.attribute("name");
+                d[pos].setName(param.attribute("name"));
+             } else if (sub.tagName() == "byte"){
+                 QString byte = sub.text();
+                 QStringList tmp;
+                 for(int x = 0; x<byte.length(); x++){
+                    tmp.append(byte.at(x));
+                 }
+                 d[pos].setBytes(tmp);
+             } else if (sub.tagName() == "conv"){
+                d[pos].setConv(sub.text().toDouble(nullptr));
+             }
+             else if (sub.tagName() == "offset"){
+                d[pos].setOffset(sub.text().toInt(nullptr, 10));
+             }
+             else if (sub.tagName() == "targets"){
+                QMap<uint, QString> tmp;
+                QDomElement tar = sub.firstChild().toElement();
+                while(!tar.isNull()){
+                    tmp.insert(tar.text().toUInt(nullptr, 10), tar.attribute("name"));
+                    tar = tar.nextSibling().toElement();
+                }
+
+             }
+             sub = sub.nextSibling().toElement();
+         }
+         pos = pos + 1;
+         param = param.nextSibling().toElement();
+     }
+     qDebug() << "can filled";
+     qDebug() << "can test: " << d[canCount-4].getName();
+     emit canFilled();
+
+}
+
+int configHandler::getCanCount()
+{
+    QDomDocument canXml;
+    QFile f(canPath);
+     if(f.exists()){
+     canXml.setContent(&f);
+     f.close();
+     }
+     QDomElement root = canXml.documentElement();
+     QDomElement param = root.firstChild().toElement();
+
+     canCount = 0;
+     //gets number of params
+     while(!param.isNull()){
+         canCount = canCount + 1;
+         param = param.nextSibling().toElement();
+     }
+    qDebug() << "can count: " << canCount;
+    return canCount;
 }
 
 void configHandler::clearConfigXml()

@@ -53,6 +53,15 @@ int main(int argc, char *argv[])
     defWin.parseDefs();
     qDebug() << defWin.params();
 
+    qDebug() << "main can count: " << hand.getCanCount();
+    canDef * _candef = new canDef[hand.getCanCount()];
+    canData _canData(_candef, hand.getCanCount());
+    QObject::connect(&hand, &configHandler::canFilled, [&_canData, &_candef, &hand](){
+        qDebug() << "fill can from connect";
+        _canData.fillData(_candef, hand.getCanCount());
+    } );
+    hand.fillCan(_candef);
+
 
 
     canbus can(nullptr, cfg);
@@ -75,7 +84,7 @@ int main(int argc, char *argv[])
     QObject* main = obj.at(0);
     QObject * statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
-    gauges* gauge = new gauges(nullptr, main, &gr, &tr, &cfg[config::GAUGES]);
+    gauges* gauge = new gauges(nullptr, main, &gr, &tr, &cfg[config::GAUGES], &_canData);
     QObject::connect(log, &logger::setParams, gauge, &gauges::setParamPointer);
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
     QObject::connect(gauge, &gauges::tripUpdated, &hand, &configHandler::storeTrip);
@@ -98,6 +107,9 @@ int main(int argc, char *argv[])
         x = x.nextSibling().toElement();
     }
 
+
+    //cannects can data to gauges
+    QObject::connect(&_canData, &canData::neutralSwitch, gauge, &gauges::updateNeutral);
 
 
 

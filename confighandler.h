@@ -9,6 +9,8 @@
 #include "gear.h"
 #include "trip.h"
 #include "config.h"
+#include "candef.h"
+#include "candata.h"
 
 class configHandler : public QObject
 {
@@ -21,6 +23,7 @@ public:
 
 signals:
     void defsFilled();
+    void canFilled();
 public slots:
     QString getResourcesPath();
     QString getConfigPath();
@@ -31,13 +34,16 @@ public slots:
     void fillTrip(trip* tr);
     void storeTrip(QString trip, QString val);
     void parseConfig();
+    void fillCan(canDef * d);
 
+    int getCanCount();
 private:
     QString applicationDir;
     QString _defPath;
     QString ratioPath;
     QString configPath;
     QString resourcesPath;
+    QString canPath;
 
     QDomDocument configXml;
     QDomDocument defXml;
@@ -46,6 +52,8 @@ private:
     void clearConfigXml();
     void setDefPath();
     config * cfg;
+
+    int canCount;
 
 
 

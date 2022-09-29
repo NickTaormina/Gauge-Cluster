@@ -26,12 +26,12 @@ void canDef::setFrameID(uint newFrameID)
     FrameID = newFrameID;
 }
 
-const QList<int> &canDef::getBytes() const
+const QStringList &canDef::getBytes() const
 {
     return bytes;
 }
 
-void canDef::setBytes(const QList<int> &newBytes)
+void canDef::setBytes(const QStringList &newBytes)
 {
     bytes = newBytes;
 }
