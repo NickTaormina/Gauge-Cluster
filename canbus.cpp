@@ -10,10 +10,11 @@ canbus::canbus(QObject *parent)
 
 }
 
-canbus::canbus(QObject *parent, config *c)
+canbus::canbus(QObject *parent, config *c, serialHandler* s)
 {
     parent = nullptr;
     setConfigVars(c);
+    serial = s;
 }
 
 QCanBusDevice *canbus::dev()
@@ -114,7 +115,7 @@ QByteArray canbus::readFrames(uint frameID)
 QByteArray canbus::readFrames(uint frameID, char filter, int ignore)
 {
     QByteArray rxmsg;
-    if(ignore == 1){
+    if(useJ2534 == 1){
         _dev->waitForFramesReceived(100);
         if(_dev){
             while(_dev->framesAvailable()){
@@ -133,7 +134,11 @@ QByteArray canbus::readFrames(uint frameID, char filter, int ignore)
         }
         qDebug() << "rxmsg" << rxmsg;
 
+    } else {
+        rxmsg = serial->waitForEcuResponse(100);
+        qDebug() << "tried to read from esp32:";
     }
+    qDebug() << "rxmsg" << rxmsg;
     return rxmsg;
 }
 
@@ -171,6 +176,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
         }
     } else {
         if(serial){
+            qDebug() << "canbus write frame";
             if(numFrames <= 1){
                 QCanBusFrame frame = QCanBusFrame(frameID, bytes);
                 qDebug() << frame.toString();
@@ -253,9 +259,7 @@ bool canbus::isConnected()
 void canbus::setConfigVars(config *cfg)
 {
     useJ2534 = cfg->getValue("useJ2534").toInt(nullptr, 10);
-    if(useJ2534 == 0){
-        serial = new serialHandler(this);
-    }
+
     qDebug() << "j2534: " << useJ2534;
     baudRate = cfg->getValue("baudRate").toInt(nullptr, 10);
     qDebug() << "baudrate: " << baudRate;

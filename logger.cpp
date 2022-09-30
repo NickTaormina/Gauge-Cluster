@@ -34,11 +34,12 @@ void logger::log(){
 
             //send the bytes
             can->writeFrames(fr.string2Uint("000007E0"), definition->getTxBytes());
-            /*
+
             //read the received bytes. filter out acknowledge message
             QByteArray rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("48"), 1);
-
+                qDebug() << "rxmsg in logger: " << rxmsg;
                 //look for the starting point of the actual useful data. after the first "E8" byte
+
                 if(!rxmsg.isEmpty()){
                     int pos = -1;
                     for(int i = 0; i < rxmsg.size(); i++){
@@ -89,11 +90,12 @@ void logger::log(){
                 }
 
             rxmsg.clear();
-            */
+
 
         } else {
             qDebug() << "error: no device or message";
         }
+    qDebug() << "logger finished";
 
 }
 

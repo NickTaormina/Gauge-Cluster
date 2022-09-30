@@ -116,6 +116,7 @@ private:
     //class objects
     gear* g;
     trip* _trip;
+    canData * _data;
 signals:
     void sweepDone();
 };

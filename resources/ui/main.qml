@@ -517,6 +517,25 @@ Window{
             fillMode: Image.PreserveAspectFit
         }
 
+        Button {
+            id: settingsBtn
+            objectName: "settingsBtn"
+            x: 901
+            y: 44
+            width: 118
+            height: 40
+            text: qsTr("Settings")
+            background: Rectangle {
+                color: "#5c5c5c"
+                radius: 10
+            }
+            onClicked:{
+                var component = Qt.createComponent("SettingsWindow.qml")
+                var win = component.createObject(root)
+                win.show
+
+            }
+        }
 
 
 

@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>resources\ui\main.qml</file>
         <file>resources\ui\DefinitionWindow.qml</file>
+		<file>resources\ui\SettingsWindow.qml</file>
     </qresource>
 </RCC>

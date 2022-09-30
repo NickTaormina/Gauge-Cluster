@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
     hand.fillCan(_candef);
 
 
-
-    canbus can(nullptr, cfg);
+    serialHandler shand;
+    canbus can(nullptr, cfg, &shand);
     parameter* par;
     can.connectToCanDevice();
     logger* log= new logger(nullptr, &can, par, &def);
@@ -110,6 +110,7 @@ int main(int argc, char *argv[])
 
     //cannects can data to gauges
     QObject::connect(&_canData, &canData::neutralSwitch, gauge, &gauges::updateNeutral);
+    QObject::connect(&shand, &serialHandler::messageRead, &_canData, &canData::receiveCanData);
 
 
 

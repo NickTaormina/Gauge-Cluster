@@ -45,6 +45,7 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
 
     g = gear;
     _trip = tr;
+    _data = data;
     activeTrip = "tripA";
 
     //find ui gauge elements to control. should probably move these to QML
@@ -74,6 +75,9 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
         gaugeSweep();
     }
 
+    QObject::connect(_data, &canData::turnSignal, this, &gauges::updateTurnSignals);
+    QObject::connect(_data, &canData::lights, this, &gauges::updateLights);
+     QObject::connect(_data, &canData::reverseSwitch, this, &gauges::updateReverse);
 }
 
 
@@ -324,16 +328,16 @@ void gauges::sweepBack()
 void gauges::updateLights(QString status)
 {
     if(status == "on"){
-        qDebug() << "lights on"; //icon visible
+        //qDebug() << "lights on"; //icon visible
         lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
         lightIndicator->setProperty("opacity", 1.0);
     } else if (status == "park"){
-        qDebug() << "parking lights on"; //icon visible (maybe dimmed)
+        //qDebug() << "parking lights on"; //icon visible (maybe dimmed)
         lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
         lightIndicator->setProperty("opacity", 0.7);
     } else{
         //off
-        qDebug() << "lights off"; //icon not visible
+        //qDebug() << "lights off"; //icon not visible
         lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOff.svg");
     }
 }
@@ -341,21 +345,22 @@ void gauges::updateLights(QString status)
 //shows which turn signals are on/off
 void gauges::updateTurnSignals(QString status)
 {
+    //qDebug() << "updating turn signals";
     if(status == "left"){
-        qDebug() << "left signal";
+        //qDebug() << "left signal";
         leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
         rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
     } else if (status == "right"){
-        qDebug() << "right signal";
+        //qDebug() << "right signal";
         leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
         rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
     } else if (status == "hazard"){
-        qDebug() << "hazards";
+        //qDebug() << "hazards";
         leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
         rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
     } else{
         //off
-        qDebug() << "turn signals off";
+        //qDebug() << "turn signals off";
         leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
         rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
     }
@@ -366,7 +371,7 @@ void gauges::updateNeutral(QString status)
 {
     if(status == "Neutral"){
         geartext->setProperty("text", "N");
-        qDebug() << "neutral";
+        //qDebug() << "neutral";
     } else {
         updateGear();
     }
@@ -377,7 +382,7 @@ void gauges::updateReverse(QString status)
 {
     if(status == "Reverse"){
         geartext->setProperty("text", "R");
-        qDebug() << "Reverse";
+        ///=qDebug() << "Reverse";
     } else {
         updateGear();
     }

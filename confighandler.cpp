@@ -299,6 +299,7 @@ void configHandler::fillCan(canDef *d)
              if(sub.tagName() == "id"){
                  qDebug() << "setting can def: " << param.attribute("name");
                 d[pos].setName(param.attribute("name"));
+                d[pos].setFrameID(sub.text().toUInt(nullptr, 10));
              } else if (sub.tagName() == "byte"){
                  QString byte = sub.text();
                  QStringList tmp;
@@ -317,8 +318,10 @@ void configHandler::fillCan(canDef *d)
                 QDomElement tar = sub.firstChild().toElement();
                 while(!tar.isNull()){
                     tmp.insert(tar.text().toUInt(nullptr, 10), tar.attribute("name"));
+                    qDebug() << "target: " << tar.text().toUInt(nullptr, 10) << " name: " << tar.attribute("name");
                     tar = tar.nextSibling().toElement();
                 }
+                d[pos].setTargets(tmp);
 
              }
              sub = sub.nextSibling().toElement();

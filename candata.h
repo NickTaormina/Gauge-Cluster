@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include <QCanBus>
-#include <canbus.h>
+#include "canbus.h"
 #include "candef.h"
 
 class canData : public QObject

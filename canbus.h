@@ -6,12 +6,13 @@
 #include "config.h"
 #include "serialhandler.h"
 
+
 class canbus : public QObject
 {
     Q_OBJECT
 public:
     explicit canbus(QObject *parent = nullptr);
-    canbus(QObject *parent, config * c);
+    canbus(QObject *parent, config * c, serialHandler * s);
     QCanBusDevice* dev();
     void connectToCanDevice();
     QByteArray readFrames();
