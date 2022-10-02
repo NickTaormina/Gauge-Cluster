@@ -43,7 +43,7 @@ void canData::fillData(canDef *def, int count)
 }
 
 
-//emits signal with can status (from def) for cluster to handle
+//emits signal with can STATUS (from def) for cluster to handle
 void canData::emitter(QString name, QString status)
 {
     if(name == "Turn Signals"){
@@ -65,6 +65,14 @@ void canData::emitter(QString name, QString status)
     }
 }
 
+//emits signal with can VALUE (from def) for cluster to handle
+void canData::valueEmitter(QString name, double value)
+{
+    if(name == "Vehicle Speed"){
+        emit speedChanged(value);
+    }
+}
+
 //processes can info for def with specific values (ex: lights)
 //TODO: processing for bit specific values like defrost
 void canData::targetProcess(QMap<uint, QString> t, QByteArray p, int index)
@@ -74,10 +82,13 @@ void canData::targetProcess(QMap<uint, QString> t, QByteArray p, int index)
     //qDebug() << "payload: " << p;
     uint x;
     if(bytes.length() == 1){
-
-        x = static_cast<quint8>(p.at(bytes.at(0).toUInt(nullptr, 10))); //can data assumed to be in base 10
-        //qDebug() << "bytes:" << bytes.at(0).toUInt(nullptr, 10);
-        //qDebug() << "to uint:" << QString::number(static_cast<quint8>(p.at(bytes.at(0).toUInt(nullptr, 10))));
+        if(p.length() < bytes.at(0).toInt(nullptr, 10)){
+            return;
+        } else {
+            x = static_cast<quint8>(p.at(bytes.at(0).toUInt(nullptr, 10))); //can data assumed to be in base 10
+            //qDebug() << "bytes:" << bytes.at(0).toUInt(nullptr, 10);
+            //qDebug() << "to uint:" << QString::number(static_cast<quint8>(p.at(bytes.at(0).toUInt(nullptr, 10))));
+        }
     } else {
         //TODO: implement multiple byte params
         QByteArray tmp;
@@ -102,39 +113,142 @@ void canData::targetProcess(QMap<uint, QString> t, QByteArray p, int index)
 //processes can info for def that acts like normal parameter (ex: oil temp)
 void canData::valueProcess(QByteArray p, int index)
 {
+
     QStringList bytes;
     bytes.append(_def[index].getBytes());
-    QByteArray tmp;
-    for(int i = 0; i<bytes.length(); i++){
-        tmp.append(p.at(bytes.at(i).toUInt(nullptr, 10)));
-    }
-    uint x = tmp.toUInt(nullptr, 10);
     double value;
+    uint x;
+    if(bytes.length() == 1){
+        //error checking for broken payloads
+        if(p.length() < bytes.at(0).toInt(nullptr, 10)){
+            return;
+        }else {
+            x = p.at(bytes.at(0).toUInt(nullptr, 10));
+        }
+    } else {
+        QString tmp;
+        for(int i = 0; i<bytes.length(); i++){
+            //error check
+            if(p.length() < bytes.at(i).toInt(nullptr, 10)){
+                return;
+            }else {
+                //convert payload value to binary. it didnt like gaing straight to a string
+                QString val = QString::number(static_cast<quint8>(p.at(bytes.at(i).toUInt(nullptr, 10))), 2);
+
+                //add padding zeroes
+                if(val.length() < 8){
+                    for(int u = val.length(); u<8; u++){
+                        val.prepend("0");
+                    }
+                }
+
+                //add in correct endian order. 1 = big ( i think)
+                if(_def[index].getEndian() == 1){
+                    tmp.append(val);
+                }else{
+                    tmp.prepend(val);
+                }
+            }
+        }
+        //convert binary back into usable value
+        x = tmp.toUInt(nullptr, 2);
+    }
+
+
+    //run value through def equation
     value = x*_def[index].getConv();
     value = value + _def[index].getOffset();
-    emit valueChanged(_def[index].getName(), value);
+
+    //emit converted value
+    valueEmitter(_def[index].getName(), value);
+}
+
+void canData::rpmProcess(QByteArray p)
+{
+    if(p.length() < 6){
+        return;
+    } else {
+        QString byte4 = QString::number(static_cast<quint8>(p.at(4)), 2);
+        //add padding zeroes if needed
+        if(byte4.length() <8){
+            for(int i = byte4.length(); i<8; i++){
+                byte4.prepend("0");
+            }
+        }
+        QString byte5 = QString::number(static_cast<quint8>(p.at(5)), 2);
+        if(byte5.length() <8){
+            for(int i = byte5.length(); i<8; i++){
+                byte5.prepend("0");
+            }
+        }
+        //get last 4 bits of byte 5
+        byte5 = byte5.remove(0, 4);
+
+        QString rpmByte = byte5+byte4;
+        uint rpm = rpmByte.toUInt(nullptr, 2);
+        emit rpmChanged(rpm);
+    }
+}
+
+void canData::bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int index)
+{
+    QStringList bytes;
+    bytes.append(_def[index].getBytes());
+    int length = b.length();
+    //error checking for small payload
+    if(p.length() < bytes.at(0).toInt(nullptr, 10)){
+        return;
+    } else {
+        if(length == 1){
+            int bitIndex = b.at(0).toInt(nullptr, 10);
+            QString bit = QString::number(p.at(bytes.at(0).toUInt(nullptr, 10)), 2);
+            if(bit.length() < 8){
+                for(int i = bit.length(); i<8; i++){
+                    bit.prepend("0");
+                }
+            }
+            bitIndex = 8-bitIndex-1;
+            QString valString = (bit.at(bitIndex));
+            uint val = valString.toUInt(nullptr, 10);
+            if(t.contains(val)){
+                QString status = t.value(val);
+                emitter(_def[index].getName(), status);
+            }
+        } else {
+         //TODO: work with defs with multiple bit addr
+        }
+    }
+
+
 }
 
 //sends useful frame to be given a value and emitted
 void canData::processUsefulFrame(QCanBusFrame frame)
 {
-    //qDebug() << "useful frame";
     QList<int> indexes;
     for(int i = 0; i<defCount; i++){
         if(idList.at(i) == frame.frameId()){
-            //qDebug() << "appending index: " << idList.at(i) << " : " << i;
             indexes.append(i);
         }
     }
-    //qDebug() << "indexes length: " << indexes.length();
+    //rpm processing is hard coded in, because its too complicated for config
+    if(frame.frameId() == 321){
+        rpmProcess(frame.payload());
+    }
+    if(frame.frameId() == 642){
+        qDebug() << "signal: " << frame.toString();
+    }
     QByteArray payload = frame.payload();
     for(int i = 0; i<indexes.length(); i++){
         QMap<uint, QString> targets = _def[indexes.at(i)].getTargets();
-        //qDebug() << "targets count: " << targets.count();
-        //qDebug() << "targets" << targets;
+
         if(!targets.isEmpty()){
-           // qDebug() << "processing target value: " << frame.toString();
-            targetProcess(targets, payload, indexes.at(i));
+            if(!_def[indexes.at(i)].getBits().isEmpty()){
+                bitProcess(targets, payload, _def[indexes.at(i)].getBits(), indexes.at(i));
+            } else {
+                targetProcess(targets, payload, indexes.at(i));
+            }
+
         } else {
             valueProcess(payload, indexes.at(i));
         }

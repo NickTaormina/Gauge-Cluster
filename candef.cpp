@@ -65,3 +65,23 @@ void canDef::setTargets(const QMap<uint, QString> &newTargets)
 {
     targets = newTargets;
 }
+
+const QStringList &canDef::getBits() const
+{
+    return bits;
+}
+
+void canDef::setBits(const QStringList &newBits)
+{
+    bits = newBits;
+}
+
+int canDef::getEndian() const
+{
+    return endian;
+}
+
+void canDef::setEndian(int newEndian)
+{
+    endian = newEndian;
+}

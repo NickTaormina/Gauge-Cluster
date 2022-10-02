@@ -24,6 +24,9 @@ signals:
     void neutralSwitch(QString status);
     void reverseSwitch(QString status);
     void valueChanged(QString name, double value);
+
+    void rpmChanged(uint rpm);
+    void speedChanged(double spd);
 public slots:
     void receiveCanData(QCanBusFrame frame);
     void fillData(canDef* def, int count);
@@ -34,8 +37,11 @@ private:
     int defCount;
 
     void emitter(QString name, QString status);
+    void valueEmitter(QString name, double value);
     void targetProcess(QMap<uint, QString> t, QByteArray p, int index);
     void valueProcess(QByteArray p, int index);
+    void rpmProcess(QByteArray p);
+    void bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int index);
 
 signals:
     void usefulFrameReceived(QCanBusFrame frame);

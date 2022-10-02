@@ -305,13 +305,25 @@ void configHandler::fillCan(canDef *d)
                  QStringList tmp;
                  for(int x = 0; x<byte.length(); x++){
                     tmp.append(byte.at(x));
+                    qDebug() << "name: " << d[pos].getName() << " byte: " << byte.at(x);
                  }
                  d[pos].setBytes(tmp);
+             }else if (sub.tagName() == "bits"){
+                 QDomElement b = sub.firstChild().toElement();
+                 QStringList tmp;
+                 while(!b.isNull()){
+                     tmp.append( b.text());
+                     b = b.nextSibling().toElement();
+                 }
+                 d[pos].setBits(tmp);
              } else if (sub.tagName() == "conv"){
                 d[pos].setConv(sub.text().toDouble(nullptr));
              }
              else if (sub.tagName() == "offset"){
                 d[pos].setOffset(sub.text().toInt(nullptr, 10));
+             }
+             else if (sub.tagName() == "bigEndian"){
+                d[pos].setEndian(sub.text().toInt(nullptr, 10));
              }
              else if (sub.tagName() == "targets"){
                 QMap<uint, QString> tmp;

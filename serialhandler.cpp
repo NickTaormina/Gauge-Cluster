@@ -43,6 +43,7 @@ serialHandler::serialHandler(QObject *parent)
 
     serial->write("WRITE:[2016] [01] [170] [0] [0] [0] [0] [0] [0] /");
 
+
     serialString = "";
 
     qDebug() << "processed frame test: " << uartToFrame("READ:[2016] [01] [170] [255] [4] [22] [39] [57] [02]").toString();
@@ -101,34 +102,25 @@ QByteArray serialHandler::waitForEcuResponse(int msecs)
 //if given READ: command, turn it into a frame
 void serialHandler::serialReceived()
 {
-    //qDebug() << "serial received";
     rxbuffer = serial->readAll();
     serialString += QString::fromStdString(rxbuffer.toStdString());
-    //qDebug() << "serial string: " << serialString;
     if(serialString.contains("\\")){
     QStringList bufferSplit = serialString.split("\\");
-    //qDebug() << "buffer split";
     if(bufferSplit.length() > 2){
         for(int i = 0; i<bufferSplit.length()-1; i++){
-            //qDebug() << "buffer split len: " << bufferSplit.length();
             if(bufferSplit.at(i)!= ""){
-                //qDebug() << "split: " << i << " : " << bufferSplit.at(i);
                 if(bufferSplit.at(i).contains("READ:") && !bufferSplit.at(i).contains("WRITE")){
                     //do stuff with read message
-                    //qDebug() << "buffer split i" << i;
-                    //qDebug() << "about to convert frame:";
                     if(i < bufferSplit.length()-1){
-                        //qDebug() << "split: " <<bufferSplit.at(i);
-                        //qDebug() << "about to process:";
                         currentFrame = uartToFrame(bufferSplit.at(i));
                     }
-                    //qDebug() << "frame converted" << currentFrame.frameId() << " : " << currentFrame.payload();
-                    if(currentFrame.frameId() == 338){
+                    if(currentFrame.frameId() == 2024){
                         //qDebug() << "ecu response: " << currentFrame.toString();
-                        //emit ecuResponse(currentFrame);
+                        emit ecuResponse(currentFrame);
+                    } else {
+                        emit messageRead(currentFrame);
                     }
-                    emit messageRead(currentFrame);
-                    //qDebug() << "READ: ";
+
                 }
 
             }
@@ -201,8 +193,6 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
             i = i + 1;
         }
     frame.setPayload(payload);
-    //qDebug() << "processed frame: " << frame.toString();
-    //emit ecuResponse(frame);
     return frame;
 }
 
@@ -214,10 +204,7 @@ void serialHandler::writeFrame(QCanBusFrame frame)
     QString framePayload = fr.bytes2String(frame.payload()); //local copy of the payload
     QString payload; //formatted payload that will be sent
     int x = 0;
-    qDebug() << "write frame set";
     for(int i = 0; i<=framePayload.length()-1; i = i+2){
-        qDebug() << "frame payload length: " << framePayload.length();
-        qDebug() << "frame payload i: " << i;
         payload.insert(x, "[");
         QString tmp; //tmp used to turn 2 hex digits to dec
         tmp.append(framePayload.at(i));

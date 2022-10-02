@@ -9,6 +9,7 @@
 #include "trip.h"
 #include "config.h"
 #include "candata.h"
+#include <QtMath>
 
 class gauges : public QObject
 {
@@ -21,6 +22,7 @@ signals:
 void tripUpdated(QString trip, QString val);
 public slots:
     void setRPM();
+    void setRPMCAN(uint rpm);
     void setSpeed();
     Q_INVOKABLE void setParamPointer(parameter * parameter, int length);
     Q_INVOKABLE void resetTrip();
@@ -37,6 +39,7 @@ public slots:
     void updateTurnSignals(QString status);
     void updateNeutral(QString status);
     void updateReverse(QString status);
+    void setSpeedCAN(double speed);
 private:
 
     int minRPM;
@@ -71,6 +74,7 @@ private:
     void updateTrip();
     void showKnock();
 
+    void sweepDone();
 
 
     //ui gauge objects
@@ -118,7 +122,6 @@ private:
     trip* _trip;
     canData * _data;
 signals:
-    void sweepDone();
 };
 
 #endif // GAUGES_H

@@ -28,6 +28,12 @@ public:
     const QMap<uint, QString> &getTargets() const;
     void setTargets(const QMap<uint, QString> &newTargets);
 
+    const QStringList &getBits() const;
+    void setBits(const QStringList &newBits);
+
+    int getEndian() const;
+    void setEndian(int newEndian);
+
 signals:
 
 private:
@@ -37,6 +43,8 @@ private:
     float conv;
     int offset;
     QMap<uint, QString> targets;
+    QStringList bits;
+    int endian;
 };
 
 #endif // CANDEF_H

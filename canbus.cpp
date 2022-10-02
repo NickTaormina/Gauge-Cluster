@@ -192,13 +192,11 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
                     }
 
                     QCanBusFrame frame = QCanBusFrame(frameID, payload);
-                    if(count == 0){
-                    serial->writeFrame(frame);}
+                    serial->writeFrame(frame);
 
                     count++;
                 }
             }
-            qDebug() << "frames written";
         } else {
             printf("failed to send");
         }

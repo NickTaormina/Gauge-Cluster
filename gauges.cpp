@@ -77,7 +77,9 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
 
     QObject::connect(_data, &canData::turnSignal, this, &gauges::updateTurnSignals);
     QObject::connect(_data, &canData::lights, this, &gauges::updateLights);
-     QObject::connect(_data, &canData::reverseSwitch, this, &gauges::updateReverse);
+    QObject::connect(_data, &canData::reverseSwitch, this, &gauges::updateReverse);
+    QObject::connect(_data, &canData::rpmChanged, this, &gauges::setRPMCAN);
+    QObject::connect(_data, &canData::speedChanged, this, &gauges::setSpeedCAN);
 }
 
 
@@ -114,7 +116,37 @@ void gauges::setRPM()
 
         currRPMPos = pos;
     } else {
-        qDebug() << "rpm not found";
+    }
+}
+
+void gauges::setRPMCAN(uint rpm)
+{
+    if(sweepFinished == 1){
+
+        int diff = 0;
+        double percent = (double)(rpm)/maxRPM;
+        double pos = minTach;
+
+        if(maxTach > minTach){ //TODO: implement this correctly
+            diff = minTach - maxTach;
+            pos = minTach + (percent*diff);
+
+        } else {
+            diff = (minTach + maxTach)-180;
+            pos = (double)minTach + (double)(percent*diff);
+        }
+
+        QPropertyAnimation *rpmAnim = new QPropertyAnimation(tachNeedle, "rotation");
+        rpmAnim->setDuration(100);
+        rpmAnim->setStartValue(currRPMPos);
+        rpmAnim->setEndValue(pos);
+        rpmAnim->start();
+        if(rpm < (uint)maxRPM){
+            rpmtext->setProperty("text", rpm);
+        }
+
+        currRPMPos = pos;
+    } else {
     }
 }
 
@@ -149,7 +181,39 @@ void gauges::setSpeed()
         }
         currSpeedPos = pos;
     } else {
-        qDebug() << "speed not found";
+    }
+}
+
+//updates the speed analog gauge from passive CAN read
+void gauges::setSpeedCAN(double spd)
+{
+    speed = spd;
+    if(sweepFinished == 1){
+        if(speedTime->isActive()){
+            speedTime->setInterval(5);
+        }
+        int diff = 0;
+        double percent = (double)speed/maxSpeed;
+        double pos = minSpeedoRot;
+        if(maxSpeedoRot > minSpeedoRot){
+            diff = maxSpeedoRot - minSpeedoRot;
+            pos = minSpeedoRot + (percent*diff);
+        } else {
+            diff = (minSpeedoRot + maxSpeedoRot)-180;
+            pos = (double)minSpeedoRot + (double)(percent*diff);
+        }
+        int speedDelta = speed - currSpeed;
+        if(speedDelta != 0){
+            int speedDuration = abs((20/(speedDelta))/2);
+            speedTime->start(speedDuration);
+            QPropertyAnimation *speedAnim = new QPropertyAnimation(speedoNeedle, "rotation");
+            speedAnim->setDuration(animDuration);
+            speedAnim->setStartValue(currSpeedPos);
+            speedAnim->setEndValue(pos);
+            speedAnim->start();
+            currSpeed = speed;
+        }
+        currSpeedPos = pos;
     }
 }
 
@@ -321,6 +385,13 @@ void gauges::sweepBack()
     rpmAnim->setStartValue(maxTach+360);
     rpmAnim->setEndValue(minTach);
     rpmAnim->start();
+    QTimer* finish = new QTimer(this);
+    finish->setSingleShot(true);
+    finish->setInterval(300);
+    finish->start();
+    QObject::connect(finish, &QTimer::timeout, this, &gauges::sweepDone);
+}
+void gauges::sweepDone(){
     sweepFinished = 1;
 }
 
@@ -328,16 +399,15 @@ void gauges::sweepBack()
 void gauges::updateLights(QString status)
 {
     if(status == "on"){
-        //qDebug() << "lights on"; //icon visible
+        //icon visible
         lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
         lightIndicator->setProperty("opacity", 1.0);
     } else if (status == "park"){
-        //qDebug() << "parking lights on"; //icon visible (maybe dimmed)
+        //icon visible (dimmed)
         lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
         lightIndicator->setProperty("opacity", 0.7);
     } else{
-        //off
-        //qDebug() << "lights off"; //icon not visible
+        //off: icon not visible
         lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOff.svg");
     }
 }
@@ -347,20 +417,16 @@ void gauges::updateTurnSignals(QString status)
 {
     //qDebug() << "updating turn signals";
     if(status == "left"){
-        //qDebug() << "left signal";
         leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
         rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
     } else if (status == "right"){
-        //qDebug() << "right signal";
         leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
         rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
     } else if (status == "hazard"){
-        //qDebug() << "hazards";
         leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
         rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
     } else{
         //off
-        //qDebug() << "turn signals off";
         leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
         rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
     }
@@ -371,7 +437,6 @@ void gauges::updateNeutral(QString status)
 {
     if(status == "Neutral"){
         geartext->setProperty("text", "N");
-        //qDebug() << "neutral";
     } else {
         updateGear();
     }
@@ -382,7 +447,6 @@ void gauges::updateReverse(QString status)
 {
     if(status == "Reverse"){
         geartext->setProperty("text", "R");
-        ///=qDebug() << "Reverse";
     } else {
         updateGear();
     }

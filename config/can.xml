@@ -17,6 +17,12 @@
 		<conv>0.39216</conv>
 		<offset>0</offset>
 	</param>
+	<param name="Throttle Position">
+		<id>320</id>
+		<byte length = "1">5</byte>
+		<conv>0.39216</conv>
+		<offset>0</offset>
+	</param>
 	<param name="Brake Position">
 		<id>209</id>
 		<byte length = "1">2</byte>
@@ -33,14 +39,6 @@
 			<target name="off">1</target>
 		</targets>
 	</param>
-	<param name="Handbrake">
-		<id>338</id>
-		<byte length = "1">6</byte>
-		<targets>
-			<target name="engaged">8</target>
-			<target name="disengaged">0</target>
-		</targets>
-	</param>
 	<param name="Lights">
 		<id>338</id>
 		<byte length = "1">7</byte>
@@ -48,14 +46,18 @@
 			<target name="off">128</target>
 			<target name="park">132</target>
 			<target name="on">140</target>
+			<target name="flash">152</target>
+			<target name="toggle">156</target>
 		</targets>
 	</param>
 	<param name="Defrost">
 		<id>640</id>
 		<byte length = "1">0</byte>
-		<bits>3</bits>
+		<bits>
+			<bit>3</bit>
+		</bits>
 		<targets>
-			<target name="off">0</target>
+			<target name="off">0</target> 	
 			<target name="on">1</target>
 		</targets>
 	</param>
@@ -91,12 +93,45 @@
 			<target name="Gear">20</target>
 		</targets>
 	</param>
+	<param name="Handbrake">
+		<id>338</id>
+		<byte length = "1">6</byte>
+		<bits>
+			<bit>3</bit>
+		</bits>
+		<targets>
+			<target name="engaged">1</target>
+			<target name="disengaged">0</target>
+		</targets>
+	</param>
 	<param name="Reverse Switch">
 		<id>338</id>
 		<byte length = "1">6</byte>
+		<bits>
+			<bit>2</bit>
+		</bits>
 		<targets>
-			<target name="Reverse">12</target>
-			<target name="Gear">8</target>
+			<target name="Reverse">1</target>
+			<target name="Gear">0</target>
+		</targets>
+	</param>
+	<param name="Brake Switch">
+		<id>338</id>
+		<byte length = "1">6</byte>
+		<bits>
+			<bit>4</bit>
+		</bits>
+		<targets>
+			<target name="on">1</target>
+			<target name="off">0</target>
+		</targets>
+	</param>
+	<param name="Clutch Switch">
+		<id>324</id>
+		<byte length = "1">2</byte>
+		<targets>
+			<target name="In">90</target>
+			<target name="Out">89</target>
 		</targets>
 	</param>
 </CAN>
