@@ -70,7 +70,7 @@ QByteArray canbus::readFrames()
 
     QByteArray rxmsg;
     if(useJ2534 == 1){
-        _dev->waitForFramesReceived(100);
+        _dev->waitForFramesReceived(200);
         if(_dev){
             while(_dev->framesAvailable()){
                 const QCanBusFrame frame = _dev->readFrame();
@@ -81,7 +81,7 @@ QByteArray canbus::readFrames()
             printf("no can device");
         }
     } else {
-        rxmsg = serial->waitForEcuResponse(100);
+        rxmsg = serial->waitForEcuResponse(200);
         qDebug() << "tried to read from esp32:";
     }
     qDebug() << "rxmsg" << rxmsg;
@@ -192,7 +192,12 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
                     }
 
                     QCanBusFrame frame = QCanBusFrame(frameID, payload);
+                    QEventLoop loop;
+                    QTimer::singleShot(100, &loop, SLOT(quit()));
+                    loop.exec();
                     serial->writeFrame(frame);
+                    serial->waitForBytesWritten(5);
+
 
                     count++;
                 }

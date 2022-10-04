@@ -97,6 +97,11 @@ QByteArray serialHandler::waitForEcuResponse(int msecs)
     return rx;
 }
 
+bool serialHandler::waitForBytesWritten(int msecs)
+{
+    serial->waitForBytesWritten(msecs);
+}
+
 
 //processing for all received serial messages
 //if given READ: command, turn it into a frame
@@ -113,6 +118,9 @@ void serialHandler::serialReceived()
                     //do stuff with read message
                     if(i < bufferSplit.length()-1){
                         currentFrame = uartToFrame(bufferSplit.at(i));
+                    }
+                    if(currentFrame.frameId() == 885){
+                        qDebug() << "door frame: " << currentFrame.toString();
                     }
                     if(currentFrame.frameId() == 2024){
                         //qDebug() << "ecu response: " << currentFrame.toString();

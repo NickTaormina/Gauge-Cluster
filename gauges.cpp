@@ -121,6 +121,7 @@ void gauges::setRPM()
 
 void gauges::setRPMCAN(uint rpm)
 {
+    _rpm = rpm;
     if(sweepFinished == 1){
 
         int diff = 0;
@@ -289,7 +290,8 @@ void gauges::findOdoIndex()
 void gauges::updateGear()
 {
     if(g){
-        QString currgear = g->calcGear(par[rpmIndex].getValue(), speed);
+        QString currgear = g->calcGear(_rpm, speed);
+        //qDebug() << "update gear: " << _rpm << " : " << speed;
         geartext->setProperty("text", currgear);
 
     }
@@ -387,7 +389,7 @@ void gauges::sweepBack()
     rpmAnim->start();
     QTimer* finish = new QTimer(this);
     finish->setSingleShot(true);
-    finish->setInterval(300);
+    finish->setInterval(1050);
     finish->start();
     QObject::connect(finish, &QTimer::timeout, this, &gauges::sweepDone);
 }

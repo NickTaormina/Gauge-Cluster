@@ -58,6 +58,7 @@ private:
     int currRPM;
     int currSpeed;
     int speed;
+    int _rpm;
     double currRPMPos;
     double currSpeedPos;
 

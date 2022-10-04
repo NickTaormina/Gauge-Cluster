@@ -35,7 +35,7 @@ QString parameter::getUnit(){
 }
 void parameter::setValue(double val){
     value = val;
-    emit valueChanged();
+    //emit valueChanged();
 }
 double parameter::getValue(){
     return value;

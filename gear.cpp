@@ -21,8 +21,8 @@ QString gear::calcGear(int rpm, int speed)
         float rpmRatio = rpm/finalDrive;
         float gear = rpmRatio/wheelRPM;
         for(int i = 0; i<ratios.length(); i++){
-
-            if(ratios.at(i)/gear >0.99 && ratios.at(i)/gear <1.01){
+            //qDebug() << "ratio: " << ratios.at(i)/gear;
+            if(ratios.at(i)/gear >0.9 && ratios.at(i)/gear <1.1){
                 i = i+1;
                 return QString::number(i);
             }

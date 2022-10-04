@@ -235,9 +235,6 @@ void canData::processUsefulFrame(QCanBusFrame frame)
     if(frame.frameId() == 321){
         rpmProcess(frame.payload());
     }
-    if(frame.frameId() == 642){
-        qDebug() << "signal: " << frame.toString();
-    }
     QByteArray payload = frame.payload();
     for(int i = 0; i<indexes.length(); i++){
         QMap<uint, QString> targets = _def[indexes.at(i)].getTargets();

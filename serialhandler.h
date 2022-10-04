@@ -15,6 +15,7 @@ public:
     explicit serialHandler(QObject *parent = nullptr);
     bool waitForFramesReceived(int msecs);
     QByteArray waitForEcuResponse(int msecs);
+    bool waitForBytesWritten(int msecs);
 public slots:
     void serialReceived();
     QCanBusFrame uartToFrame(QString msg);
