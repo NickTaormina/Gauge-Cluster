@@ -24,6 +24,7 @@ signals:
     void neutralSwitch(QString status);
     void reverseSwitch(QString status);
     void valueChanged(QString name, double value);
+    void paramValueChanged(QString name, double value);
 
     void rpmChanged(uint rpm);
     void speedChanged(double spd);

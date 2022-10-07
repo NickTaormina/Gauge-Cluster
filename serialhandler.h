@@ -23,6 +23,7 @@ public slots:
 signals:
     void messageRead(QCanBusFrame frame);
     void ecuResponse(QCanBusFrame frame);
+    void testRes();
 private:
     QSerialPort *serial;
     QSerialPortInfo info;
@@ -31,6 +32,8 @@ private:
     frames fr;
     int ct;
     QCanBusFrame currentFrame;
+
+    int lastSerial;
 };
 
 #endif // SERIALHANDLER_H

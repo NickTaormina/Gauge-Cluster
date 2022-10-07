@@ -86,6 +86,7 @@ int main(int argc, char *argv[])
 
     gauges* gauge = new gauges(nullptr, main, &gr, &tr, &cfg[config::GAUGES], &_canData);
     QObject::connect(log, &logger::setParams, gauge, &gauges::setParamPointer);
+    QObject::connect(&shand, &serialHandler::ecuResponse, log, &logger::combineECUResponse);
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
     QObject::connect(gauge, &gauges::tripUpdated, &hand, &configHandler::storeTrip);
     defWin.fillDefs();

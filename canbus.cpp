@@ -135,8 +135,8 @@ QByteArray canbus::readFrames(uint frameID, char filter, int ignore)
         qDebug() << "rxmsg" << rxmsg;
 
     } else {
-        rxmsg = serial->waitForEcuResponse(100);
-        qDebug() << "tried to read from esp32:";
+        //rxmsg = serial->waitForEcuResponse(220);
+        //qDebug() << "tried to read from esp32:";
     }
     qDebug() << "rxmsg" << rxmsg;
     return rxmsg;

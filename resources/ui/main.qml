@@ -262,7 +262,6 @@ Window{
                             id: warningImage
                             width: 56
                             height: 56
-                            source: "qrc:/qtquickplugin/images/template_image.png"
                             sourceSize.width: 56
                             fillMode: Image.PreserveAspectFit
                         }
@@ -427,6 +426,159 @@ Window{
                     font.family: "NI7SEG"
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
+
+                Rectangle {
+                    id: statusRect
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    x: 139
+                    y: 175
+                    width: parent.width
+                    height: 180
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: "#00ffffff"
+                    border.color: "#00000000"
+                    border.width: 0
+
+                    Rectangle {
+                        id: verticalBar
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        x: 203
+                        y: 10
+                        width: 1
+                        height: 170
+                        color: "#6fffffff"
+                    }
+
+                    Rectangle {
+                        id: horizontalBar1
+                        x: 80
+                        y: 13
+                        width: 420
+                        height: 1
+                        color: "#6fffffff"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                    }
+
+                    Label {
+                        id: topLeftValue
+                        x: 45
+                        y: 40
+                        width: 200
+                        objectName: "topLeftValue"
+                        color: "#c5c5c5"
+                        text: qsTr("14.7")
+                        font.family: "Michroma"
+                        font.pointSize: 24
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    Label {
+                        id: topRightValue
+                        x: 255
+                        y: 40
+                        width: 200
+                        objectName: "topRightValue"
+                        color: "#c5c5c5"
+                        text: qsTr("-0.71")
+                        font.pointSize: 24
+                        font.family: "Michroma"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    Label {
+                        id: bottomRightValue
+                        x: 255
+                        y: 120
+                        width: 200
+                        color: "#c5c5c5"
+                        objectName: "bottomRightValue"
+                        text: qsTr("196")
+                        font.pointSize: 24
+                        font.family: "Michroma"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    Label {
+                        id: bottomLeftValue
+                        x: 45
+                        y: 120
+                        width: 200
+                        color: "#c5c5c5"
+                        objectName: "bottomLeftValue"
+                        text: qsTr("102")
+                        font.pointSize: 24
+                        font.family: "Michroma"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    Label {
+                        id: topLeftLabel
+                        objectName: "topLeftLabel"
+                        x: 60
+                        y: 10
+                        width: 170
+                        height: 30
+                        color: "#c5c5c5"
+                        text: qsTr("AF Ratio")
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        wrapMode: Text.NoWrap
+                        font.pointSize: 14
+                        font.family: "Michroma"
+                    }
+                    Label {
+                        id: topRightLabel
+                        x: 275
+                        y: 10
+                        width: 170
+                        height: 30
+                        objectName: "topRightLabel"
+                        color: "#c5c5c5"
+                        text: qsTr("AF Learn")
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        wrapMode: Text.NoWrap
+                        font.pointSize: 14
+                        font.family: "Michroma"
+                    }
+                    Label {
+                        id: bottomRightLabel
+                        x: 275
+                        y: 90
+                        width: 170
+                        objectName: "bottomRightLabel"
+                        height: 30
+                        color: "#c5c5c5"
+                        text: qsTr("Oil Temp")
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        wrapMode: Text.NoWrap
+                        font.pointSize: 14
+                        font.family: "Michroma"
+                    }
+                    Label {
+                        id: bottomLeftLabel
+                        x: 60
+                        y: 90
+                        width: 170
+                        height: 30
+                        color: "#c5c5c5"
+                        objectName: "bottomLeftLabel"
+                        text: qsTr("Intake Temp")
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        wrapMode: Text.NoWrap
+                        font.pointSize: 14
+                        font.family: "Michroma"
+                    }
+                }
             }
         }
 
@@ -543,7 +695,7 @@ Window{
 }
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.9}D{i:15}D{i:21}D{i:22}
+    D{i:0;formeditorZoom:0.9}D{i:34}D{i:35}D{i:36}D{i:37}
 }
 ##^##*/
 

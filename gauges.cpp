@@ -48,6 +48,8 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
     _data = data;
     activeTrip = "tripA";
 
+
+
     //find ui gauge elements to control. should probably move these to QML
     tachNeedle = main->findChild<QObject*>("tachneedle", Qt::FindChildrenRecursively);
     speedoNeedle = main->findChild<QObject*>("speedoneedle", Qt::FindChildrenRecursively);
@@ -64,6 +66,25 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
     rightSignal = main->findChild<QObject*>("rightSignal", Qt::FindChildrenRecursively);
     lightIndicator = main->findChild<QObject*>("lightIndicator", Qt::FindChildrenRecursively);
 
+    //finds ui parameter objects (from logger)
+    topLeftLabel = main->findChild<QObject*>("topLeftLabel", Qt::FindChildrenRecursively);
+    topRightLabel = main->findChild<QObject*>("topRightLabel", Qt::FindChildrenRecursively);
+    bottomLeftLabel = main->findChild<QObject*>("bottomLeftLabel", Qt::FindChildrenRecursively);
+    bottomRightLabel = main->findChild<QObject*>("bottomRightLabel", Qt::FindChildrenRecursively);
+    topLeftValue = main->findChild<QObject*>("topLeftValue", Qt::FindChildrenRecursively);
+    topRightValue = main->findChild<QObject*>("topRightValue", Qt::FindChildrenRecursively);
+    bottomRightValue = main->findChild<QObject*>("bottomRightValue", Qt::FindChildrenRecursively);
+    bottomLeftValue = main->findChild<QObject*>("bottomLeftValue", Qt::FindChildrenRecursively);
+
+    //paramater display label init
+    topLeftText = "AF Ratio";
+    topLeftLabel->setProperty("text", topLeftText);
+    topRightText = "AF Learning";
+    topRightLabel->setProperty("text", topRightText);
+    bottomRightText = "Oil Temp";
+    bottomRightLabel->setProperty("text", bottomRightText);
+    bottomLeftText = "Intake Temp";
+    bottomLeftLabel->setProperty("text", bottomLeftText);
 
     //set the trip indicator value on startup
     tripNum->setProperty("text", _trip->getTrip());
@@ -94,7 +115,7 @@ void gauges::setRPM()
 
         int diff = 0;
         double percent = (double)(rpm)/maxRPM;
-        double pos = minTach;
+        double pos;
 
         if(maxTach > minTach){ //TODO: implement this correctly
             diff = minTach - maxTach;
@@ -126,7 +147,7 @@ void gauges::setRPMCAN(uint rpm)
 
         int diff = 0;
         double percent = (double)(rpm)/maxRPM;
-        double pos = minTach;
+        double pos;
 
         if(maxTach > minTach){ //TODO: implement this correctly
             diff = minTach - maxTach;
@@ -267,6 +288,7 @@ void gauges::resetTrip() //TODO: multiple trips
 //finds the rpm parameter
 void gauges::findRPMIndex()
 {
+    rpmIndex = 0;
     for(int i = 0; i < paramLength; i++){
         if(par[i].getName().toUpper() == "ENGINE SPEED"){
             rpmIndex = i;
@@ -274,10 +296,21 @@ void gauges::findRPMIndex()
         }
     }
 }
-
+//finds the parameter for vehicle speed
+void gauges::findSpeedIndex()
+{
+    speedIndex = 0;
+    for(int i = 0; i < paramLength; i++){
+        if(par[i].getName().toUpper() == "VEHICLE SPEED"){
+            speedIndex = i;
+            break;
+        }
+    }
+}
 //finds the odometer reading parameter
 void gauges::findOdoIndex()
 {
+    odoIndex = 0;
     for(int i = 0; i < paramLength; i++){
         if(par[i].getName().toUpper() == "ODOMETER"){
             odoIndex = i;
@@ -300,6 +333,9 @@ void gauges::updateGear()
 //finds index in parameter array for each of the knock params
 void gauges::getKnockIndexes()
 {
+    fklIndex = 0;
+    fbkIndex = 0;
+    damIndex = 0;
     for(int i = 0; i < paramLength; i++){
         if(par[i].getName().toUpper() == "FINE KNOCK LEARN"){
             fklIndex = i;
@@ -356,7 +392,7 @@ void gauges::sweepForward()
     QPropertyAnimation *speedAnim = new QPropertyAnimation(speedoNeedle, "rotation");
     QPropertyAnimation *rpmAnim = new QPropertyAnimation(tachNeedle, "rotation");
 
-    sweepTimer->setInterval(1100);
+    sweepTimer->setInterval(1050);
     speedAnim->setDuration(1000);
     speedAnim->setStartValue(minSpeedoRot);
     speedAnim->setEndValue(maxSpeedoRot+360);
@@ -392,7 +428,34 @@ void gauges::sweepBack()
     finish->setInterval(1050);
     finish->start();
     QObject::connect(finish, &QTimer::timeout, this, &gauges::sweepDone);
+    updateParamDisplay("AF Ratio", 11.47);
 }
+
+void gauges::updateParamDisplay(QString name, double value)
+{
+    //convert to string to allow formatting
+    QString val = QString::number(value);
+
+    if(name == "AF Ratio"){
+        //ensures two decimals
+        if(val.length()<3){
+            val.append(".");
+        }
+        if(val.length()<5){
+            for(int i = val.length(); i<5; i++){
+                val.append("0");
+            }
+        }
+        topLeftValue->setProperty("text", val);
+    }else if (name == "AF Learning 1"){
+        topRightValue->setProperty("text", val);
+    } else if (name == "Oil Temp"){
+        bottomRightValue->setProperty("text", val);
+    } else if (name == "Intake Manifold Temperature"){
+        bottomLeftValue->setProperty("text", val);
+    }
+}
+
 void gauges::sweepDone(){
     sweepFinished = 1;
 }
@@ -461,16 +524,7 @@ void gauges::gaugeSweep()
     sweepForward();
 }
 
-//finds the parameter for vehicle speed
-void gauges::findSpeedIndex()
-{
-    for(int i = 0; i < paramLength; i++){
-        if(par[i].getName().toUpper() == "VEHICLE SPEED"){
-            speedIndex = i;
-            break;
-        }
-    }
-}
+
 
 void gauges::startTimer(){
     if(!timer->isActive()){

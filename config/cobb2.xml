@@ -119,7 +119,7 @@
 		<offset>0</offset>
 	</conversions>
 </ecuparam>
-<ecuparam id="16" name="Ignition  Timing" desc="P16">
+<ecuparam id="16" name="Ignition Timing" desc="P16">
 	<address length="6">000011</address>
 	<response length="1">04</response>
 	<conversions>

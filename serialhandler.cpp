@@ -34,6 +34,7 @@ serialHandler::serialHandler(QObject *parent)
 
         }
     }
+    lastSerial = 0;
     //QTimer * timer = new QTimer(this);
     //timer->setInterval(1000);
     //QObject::connect(timer, &QTimer::timeout, this, &serialHandler::serialReceived);
@@ -71,30 +72,49 @@ bool serialHandler::waitForFramesReceived(int msecs)
 QByteArray serialHandler::waitForEcuResponse(int msecs)
 {
     int multiPartMsg = 0;
-    QByteArray rx;
+    QByteArray rx = "";
+    QString test;
     enum {Received = 0, Error, Timeout};
     QEventLoop loop;
-    //QObject::connect(this, &serialHandler::ecuResponse, &loop, [&]() {loop.exit(Received);});
-    QObject::connect(this, &serialHandler::ecuResponse, [&rx, &multiPartMsg, &loop] (QCanBusFrame lamFrame) {
-        if(lamFrame.payload().at(0) == 10){
-            qDebug() << "multi part msg";
-            multiPartMsg = 1;
-        }
-        qDebug() << "lam test: " << lamFrame.toString();
-        rx.append(lamFrame.payload());
-        qDebug() << "frame set test: " << QString(rx.toHex().toUpper());
-        if(multiPartMsg != 1){
-            loop.exit(Received);
-        }
-    } );
+    //QObject::connect(this, &serialHandler::testRes, &loop, [&]() {qDebug() << "exit"; loop.exit(Received);});
+
     if(msecs >= 0){
         QTimer::singleShot(msecs, &loop, [&]() {loop.exit(Timeout);});
     }
     int result = loop.exec(QEventLoop::ExcludeUserInputEvents);
+    /*
+    QObject::connect(this, &serialHandler::ecuResponse, [&loop, this] (QCanBusFrame lamFrame) {
+        if(lamFrame.isValid()){
+            qDebug() << "valid frame";
+        }
+        if(lamFrame.payload().at(0) == 10){
+            qDebug() << "multi part msg";
+
+        }
+       // qDebug() << "lam test: " << lamFrame.toString();
+        //QByteArray tmp = lamFrame.payload();
+        //qDebug() << "tmp: " << tmp;
+        //rx.insert(0, tmp);
+        //rx.append(lamFrame.payload());
+        //qDebug() << "frame set test: " << QString(rx.toHex().toUpper());
+        if(1){
+           qDebug() << "extining";
+           loop.exit(Received);
+        }
+
+    } );
     if(result == Timeout){
         qDebug() << "frame timed out";
-    }
+    } else if(result == Received){
+        qDebug() << "loop received";
+        return rx;
+        //QObject::disconnect(this, &serialHandler::ecuResponse, this, nullptr);
+        //qDebug() << "rx lam: " << rx;
+    }*/
+
     return rx;
+
+
 }
 
 bool serialHandler::waitForBytesWritten(int msecs)
@@ -109,33 +129,75 @@ void serialHandler::serialReceived()
 {
     rxbuffer = serial->readAll();
     serialString += QString::fromStdString(rxbuffer.toStdString());
+    //Debug() << "serial received";
     if(serialString.contains("\\")){
+        rxbuffer.clear();
+
     QStringList bufferSplit = serialString.split("\\");
-    if(bufferSplit.length() > 2){
+    int cleared = 1;
+    if(bufferSplit.length() > 1){
         for(int i = 0; i<bufferSplit.length()-1; i++){
             if(bufferSplit.at(i)!= ""){
+
                 if(bufferSplit.at(i).contains("READ:") && !bufferSplit.at(i).contains("WRITE")){
                     //do stuff with read message
-                    if(i < bufferSplit.length()-1){
-                        currentFrame = uartToFrame(bufferSplit.at(i));
-                    }
+                    currentFrame = uartToFrame(bufferSplit.at(i));
+                    //qDebug() << "frame: " << currentFrame.toString();
+                    //qDebug() << bufferSplit.at(i);
                     if(currentFrame.frameId() == 885){
                         qDebug() << "door frame: " << currentFrame.toString();
                     }
                     if(currentFrame.frameId() == 2024){
-                        //qDebug() << "ecu response: " << currentFrame.toString();
+                       // qDebug() << "ecu response: " << currentFrame.toString();
                         emit ecuResponse(currentFrame);
+                        emit testRes();
                     } else {
                         emit messageRead(currentFrame);
                     }
+                    int len = bufferSplit.at(i).length();
+                    serialString.remove(bufferSplit.at(i)+"\\");
+                    if(i == bufferSplit.length()-2){
+                        //qDebug() << "end";
+                        if(lastSerial == serialString.length()){
+                            //qDebug() << "clearing";
+                            serialString.clear();
+                        } else {
 
+                            lastSerial = serialString.length();
+                        }
+
+                    }
+                    //qDebug() << "length: " << len << " serial: " << serialString.length() << " : " << bufferSplit.length();
+
+                    bufferSplit.replace(i, "");
+                    //qDebug() << "buffer length: " << bufferSplit.length();
+                }
+                else{
+                    cleared = 0;
                 }
 
             }
         }
+        /*
+        if(serialString.at(serialString.length()-1) == "\\"){
+            qDebug() << "clearing buffer: ";
+            rxbuffer.clear();
+            serialString.clear();
+        }*/
+
+
+        if(cleared == 1){
+            //qDebug() << "cleared";
+            //rxbuffer.clear();
+            bufferSplit.clear();
+            //serialString.clear();
+        }
     }
 
-    if(bufferSplit.length() > 10){
+
+    if(bufferSplit.length() > 100){
+        //qDebug() << "overloaded";
+        //qDebug() << serialString;
         bufferSplit.clear();
         rxbuffer.clear();
         serialString.clear();
@@ -230,7 +292,7 @@ void serialHandler::writeFrame(QCanBusFrame frame)
     serialMsg.append(payload);
     serialMsg.append("/");
     serial->write(serialMsg.toStdString().c_str());
-    qDebug() << "sent serial frame: " << serialMsg.toStdString().c_str();
+    //qDebug() << "sent serial frame: " << serialMsg.toStdString().c_str();
 
 
 

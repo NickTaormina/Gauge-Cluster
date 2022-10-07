@@ -70,6 +70,8 @@ void canData::valueEmitter(QString name, double value)
 {
     if(name == "Vehicle Speed"){
         emit speedChanged(value);
+    } else if (name == "Oil Temp"){
+        emit paramValueChanged(name, value);
     }
 }
 

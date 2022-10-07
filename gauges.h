@@ -33,6 +33,7 @@ public slots:
     void gaugeSweep();
     void sweepForward();
     void sweepBack();
+    void updateParamDisplay(QString name, double value);
 
     //can indicators
     void updateLights(QString status);
@@ -78,6 +79,16 @@ private:
     void sweepDone();
 
 
+    //parameter display
+    QString topLeftText;
+    QString topLeftVal;
+    QString topRightText;
+    QString topRightVal;
+    QString bottomRightText;
+    QString bottomRightVal;
+    QString bottomLeftText;
+    QString bottomLeftVal;
+
     //ui gauge objects
     QObject * tachNeedle;
     QObject * speedoNeedle;
@@ -93,6 +104,16 @@ private:
     QObject * leftSignal;
     QObject * rightSignal;
     QObject * lightIndicator;
+
+    //ui parameter objects
+    QObject * topLeftLabel;
+    QObject * topLeftValue;
+    QObject * topRightLabel;
+    QObject * topRightValue;
+    QObject * bottomRightLabel;
+    QObject * bottomRightValue;
+    QObject * bottomLeftLabel;
+    QObject * bottomLeftValue;
 
     //timers
     QTimer* timer;
