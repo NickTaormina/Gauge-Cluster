@@ -34,10 +34,6 @@ void trip::resetTrip()
     milesTraveled = 0;
 }
 
-QString trip::getTripNum()
-{
-    return tripNum;
-}
 
 QString trip::getTrip()
 {

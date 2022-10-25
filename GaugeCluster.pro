@@ -19,12 +19,13 @@ SOURCES += main.cpp \
     logger.cpp \
     parameter.cpp \
     serialhandler.cpp \
-    trip.cpp
+    trip.cpp \
+    weather.cpp
 
 RESOURCES += qml.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH =
+QML_IMPORT_PATH = resources/ui/
 
 # Additional import path used to resolve QML modules just for Qt Quick Designer
 QML_DESIGNER_IMPORT_PATH =
@@ -49,4 +50,5 @@ HEADERS += \
     logger.h \
     parameter.h \
     serialhandler.h \
-    trip.h
+    trip.h \
+    weather.h

@@ -7,7 +7,7 @@ canData::canData(QObject *parent)
 }
 canData::canData(canDef *def, int count)
 {
-    qDebug() << "candata const";
+    qDebug() << "*candata construct";
     //populate local variables
     defCount = count;
 
@@ -32,14 +32,14 @@ void canData::fillData(canDef *def, int count)
 {
     defCount = count;
     _def = def;
-    qDebug() << "candata set";
+    qDebug() << "*candata set";
     for(int i = 0; i < defCount; i++){
-        qDebug() << "can name: " << _def[i].getName();
-        qDebug() << "canID: " << _def[i].getFrameID();
+        qDebug() << "*can name: " << _def[i].getName();
+        qDebug() << "*canID: " << _def[i].getFrameID();
        nameList.append(_def[i].getName());
        idList.append(_def[i].getFrameID());
     }
-    qDebug() << "id list: " << idList;
+    qDebug() << "*can id list: " << idList;
 }
 
 
@@ -118,6 +118,7 @@ void canData::valueProcess(QByteArray p, int index)
 
     QStringList bytes;
     bytes.append(_def[index].getBytes());
+    //qDebug() << "bytes: " << bytes;
     double value;
     uint x;
     if(bytes.length() == 1){
@@ -125,7 +126,8 @@ void canData::valueProcess(QByteArray p, int index)
         if(p.length() < bytes.at(0).toInt(nullptr, 10)){
             return;
         }else {
-            x = p.at(bytes.at(0).toUInt(nullptr, 10));
+            x = static_cast<quint8>(p.at(bytes.at(0).toUInt(nullptr, 10)));
+            //qDebug() << "x:" << QString::number(static_cast<quint8>(p.at(bytes.at(0).toUInt(nullptr, 10))));
         }
     } else {
         QString tmp;
@@ -136,6 +138,7 @@ void canData::valueProcess(QByteArray p, int index)
             }else {
                 //convert payload value to binary. it didnt like gaing straight to a string
                 QString val = QString::number(static_cast<quint8>(p.at(bytes.at(i).toUInt(nullptr, 10))), 2);
+                //qDebug() << "val: " << val;
 
                 //add padding zeroes
                 if(val.length() < 8){
@@ -177,16 +180,21 @@ void canData::rpmProcess(QByteArray p)
                 byte4.prepend("0");
             }
         }
+        //qDebug() << "byte4: " << byte4;
         QString byte5 = QString::number(static_cast<quint8>(p.at(5)), 2);
+       // qDebug() << "byte5 raw:" << byte5;
         if(byte5.length() <8){
             for(int i = byte5.length(); i<8; i++){
                 byte5.prepend("0");
             }
         }
+        //qDebug() << "byte5: " << byte5;
         //get last 4 bits of byte 5
-        byte5 = byte5.remove(0, 4);
+        byte5 = byte5.remove(0, 3);
+        //qDebug() << "byte5 cut: " << byte5;
 
         QString rpmByte = byte5+byte4;
+        //qDebug() << "rpmByte:" << rpmByte;
         uint rpm = rpmByte.toUInt(nullptr, 2);
         emit rpmChanged(rpm);
     }

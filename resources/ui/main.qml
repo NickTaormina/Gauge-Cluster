@@ -17,580 +17,105 @@ Window{
     visible:true
 
 
+
     Rectangle {
         id: rectangle
         width: 1920
         height: 720
-        color: "#131313"
-
-        Image {
-            id: tach
-            x: 0
-            y: 0
-            width: 720
-            height: 720
-            source: "file:///" + applicationDirPath + "/resources/images/tach.png"
-            sourceSize.width: 620
-            mipmap: true
-            antialiasing: true
-            rotation: 0
-            transformOrigin: Item.Bottom
-            fillMode: Image.PreserveAspectCrop
-
-            Rectangle {
-                id: tachneedle
-                objectName: "tachneedle"
-                width: 100
-                height: 600
-                visible: true
-                color: "#005d2d2d"
-                anchors.verticalCenter: parent.verticalCenter
-                scale: 1.1
-                anchors.horizontalCenter: parent.horizontalCenter
-                rotation: 270
+        color: "#111111"
 
 
-
-                Image {
-                    id: needlePic
-                    x: 0
-                    y: 51
-                    width: 100
-                    height: 285
-                    horizontalAlignment: Image.AlignHCenter
-                    verticalAlignment: Image.AlignTop
-                    source: "file:///" + applicationDirPath + "/resources/images/needle.svg"
-                    rotation: 0
-                    transformOrigin: Item.Bottom
-                    sourceSize.width: 100
-                    sourceSize.height: 300
-                    fillMode: Image.PreserveAspectCrop
-                }
-            }
-
-            Label {
-                id: rpmText
-                objectName: "rpmText"
-                y: 420
-                width: 189
-                height: 72
-                color: "#c8c8c8"
-                text: qsTr("0")
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font.family: "Michroma"
-                font.bold: true
-                font.pointSize: 36
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-        }
-
-        Image {
-            id: speedo
-            x: 1200
-            y: -8
-            width: 720
-            height: 720
-            visible: true
-            anchors.right: parent.right
-            source: "file:///" + applicationDirPath + "/resources/images/speedo.png"
-            anchors.rightMargin: 0
-            sourceSize.height: 720
-            sourceSize.width: 620
-            antialiasing: true
-            mipmap: true
-            fillMode: Image.PreserveAspectCrop
-
-            Rectangle {
-                id: speedoNeedle
-                objectName: "speedoneedle"
-                width: 100
-                height: 600
-                visible: true
-                color: "#005d2d2d"
-                anchors.verticalCenter: parent.verticalCenter
-                scale: 1.1
-                anchors.horizontalCenter: parent.horizontalCenter
-                rotation: 270
-                Image {
-                    id: needlePic1
-                    x: 0
-                    y: 51
-                    width: 100
-                    height: 285
-                    horizontalAlignment: Image.AlignHCenter
-                    verticalAlignment: Image.AlignTop
-                    source: "file:///" + applicationDirPath + "/resources/images/needle.svg"
-                    rotation: 0
-                    fillMode: Image.PreserveAspectCrop
-                    sourceSize.width: 100
-                    transformOrigin: Item.Bottom
-                    sourceSize.height: 300
-                }
-            }
-
-            Rectangle {
-                id: fuelNeedle
-                objectName: "fuelneedle"
-                x: 210
-                y: 207
-                width: 100
-                height: 500
-                visible: true
-                color: "#005d2d2d"
-                scale: 1
-                rotation: -90
-
-                Rectangle {
-                    id: fuelAlignment
-                    x: 143
-                    y: 340
-                    width: 100
-                    height: 1
-                    color: "#ffffff"
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    visible: false
-                }
-
-                Image {
-                    id: fuelNeedlePic
-                    x: 0
-                    y: 120
-                    width: 100
-                    height: 130
-                    horizontalAlignment: Image.AlignHCenter
-                    verticalAlignment: Image.AlignTop
-                    source: "file:///" + applicationDirPath + "/resources/images/needle.svg"
-                    scale: 1.2
-                    rotation: 0
-                    sourceSize.width: 100
-                    fillMode: Image.PreserveAspectCrop
-                    transformOrigin: Item.Bottom
-                    sourceSize.height: 300
-                }
-            }
-
-        }
         Rectangle {
-            id: rectangle1
-            width: 500
-            height: 550
-            color: "#0021202c"
+            id: tachRect
+            x: 485
+            y: -319
+            width: 950
+            height: 720
+            color: "#111111"
+            border.color: "#00000000"
+            border.width: 0
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
 
-            Rectangle {
-                id: centerBoxMain
-                x: 84
-                y: -86
-                width: 500
-                height: parent.height
-                radius:10
-                color: "#131313"
-                border.color: "#3b3b3b"
-                border.width: 2
-                anchors.top: parent.top
-                anchors.topMargin: 0
+            Image {
+                id: image
+                width: 1920
+                height: 720
+                anchors.verticalCenter: parent.verticalCenter
+                source: "file:///" + applicationDirPath + "/resources/images/BMW-Z4-M40i-vs-Toyota-Supra-16-of-18.png"
                 anchors.horizontalCenter: parent.horizontalCenter
+                fillMode: Image.PreserveAspectCrop
+            }
+
+            Rectangle {
+                id: tachNeedleRect
+                objectName: "tachneedle"
+                width: 421
+                height: 20
+                color: "#00ffffff"
+                border.color: "#00000000"
+                anchors.verticalCenter: parent.verticalCenter
+                rotation: -75
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.horizontalCenterOffset: 15
 
                 Image {
-                    id: bottomRedBox
-                    width: 490
-                    height: 170
-                    y: 375
-                    clip:true
-                    source: "file:///" + applicationDirPath + "/resources/images/centerRedBox.png"
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    sourceSize.width: 550
-                    fillMode: Image.Stretch
-
-                    Rectangle {
-                        id: gearIndicatorBox
-                        x: 213
-                        width: 96
-                        height: 72
-                        color: "#00ffffff"
-                        radius: 10
-                        border.color: "#c8c8c8"
-                        border.width: 3
-                        anchors.top: parent.top
-                        anchors.topMargin: 5
-                        anchors.horizontalCenter: parent.horizontalCenter
-
-                        Text {
-                            id: gearText
-                            objectName: "gearText"
-                            width: 81
-                            height: 58
-                            color: "#c8c8c8"
-                            text: qsTr("N")
-                            anchors.verticalCenter: parent.verticalCenter
-                            font.pixelSize: 70
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            anchors.verticalCenterOffset: -3
-                            fontSizeMode: Text.FixedSize
-                            font.family: "Exo ExtraBold"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-
-                    Rectangle {
-                        id: bottomBoxSep
-                        width: 480
-                        height: 1
-                        color: "#ffffff"
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.verticalCenterOffset: -5
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    Rectangle {
-                        id: warningBox
-                        width: 56
-                        height: 56
-                        visible: false
-                        color: "#00ffffff"
-                        anchors.left: parent.left
-                        anchors.bottom: parent.bottom
-                        anchors.leftMargin: 12
-                        anchors.bottomMargin: 16
-
-                        Image {
-                            id: warningImage
-                            width: 56
-                            height: 56
-                            sourceSize.width: 56
-                            fillMode: Image.PreserveAspectFit
-                        }
-                    }
-
-                    Text {
-                        id: odoNum
-                        objectName: "odoNum"
-                        x: 143
-                        y: 134
-                        width: 166
-                        height: 36
-                        color: "#c8c8c8"
-                        text: qsTr("077500")
-                        font.pixelSize: 28
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        font.family: "Michroma"
-                        fontSizeMode: Text.FixedSize
-                    }
-
-                    Text {
-                        id: odoUnitText
-                        x: 190
-                        y: 135
-                        width: 80
-                        height: 24
-                        color: "#c8c8c8"
-                        text: qsTr("miles")
-                        anchors.bottom: parent.bottom
-                        font.pixelSize: 24
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        anchors.bottomMargin: 0
-                        anchors.left: odoNum.right
-                        fontSizeMode: Text.HorizontalFit
-                        font.family: "Exo ExtraBold"
-                    }
-
-                    Text {
-                        id: tripText
-                        objectName: "tripNum"
-                        y: 98
-                        width: 198
-                        height: 36
-                        color: "#c8c8c8"
-                        text: qsTr("0.0")
-                        anchors.bottom: parent.bottom
-                        font.pixelSize: 28
-                        horizontalAlignment: Text.AlignRight
-                        verticalAlignment: Text.AlignVCenter
-                        anchors.horizontalCenterOffset: -2
-                        anchors.bottomMargin: 36
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        fontSizeMode: Text.FixedSize
-                        font.family: "Michroma"
-
-                        Image {
-                            id: tripImage
-                            width: 28
-                            height: 28
-                            visible: true
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            source: "file:///" + applicationDirPath + "/resources/images/tripImage.png"
-                            anchors.leftMargin: 0
-                            anchors.verticalCenterOffset: 2
-                            sourceSize.height: 26
-                            sourceSize.width: 26
-                            fillMode: Image.PreserveAspectCrop
-                            MouseArea{
-                                anchors.fill: parent
-                                onClicked: {
-                                    gauge.resetTrip()
-
-                                }
-                            }
-                        }
-                    }
-
-                }
-
-                Image {
-                    id: topRedBox
-                    y: 5
-                    width: 490
-                    height: 170
-                    clip:true
-                    source: "file:///" + applicationDirPath + "/resources/images/centerRedBox.png"
-                    rotation: 180
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    sourceSize.width: 550
-                    fillMode: Image.Stretch
-
-                    Rectangle {
-                        id: speedoHandler
-                        width: 480
-                        rotation: 180
-                        height: 150
-                        color: "#00ffffff"
-                        border.color: "#00000000"
-                        border.width: 0
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-
-                        Label {
-                            id: speedText
-                            x: 182
-                            y: 39
-                            objectName: "speedText"
-                            width: speedText.paintedWidth
-                            height: 78
-                            color: "#c8c8c8"
-                            text: qsTr("0")
-                            anchors.verticalCenter: parent.verticalCenter
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-
-                            font.bold: true
-                            font.pointSize: 64
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.family: "Michroma"
-                        }
-
-                        Label {
-                            id: mphText
-                            x: 162
-                            y: 39
-                            width: 80
-                            height: 30
-                            color: "#c8c8c8"
-                            text: qsTr("MPH")
-                            anchors.bottom: speedText.bottom
-                            anchors.left: speedText.right
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-
-
-                            objectName: "speedText"
-                            font.pointSize: 26
-                            font.family: "Exo ExtraBold"
-                            font.bold: true
-                        }
-                    }
-                }
-
-                Text {
-                    id: statusText
-                    objectName: "statusText"
-                    width: 453
-                    height: 140
-                    visible: false
-                    color: "#c8c8c8"
-                    text: qsTr("Error Message")
+                    id: needlePic
+                    width: 35
+                    height: 250
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 55
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    lineHeightMode: Text.ProportionalHeight
-                    wrapMode: Text.WordWrap
-                    fontSizeMode: Text.VerticalFit
-                    font.family: "NI7SEG"
+                    source: "file:///" + applicationDirPath + "/resources/images/needle.png"
+                    rotation: 270
+                    anchors.verticalCenterOffset: 0
+                    anchors.horizontalCenterOffset: -135
+                    transformOrigin: Item.Center
+                    sourceSize.height: 112
+                    sourceSize.width: 75
                     anchors.horizontalCenter: parent.horizontalCenter
+                    fillMode: Image.PreserveAspectCrop
                 }
+            }
 
-                Rectangle {
-                    id: statusRect
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    x: 139
-                    y: 175
-                    width: parent.width
-                    height: 180
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: "#00ffffff"
-                    border.color: "#00000000"
-                    border.width: 0
 
-                    Rectangle {
-                        id: verticalBar
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.verticalCenter: parent.verticalCenter
-                        x: 203
-                        y: 10
-                        width: 1
-                        height: 170
-                        color: "#6fffffff"
-                    }
+        }
 
-                    Rectangle {
-                        id: horizontalBar1
-                        x: 80
-                        y: 13
-                        width: 420
-                        height: 1
-                        color: "#6fffffff"
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
+        Rectangle {
+            id: gearIndicatorBox
+            x: 202
+            width: 150
+            height: 150
+            color: "#00ffffff"
+            radius: 10
+            border.color: "#00c8c8c8"
+            border.width: 0
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
 
-                    }
-
-                    Label {
-                        id: topLeftValue
-                        x: 45
-                        y: 40
-                        width: 200
-                        objectName: "topLeftValue"
-                        color: "#c5c5c5"
-                        text: qsTr("14.7")
-                        font.family: "Michroma"
-                        font.pointSize: 24
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-
-                    Label {
-                        id: topRightValue
-                        x: 255
-                        y: 40
-                        width: 200
-                        objectName: "topRightValue"
-                        color: "#c5c5c5"
-                        text: qsTr("-0.71")
-                        font.pointSize: 24
-                        font.family: "Michroma"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-
-                    Label {
-                        id: bottomRightValue
-                        x: 255
-                        y: 120
-                        width: 200
-                        color: "#c5c5c5"
-                        objectName: "bottomRightValue"
-                        text: qsTr("196")
-                        font.pointSize: 24
-                        font.family: "Michroma"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-
-                    Label {
-                        id: bottomLeftValue
-                        x: 45
-                        y: 120
-                        width: 200
-                        color: "#c5c5c5"
-                        objectName: "bottomLeftValue"
-                        text: qsTr("102")
-                        font.pointSize: 24
-                        font.family: "Michroma"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-
-                    Label {
-                        id: topLeftLabel
-                        objectName: "topLeftLabel"
-                        x: 60
-                        y: 10
-                        width: 170
-                        height: 30
-                        color: "#c5c5c5"
-                        text: qsTr("AF Ratio")
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        wrapMode: Text.NoWrap
-                        font.pointSize: 14
-                        font.family: "Michroma"
-                    }
-                    Label {
-                        id: topRightLabel
-                        x: 275
-                        y: 10
-                        width: 170
-                        height: 30
-                        objectName: "topRightLabel"
-                        color: "#c5c5c5"
-                        text: qsTr("AF Learn")
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        wrapMode: Text.NoWrap
-                        font.pointSize: 14
-                        font.family: "Michroma"
-                    }
-                    Label {
-                        id: bottomRightLabel
-                        x: 275
-                        y: 90
-                        width: 170
-                        objectName: "bottomRightLabel"
-                        height: 30
-                        color: "#c5c5c5"
-                        text: qsTr("Oil Temp")
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        wrapMode: Text.NoWrap
-                        font.pointSize: 14
-                        font.family: "Michroma"
-                    }
-                    Label {
-                        id: bottomLeftLabel
-                        x: 60
-                        y: 90
-                        width: 170
-                        height: 30
-                        color: "#c5c5c5"
-                        objectName: "bottomLeftLabel"
-                        text: qsTr("Intake Temp")
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        wrapMode: Text.NoWrap
-                        font.pointSize: 14
-                        font.family: "Michroma"
-                    }
-                }
+            Label {
+                id: gearIndicator
+                objectName: "gearText"
+                x: 31
+                y: -19
+                color: "#b53519"
+                text: qsTr("2")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenterOffset: -5
+                anchors.verticalCenterOffset: 0
+                font.pointSize: 100
+                font.family: "Alaca Bold Italic"
+                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
 
         Button {
             id: defButton
-            x: 710
-            y: 44
+            x: 91
+            y: 672
             width: 118
             height: 40
             background: Rectangle{
                 radius: 10
-                color: "#5c5c5c"
+                color: "#404040"
             }
             text: qsTr("Defs")
             icon.color: "#000000"
@@ -608,28 +133,50 @@ Window{
 
         Button {
             id: logBtn
-            x: 1090
-            y: 44
+            x: 361
+            y: 672
             width: 118
             height: 40
             text: qsTr("Start Logging")
             background: Rectangle {
                 radius: 10
-                color: "#5c5c5c"
+                color: "#404040"
             }
             onClicked: {
                 logger.startLogging()
             }
         }
 
+        Button {
+            id: settingsBtn
+            objectName: "settingsBtn"
+            x: 228
+            y: 672
+            width: 118
+            height: 40
+            text: qsTr("Settings")
+            background: Rectangle {
+                color: "#404040"
+                radius: 10
+            }
+            onClicked:{
+                var component = Qt.createComponent("SettingsWindow.qml")
+                var win = component.createObject(root)
+                win.show
+
+            }
+        }
+
         Image {
             id: rightSignal
             objectName:"rightSignal"
-            x: 1216
-            y: 125
             width: 64
             height: 64
+            anchors.top: parent.top
             source: "file:///" + applicationDirPath + "/resources/images/offSignal.svg"
+            anchors.topMargin: 15
+            anchors.horizontalCenterOffset: 350
+            anchors.horizontalCenter: parent.horizontalCenter
             antialiasing: true
             mipmap: true
             sourceSize.height: 64
@@ -640,11 +187,13 @@ Window{
         Image {
             id: leftSignal
             objectName:"leftSignal"
-            x: 640
-            y: 125
             width: 64
             height: 64
+            anchors.top: parent.top
             source: "file:///" + applicationDirPath + "/resources/images/offSignal.svg"
+            anchors.topMargin: 15
+            anchors.horizontalCenterOffset: -350
+            anchors.horizontalCenter: parent.horizontalCenter
             mirror: true
             fillMode: Image.PreserveAspectFit
             antialiasing: true
@@ -656,11 +205,14 @@ Window{
         Image {
             id: lightIndicator
             objectName:"lightIndicator"
-            x: 1260
             y: 76
             width: 64
             height: 64
-            source: "file:///" + applicationDirPath + "/resources/images/lightsOn.svg"
+            anchors.bottom: parent.bottom
+            source: "file:///" + applicationDirPath + "/resources/images/lightsOff.svg"
+            anchors.bottomMargin: -5
+            anchors.horizontalCenterOffset: -300
+            anchors.horizontalCenter: parent.horizontalCenter
             scale: 0.7
             antialiasing: true
             mipmap: true
@@ -669,33 +221,338 @@ Window{
             fillMode: Image.PreserveAspectFit
         }
 
-        Button {
-            id: settingsBtn
-            objectName: "settingsBtn"
-            x: 901
-            y: 44
-            width: 118
-            height: 40
-            text: qsTr("Settings")
-            background: Rectangle {
-                color: "#5c5c5c"
-                radius: 10
-            }
-            onClicked:{
-                var component = Qt.createComponent("SettingsWindow.qml")
-                var win = component.createObject(root)
-                win.show
 
+
+        Text {
+            id: odoNum
+            objectName: "odoNum"
+            x: 1308
+            y: 574
+            width: 166
+            height: 36
+            color: "#c8c8c8"
+            text: qsTr("000000")
+            font.pixelSize: 28
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            font.family: "Michroma"
+            fontSizeMode: Text.FixedSize
+        }
+
+        Text {
+            id: odoUnitText
+            x: 314
+            y: 586
+            width: 80
+            height: 24
+            color: "#c8c8c8"
+            text: qsTr("miles")
+            anchors.bottom: parent.bottom
+            font.pixelSize: 24
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            anchors.leftMargin: 0
+            anchors.bottomMargin: 110
+            anchors.left: odoNum.right
+            fontSizeMode: Text.HorizontalFit
+            font.family: "Exo ExtraBold"
+        }
+
+        Text {
+            id: tripText
+            x: 1600
+            objectName: "tripNum"
+            y: 540
+            width: 198
+            height: 36
+            color: "#c8c8c8"
+            text: qsTr("0.0")
+            anchors.bottom: parent.bottom
+            font.pixelSize: 28
+            horizontalAlignment: Text.AlignRight
+            verticalAlignment: Text.AlignVCenter
+            anchors.horizontalCenterOffset: 415
+            anchors.bottomMargin: 140
+            anchors.horizontalCenter: parent.horizontalCenter
+            fontSizeMode: Text.FixedSize
+            font.family: "Michroma"
+
+            Image {
+                id: tripImage
+                width: 28
+                height: 28
+                visible: true
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                source: "file:///" + applicationDirPath + "/resources/images/tripImage.png"
+                anchors.leftMargin: 0
+                anchors.verticalCenterOffset: 2
+                sourceSize.height: 26
+                sourceSize.width: 26
+                fillMode: Image.PreserveAspectCrop
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        gauge.switchActiveTrip();
+
+                    }
+                }
             }
         }
 
 
 
+
+
+        Rectangle {
+            id: speedoHandler
+            x: 720
+            y: 285
+            width: 480
+            rotation: 0
+            height: 150
+            color: "#00ffffff"
+            border.color: "#00000000"
+            border.width: 0
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 0
+            anchors.horizontalCenterOffset: -540
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            Label {
+                id: speedText
+                x: 182
+                y: 39
+                objectName: "speedText"
+                width: speedText.paintedWidth
+                height: 78
+                color: "#c8c8c8"
+                text: qsTr("0")
+                anchors.verticalCenter: parent.verticalCenter
+
+                anchors.right: mphText.left
+                anchors.rightMargin: 2
+                verticalAlignment: Text.AlignVCenter
+
+                font.bold: true
+                font.pointSize: 60
+
+                font.family: "Michroma"
+            }
+
+            Label {
+                id: mphText
+                x: 350
+                y: 39
+                width: 80
+                height: 30
+                color: "#c8c8c8"
+                text: qsTr("MPH")
+                anchors.bottom: speedText.bottom
+
+                verticalAlignment: Text.AlignVCenter
+
+
+                objectName: "speedText"
+                font.pointSize: 20
+                font.family: "Exo ExtraBold"
+                font.bold: true
+            }
+        }
+        Rectangle {
+            id: statusRect
+            x: 1100
+            y: 270
+            width: 500
+            height: 180
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 0
+            color: "#00ffffff"
+            border.color: "#00000000"
+            border.width: 0
+
+            Rectangle {
+                id: verticalBar
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                x: 203
+                y: 10
+                width: 2
+                height: 170
+                color: "#6fffffff"
+            }
+
+            Rectangle {
+                id: horizontalBar1
+                x: 80
+                y: 13
+                width: 400
+                height: 1
+                color: "#6fffffff"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+
+            }
+
+            Label {
+                id: topLeftValue
+                x: 45
+                y: 40
+                width: 200
+                objectName: "topLeftValue"
+                color: "#c5c5c5"
+                text: qsTr("")
+                font.family: "Michroma"
+                font.pointSize: 24
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            Label {
+                id: topRightValue
+                x: 255
+                y: 40
+                width: 200
+                objectName: "topRightValue"
+                color: "#c5c5c5"
+                text: qsTr("")
+                font.pointSize: 24
+                font.family: "Michroma"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            Label {
+                id: bottomRightValue
+                x: 255
+                y: 120
+                width: 200
+                color: "#c5c5c5"
+                objectName: "bottomRightValue"
+                text: qsTr("")
+                font.pointSize: 24
+                font.family: "Michroma"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            Label {
+                id: bottomLeftValue
+                x: 45
+                y: 120
+                width: 200
+                color: "#c5c5c5"
+                objectName: "bottomLeftValue"
+                text: qsTr("")
+                font.pointSize: 24
+                font.family: "Michroma"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            Label {
+                id: topLeftLabel
+                objectName: "topLeftLabel"
+                x: 60
+                y: 10
+                width: 170
+                height: 30
+                color: "#c5c5c5"
+                text: qsTr("AF Ratio")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                wrapMode: Text.NoWrap
+                font.pointSize: 14
+                font.family: "Michroma"
+            }
+            Label {
+                id: topRightLabel
+                x: 275
+                y: 10
+                width: 170
+                height: 30
+                objectName: "topRightLabel"
+                color: "#c5c5c5"
+                text: qsTr("AF Learn")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                wrapMode: Text.NoWrap
+                font.pointSize: 14
+                font.family: "Michroma"
+            }
+            Label {
+                id: bottomRightLabel
+                x: 275
+                y: 90
+                width: 170
+                objectName: "bottomRightLabel"
+                height: 30
+                color: "#c5c5c5"
+                text: qsTr("Oil Temp")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                wrapMode: Text.NoWrap
+                font.pointSize: 14
+                font.family: "Michroma"
+            }
+            Label {
+                id: bottomLeftLabel
+                x: 60
+                y: 90
+                width: 170
+                height: 30
+                color: "#c5c5c5"
+                objectName: "bottomLeftLabel"
+                text: qsTr("Intake Temp")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                wrapMode: Text.NoWrap
+                font.pointSize: 14
+                font.family: "Michroma"
+            }
+        }
+
+
+
+
     }
+
+    Label {
+        id: clockText
+        objectName: "clockText"
+        x: 1200
+        y: 138
+        width: 200
+        height: 50
+        color: "#c5c5c5"
+        text: qsTr("")
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        font.family: "Michroma"
+        font.pointSize: 22
+    }
+
+    Label {
+        id: tempText
+        objectName: "temperatureText"
+        x: 1400
+        y: 138
+        width: 200
+        height: 50
+        color: "#c5c5c5"
+        text: qsTr(" F")
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        font.pointSize: 20
+        font.family: "Michroma"
+    }
+
+
 }
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.9}D{i:34}D{i:35}D{i:36}D{i:37}
+    D{i:0;formeditorZoom:0.9}D{i:6;invisible:true}D{i:7;invisible:true}D{i:8;invisible:true}
+D{i:9;invisible:true}D{i:41}
 }
 ##^##*/
 

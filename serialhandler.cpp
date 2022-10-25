@@ -18,8 +18,8 @@ serialHandler::serialHandler(QObject *parent)
             }
         }
 
-        qDebug() << "settings";
-        serial->setBaudRate(600000);
+        qDebug() << "*settings";
+        serial->setBaudRate(921600);
         serial->setDataBits(QSerialPort::Data8);
         serial->setParity(QSerialPort::NoParity);
         serial->setStopBits(QSerialPort::OneStop);
@@ -34,20 +34,22 @@ serialHandler::serialHandler(QObject *parent)
 
         }
     }
+
     lastSerial = 0;
-    //QTimer * timer = new QTimer(this);
-    //timer->setInterval(1000);
-    //QObject::connect(timer, &QTimer::timeout, this, &serialHandler::serialReceived);
 
 
-    //timer->start();
 
-    serial->write("WRITE:[2016] [01] [170] [0] [0] [0] [0] [0] [0] /");
+
+
+    serial->write("W: [2016] [01] [170] [0] [0] [0] [0] [0] [0] /");
+    //serial->write("WRITE:[2016] [02] [16] [03] [0] [0] [0] [0] [0] /");
+    //serial->write("WRITE:[2016] [16] [8] [168] [0] [0] [0] [9] [0] /");
+    //qDebug() << "frame: " << uartToFrame("[2016] [16] [8] [168] [0] [0] [0] [9] [0]").toString();
+    //serial->write("WRITE:[2016] [33]");
 
 
     serialString = "";
 
-    qDebug() << "processed frame test: " << uartToFrame("READ:[2016] [01] [170] [255] [4] [22] [39] [57] [02]").toString();
 }
 
 //returns true if message is received
@@ -66,60 +68,12 @@ bool serialHandler::waitForFramesReceived(int msecs)
     return result;
 }
 
-//waits for ecu response and returns all responses if received. if multi part message, it'll keep adding payload
-//to array until it times out.
-//TODO: exit based on msg length from ecu
-QByteArray serialHandler::waitForEcuResponse(int msecs)
-{
-    int multiPartMsg = 0;
-    QByteArray rx = "";
-    QString test;
-    enum {Received = 0, Error, Timeout};
-    QEventLoop loop;
-    //QObject::connect(this, &serialHandler::testRes, &loop, [&]() {qDebug() << "exit"; loop.exit(Received);});
-
-    if(msecs >= 0){
-        QTimer::singleShot(msecs, &loop, [&]() {loop.exit(Timeout);});
-    }
-    int result = loop.exec(QEventLoop::ExcludeUserInputEvents);
-    /*
-    QObject::connect(this, &serialHandler::ecuResponse, [&loop, this] (QCanBusFrame lamFrame) {
-        if(lamFrame.isValid()){
-            qDebug() << "valid frame";
-        }
-        if(lamFrame.payload().at(0) == 10){
-            qDebug() << "multi part msg";
-
-        }
-       // qDebug() << "lam test: " << lamFrame.toString();
-        //QByteArray tmp = lamFrame.payload();
-        //qDebug() << "tmp: " << tmp;
-        //rx.insert(0, tmp);
-        //rx.append(lamFrame.payload());
-        //qDebug() << "frame set test: " << QString(rx.toHex().toUpper());
-        if(1){
-           qDebug() << "extining";
-           loop.exit(Received);
-        }
-
-    } );
-    if(result == Timeout){
-        qDebug() << "frame timed out";
-    } else if(result == Received){
-        qDebug() << "loop received";
-        return rx;
-        //QObject::disconnect(this, &serialHandler::ecuResponse, this, nullptr);
-        //qDebug() << "rx lam: " << rx;
-    }*/
-
-    return rx;
 
 
-}
-
+//allows external classes to access serial's waitforwritten
 bool serialHandler::waitForBytesWritten(int msecs)
 {
-    serial->waitForBytesWritten(msecs);
+    return serial->waitForBytesWritten(msecs);
 }
 
 
@@ -128,34 +82,28 @@ bool serialHandler::waitForBytesWritten(int msecs)
 void serialHandler::serialReceived()
 {
     rxbuffer = serial->readAll();
+    //serial->flush();
+    //serial->clear();
     serialString += QString::fromStdString(rxbuffer.toStdString());
     //Debug() << "serial received";
     if(serialString.contains("\\")){
-        rxbuffer.clear();
+        rxbuffer.clear();}
 
     QStringList bufferSplit = serialString.split("\\");
+    //qDebug() << "serial: " << serialString;
     int cleared = 1;
     if(bufferSplit.length() > 1){
         for(int i = 0; i<bufferSplit.length()-1; i++){
             if(bufferSplit.at(i)!= ""){
 
-                if(bufferSplit.at(i).contains("READ:") && !bufferSplit.at(i).contains("WRITE")){
-                    //do stuff with read message
-                    currentFrame = uartToFrame(bufferSplit.at(i));
-                    //qDebug() << "frame: " << currentFrame.toString();
+                if(bufferSplit.at(i).contains("R:") && !bufferSplit.at(i).contains("W")){
+
+                    emit serialFrameReceived(uartToFrame(bufferSplit.at(i)));
                     //qDebug() << bufferSplit.at(i);
-                    if(currentFrame.frameId() == 885){
-                        qDebug() << "door frame: " << currentFrame.toString();
-                    }
-                    if(currentFrame.frameId() == 2024){
-                       // qDebug() << "ecu response: " << currentFrame.toString();
-                        emit ecuResponse(currentFrame);
-                        emit testRes();
-                    } else {
-                        emit messageRead(currentFrame);
-                    }
-                    int len = bufferSplit.at(i).length();
+
+                    //int len = bufferSplit.at(i).length();
                     serialString.remove(bufferSplit.at(i)+"\\");
+
                     if(i == bufferSplit.length()-2){
                         //qDebug() << "end";
                         if(lastSerial == serialString.length()){
@@ -204,7 +152,7 @@ void serialHandler::serialReceived()
     }
     }
 
-}
+
 
 //returns a filled frame from given esp32 message
 QCanBusFrame serialHandler::uartToFrame(QString msg)
@@ -269,7 +217,7 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
 //creates and sends the write message to the esp32
 void serialHandler::writeFrame(QCanBusFrame frame)
 {
-    QString serialMsg = "WRITE: ";
+    QString serialMsg = "W: ";
     QString id = "[" + QString::number(frame.frameId()) + "] ";
     QString framePayload = fr.bytes2String(frame.payload()); //local copy of the payload
     QString payload; //formatted payload that will be sent
@@ -288,13 +236,17 @@ void serialHandler::writeFrame(QCanBusFrame frame)
         tmp.clear();
 
     }
+    //qDebug() << "framepayload: " << framePayload.length();
+    if(framePayload.length()<16){
+        for(int i = framePayload.length(); i < 16; i=i+2){
+            payload.insert(payload.length()-1, " [0]");
+        }
+    }
     serialMsg.append(id);
     serialMsg.append(payload);
     serialMsg.append("/");
+    //qDebug() << "serial write: " << serialMsg;
     serial->write(serialMsg.toStdString().c_str());
-    //qDebug() << "sent serial frame: " << serialMsg.toStdString().c_str();
-
-
 
 }
 

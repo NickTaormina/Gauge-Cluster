@@ -13,7 +13,57 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include "serialhandler.h"
+#include <QtGlobal>
 
+QString logPath;
+QString framePath;
+
+//debug log handler.
+void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg){
+    QString txt;
+    QString frame;
+    QByteArray local = msg.toLocal8Bit();
+    int fr = 0;
+
+    switch (type) {
+    case QtDebugMsg:
+        txt = QString("") + msg;
+        if(msg.at(0)!="*"){
+            fprintf(stdout, "%s\n", local.constData());
+        }
+        break;
+    case QtInfoMsg: //save frame processing data as info into a sep file
+        frame = QString("") + msg;
+        fr = 1;
+        break;
+    case QtWarningMsg:
+        txt = QString("Warning: ") + (msg);
+        fprintf(stdout, "%s\n", local.constData());
+    break;
+    case QtCriticalMsg:
+        txt = QString("Critical: ")+(msg);
+        fprintf(stdout, "%s\n", local.constData());
+    break;
+    case QtFatalMsg:
+        txt = QString("Fatal: ")+(msg);
+        fprintf(stdout, "%s\n", local.constData());
+        abort();
+    }
+
+    if(fr == 1){
+         QFile frameFile(framePath);
+         frameFile.open(QIODevice::WriteOnly | QIODevice::Append);
+          QTextStream fs(&frameFile);
+          fs << frame << Qt::endl;
+    }else {
+        QFile outFile(logPath);
+        outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+        QTextStream ts(&outFile);
+        ts << txt << Qt::endl;
+    }
+
+
+}
 
 
 int main(int argc, char *argv[])
@@ -39,25 +89,38 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
+
+
+    //error logging setup
+    logPath = QCoreApplication::applicationDirPath() + "/logs/"+ "log-" + QDateTime::currentDateTime().toString("dd.MM.hh.mm.ss") + ".txt";
+    framePath = QCoreApplication::applicationDirPath() + "/logs/"+ "frames-" + QDateTime::currentDateTime().toString("dd.MM.hh.mm.ss") + ".txt";
+    setvbuf(stderr, NULL, _IONBF, 0);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    qInstallMessageHandler(myMessageHandler);
+
+
+
+
+
     config* cfg = new config[5];
     configHandler hand(nullptr, cfg);
     hand.parseConfig();
-    qDebug() <<"test: " <<hand.getParams();
+    qDebug() << "*handler params: " <<hand.getParams();
     gear gr;
     hand.fillGear(&gr);
     trip tr;
-    hand.fillTrip(&tr);
+    hand.fillTrip(&tr, "tripA");
     Definition def;
     defWindow defWin(nullptr, &def);
 
     defWin.parseDefs();
     qDebug() << defWin.params();
 
-    qDebug() << "main can count: " << hand.getCanCount();
+    qDebug() << "*main can count: " << hand.getCanCount();
     canDef * _candef = new canDef[hand.getCanCount()];
     canData _canData(_candef, hand.getCanCount());
     QObject::connect(&hand, &configHandler::canFilled, [&_canData, &_candef, &hand](){
-        qDebug() << "fill can from connect";
+        qDebug() << "*fill can from connect";
         _canData.fillData(_candef, hand.getCanCount());
     } );
     hand.fillCan(_candef);
@@ -72,8 +135,8 @@ int main(int argc, char *argv[])
     QObject::connect(&defWin, &defWindow::defsFilled, log, &logger::createParamArray);
 
 
-
-
+    QObject::connect(&shand, &serialHandler::serialFrameReceived, &can, &canbus::receiveSerialFrame);
+    QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
 
     rootContext->setContextProperty("defClass", &defWin);
     rootContext->setContextProperty("logger", log);
@@ -84,18 +147,20 @@ int main(int argc, char *argv[])
     QObject* main = obj.at(0);
     QObject * statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
-    gauges* gauge = new gauges(nullptr, main, &gr, &tr, &cfg[config::GAUGES], &_canData);
+    gauges* gauge = new gauges(nullptr, main, &gr, &tr, &cfg[config::GAUGES], &hand, &_canData);
     QObject::connect(log, &logger::setParams, gauge, &gauges::setParamPointer);
-    QObject::connect(&shand, &serialHandler::ecuResponse, log, &logger::combineECUResponse);
+    QObject::connect(&can, &canbus::ecuResponse, log, &logger::combineECUResponse);
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
     QObject::connect(gauge, &gauges::tripUpdated, &hand, &configHandler::storeTrip);
+    QObject::connect(gauge, &gauges::tripSwapped, &hand, &configHandler::swapTrip);
     defWin.fillDefs();
-    qDebug() << "reponse length: " << def.getRxMessageLength();
+    qDebug() << "*reponse length: " << def.getRxMessageLength();
     rootContext->setContextProperty("gauge", gauge);
 
 
+
     QDomDocument xml;
-    qDebug() << "reading definition file";
+    qDebug() << "*reading definition file";
     QFile defFile("C:/Users/admin/OneDrive - University of Florida/Documents/_Tuning/Gauge Cluster/GaugeCluster/config/config.xml");
     xml.setContent(&defFile);
     defFile.close();
@@ -110,8 +175,15 @@ int main(int argc, char *argv[])
 
 
     //cannects can data to gauges
-    QObject::connect(&_canData, &canData::neutralSwitch, gauge, &gauges::updateNeutral);
-    QObject::connect(&shand, &serialHandler::messageRead, &_canData, &canData::receiveCanData);
+    //QObject::connect(&_canData, &canData::neutralSwitch, gauge, &gauges::updateNeutral);
+    QObject::connect(&can, &canbus::messageRead, &_canData, &canData::receiveCanData);
+
+    QEventLoop loop;
+    QTimer::singleShot(1100, &loop, SLOT(quit()));
+    loop.exec();
+    QObject::connect(log, &logger::paramUpdated, gauge, &gauges::updateParamDisplay);
+    QObject::connect(&_canData, &canData::paramValueChanged, gauge, &gauges::updateParamDisplay);
+
 
 
 

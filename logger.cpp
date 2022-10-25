@@ -15,7 +15,8 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
     can = bus;
     definition = def;
     paramLength = 0;
-    qDebug() << "logger object initialized";
+    qDebug() << "*logger object initialized";
+    logging = 0;
 }
 
 
@@ -29,8 +30,7 @@ void logger::sendLogMessage(){
 
     }
     if(definition->getTxLength() > 0){
-        qDebug() << "tx bytes" << definition->getTxBytes().toHex();
-        qDebug() << "rx array size: " << definition->getRxLength();
+        qInfo() << "tx bytes" << definition->getTxBytes().toHex();
 
             //send the bytes
             can->writeFrames(fr.string2Uint("000007E0"), definition->getTxBytes());
@@ -47,10 +47,12 @@ void logger::startLogging()
     if(logging == 0){
         logging = 1;
         sendLogMessage();
-        QObject::connect(this, &logger::ecuResponseParsed, this, &logger::sendLogMessage);
+        timer->start(100);
+        //QObject::connect(this, &logger::ecuResponseParsed, this, &logger::sendLogMessage);
 
     } else {
         stopLogging();
+        timer->stop();
     }
 }
 
@@ -67,10 +69,10 @@ void logger::stopLogging()
 //create the parameter objects needed to store the received information
 void logger::createParamArray()
 {
-    qDebug() << "create param array: " << definition->getNumParams();
+    qDebug() << "*create param array: " << definition->getNumParams();
     res = new parameter[definition->getNumParams()];
     for(int i = 0; i < definition->getNumParams(); i++){
-        qDebug() << "setting par: " << i << " : " << definition->getParamNames(i);
+        qDebug() << "*setting par: " << i << " : " << definition->getParamNames(i);
         res[i].setName(definition->getParamNames(i));
         res[i].setFormat(definition->getFormat(i));
         res[i].setUnit(definition->getUnit(i));
@@ -84,19 +86,27 @@ void logger::createParamArray()
 //reads the response from the ecu and combines frames if necessary
 void logger::combineECUResponse(QCanBusFrame frame)
 {
-    if(logging == 1){
-        qDebug() << "combine ecu";
+    if(logging != -1){
         if(frame.payload().at(0) == 16){
+            multiPartMsg = 1;
             msgLength = static_cast<quint8>(frame.payload().at(1));
-        } else {
+
+            /*if(msgLength < 16){ //why is this here?
+                msgLength = 16;
+            }*/
+        } else if (multiPartMsg == 0 && frame.payload().at(0) != 48){
+            multiPartMsg = 0;
             parseECUResponse(frame.payload());
             return;
         }
-        multiPayload.append(frame.payload());
-        if(msgLength >= multiPayload.length()){
-
-            parseECUResponse(multiPayload);
-            multiPayload.clear();
+        if(frame.payload().at(0) != 48){
+            multiPayload.append(frame.payload());
+            if(msgLength <= multiPayload.length()){
+                parseECUResponse(multiPayload);
+                multiPayload.clear();
+            }
+        } else {
+            return;
         }
     }
 }
@@ -104,6 +114,7 @@ void logger::combineECUResponse(QCanBusFrame frame)
 //converts the ecu response to a usable value
 void logger::parseECUResponse(QByteArray rxmsg)
 {
+    qInfo() << "multi payload: " << rxmsg;
     if(logging == 1){
     //qDebug() << "rxmsg: " << rxmsg;
     //look for the starting point of the actual useful data. after the first "E8" byte
@@ -112,7 +123,7 @@ void logger::parseECUResponse(QByteArray rxmsg)
         int pos = -1;
         for(int i = 0; i < rxmsg.size(); i++){
             if(fr.base10Value(rxmsg.at(i)) == 232){
-                qDebug() << "found E8 byte at: " << i;
+                qInfo() << "found E8 byte at: " << i;
                 pos = i+1;
                 break;
             }
@@ -121,11 +132,11 @@ void logger::parseECUResponse(QByteArray rxmsg)
         if(pos>-1){
             int calcpos = 0;
             for(int i = pos; i<rxmsg.length();){
-                qDebug() << "calcpos: " <<calcpos << "rx: " << definition->getRxBytes(calcpos);
+                qInfo() << "calcpos: " <<calcpos << "rx: " << definition->getRxBytes(calcpos);
                 if(definition->getRxBytes(calcpos) == 1){
-                    qDebug() << "conv" << definition->getConv(calcpos);
-                    qDebug() << "offset" << definition->getOffset(calcpos);
-                    qDebug() << "raw value" << fr.base10Value(rxmsg.at(i));
+                    qInfo() << "conv" << definition->getConv(calcpos);
+                    qInfo() << "offset" << definition->getOffset(calcpos);
+                    qInfo() << "raw value" << fr.base10Value(rxmsg.at(i));
                     if(definition->getInvert(calcpos) == 1){
                         res[calcpos].setValue(fr.base10Value(rxmsg.at(i)), definition->getConv(calcpos), definition->getOffset(calcpos), definition->getInvert(calcpos));
                     } else {
@@ -135,7 +146,7 @@ void logger::parseECUResponse(QByteArray rxmsg)
                 } else if (definition->getRxBytes(calcpos) == 2){
                     QByteArray tmp = rxmsg.mid(i,2);
                     int val = fr.base10Value(tmp);
-                    qDebug() << "raw 2 byte val: " << val;
+                    qInfo() << "raw 2 byte val: " << val;
                     if(definition->getInvert(calcpos) == 1){
                         res[calcpos].setValue(val, definition->getConv(calcpos), definition->getOffset(calcpos), definition->getInvert(calcpos));
                     }else{
@@ -145,7 +156,7 @@ void logger::parseECUResponse(QByteArray rxmsg)
                 }
                 res[calcpos].setName(definition->getParamNames(calcpos));
                 res[calcpos].setUnit(definition->getUnit(calcpos));
-                qDebug() << res[calcpos].getName() + ": " << res[calcpos].getValue();
+                qInfo() << res[calcpos].getName() + ": " << res[calcpos].getValue();
                 emit paramUpdated(res[calcpos].getName(), res[calcpos].getValue());
                 calcpos++;
                 //break when all required params are converted, even if there are extra bytes at the end

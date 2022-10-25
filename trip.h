@@ -13,7 +13,6 @@ public:
     void updateTripDistance(int speed, qint64 time);
     void setMilesTraveled(float m);
     void resetTrip();
-    QString getTripNum();
     QString getTrip();
 
 signals:
@@ -22,7 +21,7 @@ public slots:
 private:
     float milesTraveled;
     QDomDocument *xml;
-    QString tripNum;
+
 
 };
 

@@ -31,6 +31,7 @@ QString configHandler::getResourcesPath()
     if(!resourcesPath.isNull()){
         return resourcesPath;
     }
+    return NULL;
 }
 
 QString configHandler::getConfigPath()
@@ -38,6 +39,7 @@ QString configHandler::getConfigPath()
     if(!configPath.isNull()){
         return configPath;
     }
+    return NULL;
 }
 
 QString configHandler::getDefPath()
@@ -48,14 +50,14 @@ QString configHandler::getDefPath()
 
 QStringList configHandler::getParams()
 {
-    qDebug() << "reading definition file";
+    qDebug() << "*reading definition file";
     QStringList _params;
     QFile defFile(_defPath);
     defXml.setContent(&defFile);
     defFile.close();
     //get the year from the file heading
     QDomElement root = defXml.documentElement();
-    qDebug() <<root.tagName();
+    qDebug() << "*" << root.tagName();
 
     //go one level in to read all params
     QDomElement param = root.firstChild().toElement();
@@ -85,7 +87,7 @@ void configHandler::fillDefs(QStringList _selectedParams, Definition* def)
         param = root.firstChild().toElement();
         while(!param.isNull()){
             if(i >= _selectedParams.size()){
-                qDebug() << "break";
+                qDebug() << "*break";
                 break;
             }
             if(param.attribute("name") == _selectedParams.at(i)){
@@ -93,14 +95,14 @@ void configHandler::fillDefs(QStringList _selectedParams, Definition* def)
                 def->appendPID(param.attribute("id").toInt(nullptr, 10));
                 QDomElement child = param.firstChild().toElement();
                 if(child.tagName() == "address"){
-                    qDebug() << "found param: " << param.attribute("name");
+                    qDebug() << "*found param: " << param.attribute("name");
                     QString addr = child.text();
                     addr.remove(' ');
-                    qDebug() << "address: " << addr.toLatin1();
+                    qDebug() << "*address: " << addr.toLatin1();
                     def->appendTx(QByteArray::fromHex(addr.toLatin1()));
                     child = child.nextSibling().toElement();
                     if(child.tagName() == "response"){
-                        qDebug() << "Response length: " << child.attribute("length").toInt(nullptr, 10);
+                        qDebug() << "*Response length: " << child.attribute("length").toInt(nullptr, 10);
                         def->appendRx(child.attribute("length").toInt(nullptr, 10));
                     }
                     child = child.nextSibling().toElement();
@@ -120,10 +122,10 @@ void configHandler::fillDefs(QStringList _selectedParams, Definition* def)
                                 } else {
                                     def->appendInvert(0);
                                 }
-                                qDebug() <<"conv: " << conversion.attribute("expr").toDouble(nullptr);
+                                qDebug() <<"*conv: " << conversion.attribute("expr").toDouble(nullptr);
                             } else if(conversion.tagName() == "offset"){
                                 def->appendOffset(conversion.text().toFloat(nullptr));
-                                qDebug() << "offset: " << conversion.text().toFloat(nullptr);
+                                qDebug() << "*offset: " << conversion.text().toFloat(nullptr);
                             }
                             conversion = conversion.nextSibling().toElement();
                         }
@@ -135,8 +137,8 @@ void configHandler::fillDefs(QStringList _selectedParams, Definition* def)
             param = param.nextSibling().toElement();
         }
     }
-    qDebug() << "defs filled";
-    qDebug() << "raw tx message: " << def->getTxBytes().toHex();
+    qDebug() << "*defs filled";
+    qDebug() << "*raw tx message: " << def->getTxBytes().toHex();
     emit defsFilled();
 }
 
@@ -148,12 +150,12 @@ void configHandler::fillGear(gear *g)
     f.close();
     QDomElement root = ratioXml.documentElement();
     QDomElement ratio = root.firstChild().toElement();
-    qDebug() << "ratio" << ratio.tagName();
+    qDebug() << "*ratio" << ratio.tagName();
     QList<float> ratios;
     while(!ratio.isNull()){
         if(ratio.tagName() == "one"){
             ratios.append(ratio.text().toFloat(nullptr));
-            qDebug() << "1st ratio: " << ratio.text().toFloat(nullptr);
+            qDebug() << "*1st ratio: " << ratio.text().toFloat(nullptr);
         } else if(ratio.tagName() == "two"){
             ratios.append(ratio.text().toFloat(nullptr));
         } else if(ratio.tagName() == "three"){
@@ -176,16 +178,21 @@ void configHandler::fillGear(gear *g)
     g->setRatios(ratios);
 }
 
-void configHandler::fillTrip(trip *tr)
+void configHandler::fillTrip(trip *tr, QString tripName)
 {
 
     QDomElement xt = configXml.firstChild().firstChild().toElement();
     while(!xt.isNull()){
         if(xt.tagName() == "trip"){
-            xt = xt.firstChild().toElement();
-            tr->setMilesTraveled(xt.text().toFloat(nullptr));
-            qDebug() << "trip:" << xt.text().toFloat(nullptr);
-            break;
+            QDomElement trElement = xt.firstChild().toElement();
+            while(!trElement.isNull()){
+                if(trElement.tagName() == tripName){
+                    tr->setMilesTraveled(trElement.text().toFloat(nullptr));
+                    qDebug() << "*trip " << trElement.tagName()<< " : " << trElement.text().toFloat(nullptr);
+                    break;
+                }
+                trElement = trElement.nextSibling().toElement();
+            }
         }
         xt = xt.nextSibling().toElement();
     }
@@ -200,11 +207,17 @@ void configHandler::storeTrip(QString trip, QString val)
     while(!xt.isNull()){
         if(xt.tagName() == "trip"){
             tr = xt.firstChild().toElement();
-            QDomElement newNode = configXml.createElement(trip);
-            QDomText newText = configXml.createTextNode(val);
-            newNode.appendChild(newText);
-            xt.replaceChild(newNode, tr);
-            break;
+            while(!tr.isNull()){
+                if(tr.tagName() == trip){
+                    QDomElement newNode = configXml.createElement(trip);
+                    QDomText newText = configXml.createTextNode(val);
+                    newNode.appendChild(newText);
+                    xt.replaceChild(newNode, tr);
+                    break;
+                } else {
+                    tr = tr.nextSibling().toElement();
+                }
+            }
         }
         xt = xt.nextSibling().toElement();
     }
@@ -214,6 +227,37 @@ void configHandler::storeTrip(QString trip, QString val)
     configXml.save(stream, 4);
     f.close();
 
+}
+
+void configHandler::swapTrip(QString trip){
+    QFile f(configPath);
+    f.open(QIODevice::ReadWrite);
+    QDomElement xt = configXml.firstChild().firstChild().toElement();
+    while(!xt.isNull()){
+        if(xt.tagName() == "gauges"){
+            QDomElement parent = xt.firstChild().toElement();
+            QDomElement trEl = parent.firstChild().toElement();
+            while(!trEl.isNull()){
+                if(trEl.tagName() == "activeTrip"){
+                    QDomElement newNode = configXml.createElement("activeTrip");
+                    QDomText newText = configXml.createTextNode(trip);
+                    qDebug() << "*writing active trip: " << trip;
+                    newNode.appendChild(newText);
+                    parent.replaceChild(newNode, trEl);
+                    break;
+                }
+                trEl = trEl.nextSibling().toElement();
+            }
+            break;
+        }
+        xt = xt.nextSibling().toElement();
+    }
+    QDomElement tr;
+    f.resize(0);
+    QTextStream stream;
+    stream.setDevice(&f);
+    configXml.save(stream, 4);
+    f.close();
 }
 
 //reads the config xml and stores into config map
@@ -226,7 +270,7 @@ void configHandler::parseConfig()
      }
      QDomElement root = configXml.documentElement();
      QDomElement category = root.firstChild().toElement();
-     qDebug() << "category: " << category.tagName();
+     qDebug() << "*category: " << category.tagName();
      while(!category.isNull()){
          int cat;
          if(category.tagName() == "defs"){
@@ -239,11 +283,11 @@ void configHandler::parseConfig()
             cat = config::GAUGES;
          }
          QDomElement sub = category.firstChild().toElement();
-         qDebug() << "sub: " << sub.tagName();
-         qDebug() << "childNodes: " << sub.childNodes().count();
+         qDebug() << "*sub: " << sub.tagName();
+         qDebug() << "*childNodes: " << sub.childNodes().count();
          while(!sub.isNull()){
              if(sub.childNodes().count() < 2){
-                 qDebug() << "configs[" << cat << "]: " << sub.tagName() << " val: " <<sub.text();
+                 qDebug() << "*configs[" << cat << "]: " << sub.tagName() << " val: " <<sub.text();
                  cfg[cat].setValue(sub.tagName(), sub.text());
              } else {
                  QDomElement child = sub.firstChild().toElement();
@@ -252,10 +296,10 @@ void configHandler::parseConfig()
                          QString tmp = child.tagName();
                          tmp.replace(0, 1, tmp[0].toUpper());
                          tmp.prepend(sub.tagName());
-                         qDebug() << "configc: " << tmp << " val: " <<child.text();
+                         qDebug() << "*configc: " << tmp << " val: " <<child.text();
                         cfg[cat].setValue(tmp, child.text());
                      } else {
-                         qDebug() << "config xml error: too many layers";
+                         qDebug() << "*config xml error: too many layers";
                          break;
                      }
                      child = child.nextSibling().toElement();
@@ -271,7 +315,7 @@ void configHandler::parseConfig()
 //fills the can def object from xml
 void configHandler::fillCan(canDef *d)
 {
-    qDebug() << "can path" << canPath;
+    qDebug() << "*can path" << canPath;
     QDomDocument canXml;
     QFile f(canPath);
      if(f.exists()){
@@ -279,9 +323,9 @@ void configHandler::fillCan(canDef *d)
      f.close();
      }
      QDomElement root = canXml.documentElement();
-     qDebug() << "can root: " << root.tagName();
+     qDebug() << "*can root: " << root.tagName();
      QDomElement param = root.firstChild().toElement();
-     qDebug() << "can param: " << param.tagName();
+     qDebug() << "*can param: " << param.tagName();
 
      canCount = 0;
      //gets number of params
@@ -297,7 +341,7 @@ void configHandler::fillCan(canDef *d)
          QDomElement sub = param.firstChild().toElement();
          while(!sub.isNull()){
              if(sub.tagName() == "id"){
-                 qDebug() << "setting can def: " << param.attribute("name");
+                 qDebug() << "*setting can def: " << param.attribute("name");
                 d[pos].setName(param.attribute("name"));
                 d[pos].setFrameID(sub.text().toUInt(nullptr, 10));
              } else if (sub.tagName() == "byte"){
@@ -305,7 +349,7 @@ void configHandler::fillCan(canDef *d)
                  QStringList tmp;
                  for(int x = 0; x<byte.length(); x++){
                     tmp.append(byte.at(x));
-                    qDebug() << "name: " << d[pos].getName() << " byte: " << byte.at(x);
+                    qDebug() << "*name: " << d[pos].getName() << " byte: " << byte.at(x);
                  }
                  d[pos].setBytes(tmp);
              }else if (sub.tagName() == "bits"){
@@ -330,7 +374,7 @@ void configHandler::fillCan(canDef *d)
                 QDomElement tar = sub.firstChild().toElement();
                 while(!tar.isNull()){
                     tmp.insert(tar.text().toUInt(nullptr, 10), tar.attribute("name"));
-                    qDebug() << "target: " << tar.text().toUInt(nullptr, 10) << " name: " << tar.attribute("name");
+                    qDebug() << "*target: " << tar.text().toUInt(nullptr, 10) << " name: " << tar.attribute("name");
                     tar = tar.nextSibling().toElement();
                 }
                 d[pos].setTargets(tmp);
@@ -341,8 +385,7 @@ void configHandler::fillCan(canDef *d)
          pos = pos + 1;
          param = param.nextSibling().toElement();
      }
-     qDebug() << "can filled";
-     qDebug() << "can test: " << d[canCount-4].getName();
+     qDebug() << "*can filled";
      emit canFilled();
 
 }
@@ -364,7 +407,7 @@ int configHandler::getCanCount()
          canCount = canCount + 1;
          param = param.nextSibling().toElement();
      }
-    qDebug() << "can count: " << canCount;
+    qDebug() << "*can count: " << canCount;
     return canCount;
 }
 
@@ -382,15 +425,15 @@ void configHandler::setDefPath()
     f.close();
     QDomElement root = configXml.documentElement();
     QDomElement category = root.firstChild().toElement();
-    qDebug() << category.tagName();
+    qDebug() << "*" << category.tagName();
     while(!category.isNull()){
-        qDebug() << category.tagName();
+        qDebug() << "*" << category.tagName();
         if(category.tagName() == "defs"){
             category = category.firstChild().toElement();
-            qDebug() << category.tagName();
+            qDebug() << "*" << category.tagName();
             while(!category.isNull()){
                 if(category.tagName() == "defFile"){
-                    qDebug() << category.text();
+                    qDebug() << "*" << category.text();
                     _defPath = applicationDir + category.text();
                     break;
                 }
@@ -399,11 +442,12 @@ void configHandler::setDefPath()
         }
         category = category.nextSibling().toElement();
     }
+    qDebug() << "*set def path";
     } else {
         qDebug() << "no config.xml";
     }
 
-    qDebug() << "set def path";
+
 }
 
 

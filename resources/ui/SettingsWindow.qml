@@ -119,4 +119,50 @@ Rectangle {
             settingsMainItem.destroy()
         }
     }
+
+    Button {
+        id: resetTripA
+        objectName: "resetTripABtn"
+        x: 341
+        y: 51
+        width: 102
+        height: 27
+        text: qsTr("Reset Trip A")
+        background: Rectangle {
+            color: "#dbdbdb"
+            radius: 4
+        }
+        onClicked: {
+            gauge.resetTrip("tripA");
+        }
+    }
+
+    Label {
+        id: trip
+        x: 341
+        y: 25
+        width: 102
+        height: 20
+        text: qsTr("Trip")
+        horizontalAlignment: Text.AlignHCenter
+        font.pointSize: 12
+    }
+
+    Button {
+        id: resetTripB
+        objectName: "resetTripBBtn"
+        x: 341
+        y: 97
+        width: 102
+        height: 27
+        text: qsTr("Reset Trip B")
+        background: Rectangle {
+            color: "#dbdbdb"
+            radius: 4
+        }
+        onClicked: {
+            gauge.resetTrip("tripB");
+        }
+    }
+
 }

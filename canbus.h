@@ -5,6 +5,7 @@
 #include <QtSerialBus>
 #include "config.h"
 #include "serialhandler.h"
+#include "frames.h"
 
 
 class canbus : public QObject
@@ -19,11 +20,14 @@ public:
     QByteArray readFrames(uint frameID);
     QByteArray readFrames(uint frameID, char filter, int ignore);
     void writeFrames(uint frameID, QByteArray bytes);
-    void writeFrames(uint frameID, QByteArray bytes, uint override);
     bool isConnected();
-
+public slots:
+    void sendQueuedMessage();
+    void receiveSerialFrame(QCanBusFrame frame);
 signals:
-
+    void ecuAck();
+    void messageRead(QCanBusFrame frame);
+    void ecuResponse(QCanBusFrame frame);
 private:
     serialHandler* serial;
     QCanBusDevice *_dev;
@@ -31,6 +35,12 @@ private:
     void setConfigVars(config*cfg);
     int useJ2534;
     int baudRate;
+
+    QByteArray queuedMessage;
+
+    QCanBusFrame ack;
+
+    frames fr;
 };
 
 #endif // CANBUS_H

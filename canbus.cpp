@@ -15,6 +15,10 @@ canbus::canbus(QObject *parent, config *c, serialHandler* s)
     parent = nullptr;
     setConfigVars(c);
     serial = s;
+
+    //sets up acknowledgement message for ecu
+    ack.setFrameId(2016);
+    ack.setPayload(fr.string2Bytes("3000000000000000"));
 }
 
 QCanBusDevice *canbus::dev()
@@ -45,7 +49,7 @@ void canbus::connectToCanDevice()
         }
         if(_devList.length() > 0){
             if(_devList.length() == 1){
-                qDebug() << "one device found: " << _devList.at(0);
+                qDebug() << "*one device found: " << _devList.at(0);
                 _dev = QCanBus::instance()->createDevice(QStringLiteral("passthrucan"), _devList.at(0));
                 if(_dev){
                     _dev->connectDevice();
@@ -60,11 +64,11 @@ void canbus::connectToCanDevice()
             qDebug() << "no devices found";
         }
     } else {
-        qDebug() << "using esp32-can";
+        qDebug() << "*using esp32-can";
     }
 }
 
-//returns bytes from all received frames
+//returns bytes from all received frames (j3534)
 QByteArray canbus::readFrames()
 {
 
@@ -81,14 +85,14 @@ QByteArray canbus::readFrames()
             printf("no can device");
         }
     } else {
-        rxmsg = serial->waitForEcuResponse(200);
-        qDebug() << "tried to read from esp32:";
+        //rxmsg = serial->waitForEcuResponse(200);
+        qDebug() << "*tried to read from esp32:";
     }
-    qDebug() << "rxmsg" << rxmsg;
+    qDebug() << "*rxmsg" << rxmsg;
     return rxmsg;
 }
 
-//only returns frames from certain id
+//only returns frames from certain id (j2534 only)
 QByteArray canbus::readFrames(uint frameID)
 {
     QByteArray rxmsg;
@@ -99,19 +103,19 @@ QByteArray canbus::readFrames(uint frameID)
             if(frame.frameId() == frameID){
                 rxmsg.append(frame.payload());
             }
-            qDebug() << "payload: " << frame.payload();
+            qDebug() << "*payload: " << frame.payload();
         }
     } else {
 
 
         printf("no can device");
     }
-    qDebug() << "rxmsg" << rxmsg;
+    qDebug() << "*rxmsg" << rxmsg;
     return rxmsg;
 }
 
 
-//message with given filter. ignore flag determines if if keeps or ignores msg starting with filter
+//message with given filter. ignore flag determines if if keeps or ignores msg starting with filter (j2534 only)
 QByteArray canbus::readFrames(uint frameID, char filter, int ignore)
 {
     QByteArray rxmsg;
@@ -145,13 +149,13 @@ QByteArray canbus::readFrames(uint frameID, char filter, int ignore)
 //formats tx bytes and sends to ecu
 void canbus::writeFrames(uint frameID, QByteArray bytes)
 {
-    int numFrames = bytes.length()/7; //TODO: separate single frame message better. look if first byte is page#
+    int numFrames = qCeil((double)bytes.length()/7); //TODO: separate single frame message better. look if first byte is page#
 
     if(useJ2534 == 1){
         if(_dev){
             if(numFrames <= 1){
                 QCanBusFrame frame = QCanBusFrame(frameID, bytes);
-                qDebug() << frame.toString();
+                //qDebug() << frame.toString();
                 _dev->writeFrame(frame);
             } else {
                 int count = 0;
@@ -170,74 +174,104 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
                 }
             }
             _dev->waitForFramesWritten(1000);
-            qDebug() << "frames written";
+            //qDebug() << "frames written";
         } else {
-            printf("failed to send");
+            qInfo() << "failed to send";
         }
     } else {
         if(serial){
-            qDebug() << "canbus write frame";
+            //qDebug() << "canbus write frame";
+            queuedMessage.clear();
             if(numFrames <= 1){
                 QCanBusFrame frame = QCanBusFrame(frameID, bytes);
-                qDebug() << frame.toString();
+               // qDebug() << frame.toString();
                 serial->writeFrame(frame);
             } else {
                 int count = 0;
+                 QCanBusFrame frame;
                 while(count <= numFrames){
                     QByteArray payload = bytes.mid(1+(7*count), 7);
                     if(count == 0){
                         payload.insert(0,16).toHex();
+                        frame = QCanBusFrame(frameID, payload);
+                        //qDebug() << "writing start msg: " << frame.toString();
+                        serial->writeFrame(frame);
                     } else {
                         payload.insert(0, 33+(count-1)).toHex();
+                        queuedMessage.append(payload);
                     }
-
-                    QCanBusFrame frame = QCanBusFrame(frameID, payload);
-                    QEventLoop loop;
-                    QTimer::singleShot(100, &loop, SLOT(quit()));
-                    loop.exec();
-                    serial->writeFrame(frame);
-                    serial->waitForBytesWritten(5);
-
 
                     count++;
                 }
+
+                qInfo() << "queued msg: " << queuedMessage;
+
+
             }
         } else {
-            printf("failed to send");
+            qDebug() << "failed to send";
         }
     }
 }
 
-void canbus::writeFrames(uint frameID, QByteArray bytes, uint override)
+//sends the second "half" of the param request message after ecu acknowledgement
+void canbus::sendQueuedMessage()
 {
-    int numFrames = bytes.length()/7;
-    if(_dev){
-        if(numFrames < 1){
-            QCanBusFrame frame = QCanBusFrame(frameID, bytes);
-            qDebug() << frame.toString();
-            _dev->writeFrame(frame);
-        } else {
-            int count = 0;
-            while(count <= numFrames){
-                QByteArray payload = bytes.mid(1+(7*count), 7);
-                if(count == 0){
-                    payload.insert(0,16).toHex();
-                } else {
-                    payload.insert(0, 33+(count-1)).toHex();
-                }
+    if(queuedMessage.length() <1){
+        queuedMessage.clear();
+        return;
+    }
 
-                QCanBusFrame frame = QCanBusFrame(frameID, payload);
-                _dev->writeFrame(frame);
-                _dev->waitForFramesWritten(50);
-                count ++;
-            }
+    int numFrames = queuedMessage.length()/8;
+    int count = 0;
+    //QEventLoop loop;
+    while(count<=numFrames){
+        //if(!loop.isRunning()){
+        QByteArray payload = queuedMessage.mid(0+(8*count), 8); 
+        QCanBusFrame frame = QCanBusFrame(2016, payload);
+        //qDebug() << "sending frame: " << frame.toString();
+        //QThread::msleep(50);
+        serial->writeFrame(frame);
+
+
+        //QTimer::singleShot(5, &loop, SLOT(quit()));
+        //loop.exec();
+        count++;
+    }
+    queuedMessage.clear();
+
+}
+
+//sends messages based on frame content
+void canbus::receiveSerialFrame(QCanBusFrame frame)
+{
+    if(frame.frameId() == 864){
+        //qDebug() << "door frame: " << frame.toString();
+    }
+    if(frame.frameId() == 2016){
+        qInfo() << "written: " << frame.toString();
+    }
+    if(frame.frameId() == 2024){
+        qInfo() << "ecu response: " << frame.toString();
+        if(frame.payload().at(0) == 16){
+            //respond with ack message if ecu sends multipart
+            serial->writeFrame(ack);
         }
-        _dev->waitForFramesWritten(1000);
-        qDebug() << "frames written";
+        if(frame.payload().at(0) == 48){
+            //sends queued messages when ecu ack received
+            emit ecuAck();
+        } else {
+            //sends ecu response to get processed into real data
+
+            emit ecuResponse(frame);
+        }
+
     } else {
-        printf("failed to send");
+        emit messageRead(frame);
     }
 }
+
+
 
 //returns true if connected to a can device
 bool canbus::isConnected()
@@ -259,12 +293,14 @@ bool canbus::isConnected()
     return false;
 }
 
+
+
 void canbus::setConfigVars(config *cfg)
 {
     useJ2534 = cfg->getValue("useJ2534").toInt(nullptr, 10);
 
-    qDebug() << "j2534: " << useJ2534;
+    qDebug() << "*j2534: " << useJ2534;
     baudRate = cfg->getValue("baudRate").toInt(nullptr, 10);
-    qDebug() << "baudrate: " << baudRate;
+    qDebug() << "*baudrate: " << baudRate;
 }
 

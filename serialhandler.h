@@ -14,16 +14,14 @@ class serialHandler : public QObject
 public:
     explicit serialHandler(QObject *parent = nullptr);
     bool waitForFramesReceived(int msecs);
-    QByteArray waitForEcuResponse(int msecs);
     bool waitForBytesWritten(int msecs);
 public slots:
     void serialReceived();
     QCanBusFrame uartToFrame(QString msg);
     void writeFrame(QCanBusFrame frame);
 signals:
-    void messageRead(QCanBusFrame frame);
-    void ecuResponse(QCanBusFrame frame);
-    void testRes();
+    void serialFrameReceived(QCanBusFrame frame);
+
 private:
     QSerialPort *serial;
     QSerialPortInfo info;

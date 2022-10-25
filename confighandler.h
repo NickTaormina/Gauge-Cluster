@@ -21,6 +21,7 @@ public:
 
 
 
+
 signals:
     void defsFilled();
     void canFilled();
@@ -31,10 +32,11 @@ public slots:
     QStringList getParams();
     void fillDefs(QStringList _selectedParams, Definition* def);
     void fillGear(gear* g);
-    void fillTrip(trip* tr);
+    void fillTrip(trip* tr, QString tripName);
     void storeTrip(QString trip, QString val);
     void parseConfig();
     void fillCan(canDef * d);
+    void swapTrip(QString trip);
 
     int getCanCount();
 private:

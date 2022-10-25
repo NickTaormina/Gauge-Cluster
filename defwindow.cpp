@@ -16,14 +16,14 @@ defWindow::defWindow(QObject *parent, Definition *d)
      //list of default params to monitor. rpm, speed, and odometer are required
      //TODO: move these to an initializastion function that can be used in clear
      //_selectedParams.append("AF Correction 1");
-     //_selectedParams.append("AF Learning 1");
+     _selectedParams.append("AF Learning 1");
      _selectedParams.append("AF Ratio");
-     _selectedParams.append("Engine Speed");
-     _selectedParams.append("Vehicle Speed");
-     _selectedParams.append("Odometer");
-     _selectedParams.append("Feedback Knock Correction");
-     _selectedParams.append("Fine Knock Learn");
-     _selectedParams.append("Dynamic Advance Multiplier");
+     //_selectedParams.append("Engine Speed");
+    // _selectedParams.append("Vehicle Speed");
+    // _selectedParams.append("Odometer");
+    // _selectedParams.append("Feedback Knock Correction");
+    // _selectedParams.append("Fine Knock Learn");
+    // _selectedParams.append("Dynamic Advance Multiplier");
 
 }
 

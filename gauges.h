@@ -10,22 +10,26 @@
 #include "config.h"
 #include "candata.h"
 #include <QtMath>
+#include <QDateTime>
+#include "weather.h"
+#include "confighandler.h"
 
 class gauges : public QObject
 {
     Q_OBJECT
 public:
     explicit gauges(QObject *parent = nullptr);
-    gauges(QObject *parent, QObject * main, gear* gear, trip* tr, config* cfg, canData *data);
+    gauges(QObject *parent, QObject * main, gear* gear, trip* tr, config* cfg, configHandler *handler, canData *data);
 
 signals:
 void tripUpdated(QString trip, QString val);
+void tripSwapped(QString trip);
 public slots:
     void setRPM();
     void setRPMCAN(uint rpm);
     void setSpeed();
     Q_INVOKABLE void setParamPointer(parameter * parameter, int length);
-    Q_INVOKABLE void resetTrip();
+    Q_INVOKABLE void resetTrip(QString tr);
     void startTimer();
     void updateValue();
     void startTest();
@@ -34,6 +38,7 @@ public slots:
     void sweepForward();
     void sweepBack();
     void updateParamDisplay(QString name, double value);
+    void updateTemperatureText(QString t);
 
     //can indicators
     void updateLights(QString status);
@@ -41,6 +46,11 @@ public slots:
     void updateNeutral(QString status);
     void updateReverse(QString status);
     void setSpeedCAN(double speed);
+
+    void updateWeatherStatus();
+    QString getActiveTripNum();
+    void updateActiveTripDistance(int speed, qint64 time);
+    Q_INVOKABLE void switchActiveTrip();
 private:
 
     int minRPM;
@@ -77,6 +87,7 @@ private:
     void showKnock();
 
     void sweepDone();
+    void updateClock();
 
 
     //parameter display
@@ -114,12 +125,15 @@ private:
     QObject * bottomRightValue;
     QObject * bottomLeftLabel;
     QObject * bottomLeftValue;
+    QObject * clockText;
+    QObject * temperatureText;
 
     //timers
     QTimer* timer;
     QTimer* testtimer;
     QTimer* speedTime;
     QTimer* sweepTimer;
+    QTimer weatherTimer;
     QElapsedTimer elapsedTimer;
     qint64 elapsed;
 
@@ -138,11 +152,16 @@ private:
     int initialGaugeSweep;
 
 
-
+    QDateTime systime;
     //class objects
     gear* g;
     trip* _trip;
+
+    trip trA;
+    trip trB;
+    //configHandler * _cfgHand;
     canData * _data;
+    weather _weather;
 signals:
 };
 
