@@ -19,6 +19,7 @@ public slots:
     void serialReceived();
     QCanBusFrame uartToFrame(QString msg);
     void writeFrame(QCanBusFrame frame);
+    void setUsefulIDs(QList<uint> id);
 signals:
     void serialFrameReceived(QCanBusFrame frame);
 
@@ -32,6 +33,9 @@ private:
     QCanBusFrame currentFrame;
 
     int lastSerial;
+
+    QString readSerial;
+    QList<uint> idList;
 };
 
 #endif // SERIALHANDLER_H

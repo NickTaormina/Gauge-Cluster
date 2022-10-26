@@ -81,13 +81,21 @@ bool serialHandler::waitForBytesWritten(int msecs)
 //if given READ: command, turn it into a frame
 void serialHandler::serialReceived()
 {
+
     rxbuffer = serial->readAll();
-    //serial->flush();
+
     //serial->clear();
-    serialString += QString::fromStdString(rxbuffer.toStdString());
+    //serial->flush();
+    if(!rxbuffer.isEmpty()){
+        serialString += QString::fromStdString(rxbuffer.toStdString());
+    }
+    //serialString.replace(readSerial, "");
     //Debug() << "serial received";
     if(serialString.contains("\\")){
-        rxbuffer.clear();}
+        rxbuffer.clear();
+        //readSerial.append(serialString);
+
+    }
 
     QStringList bufferSplit = serialString.split("\\");
     //qDebug() << "serial: " << serialString;
@@ -97,9 +105,12 @@ void serialHandler::serialReceived()
             if(bufferSplit.at(i)!= ""){
 
                 if(bufferSplit.at(i).contains("R:") && !bufferSplit.at(i).contains("W")){
-
-                    emit serialFrameReceived(uartToFrame(bufferSplit.at(i)));
+                    QCanBusFrame tmp = uartToFrame(bufferSplit.at(i));
+                  // qInfo() << tmp.toString();
                     //qDebug() << bufferSplit.at(i);
+                    if(!tmp.payload().isEmpty()){
+                        emit serialFrameReceived(tmp);
+                    }
 
                     //int len = bufferSplit.at(i).length();
                     serialString.remove(bufferSplit.at(i)+"\\");
@@ -187,6 +198,10 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
         i = i + 1;
     }
     QByteArray payload;
+
+        if(idList.contains(frame.frameId())){
+
+
     while(i < msg.length()){
 
             if(msg.at(i) == "["){
@@ -210,8 +225,11 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
             }
             i = i + 1;
         }
+        }
     frame.setPayload(payload);
+    //qInfo() << frame.toString();
     return frame;
+
 }
 
 //creates and sends the write message to the esp32
@@ -247,6 +265,12 @@ void serialHandler::writeFrame(QCanBusFrame frame)
     serialMsg.append("/");
     //qDebug() << "serial write: " << serialMsg;
     serial->write(serialMsg.toStdString().c_str());
+    serial->flush();
 
+}
+
+void serialHandler::setUsefulIDs(QList<uint> id)
+{
+    idList = id;
 }
 

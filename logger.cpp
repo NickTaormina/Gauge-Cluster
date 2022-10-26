@@ -17,6 +17,8 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
     paramLength = 0;
     qDebug() << "*logger object initialized";
     logging = 0;
+    processing = 0;
+    etimer.start();
 }
 
 
@@ -86,35 +88,47 @@ void logger::createParamArray()
 //reads the response from the ecu and combines frames if necessary
 void logger::combineECUResponse(QCanBusFrame frame)
 {
-    if(logging != -1){
+    qInfo() << "combine ecu respo: " << frame.toString();
+    if(1){
+        qInfo () << "first if: " << frame.payload().at(0);
+
         if(frame.payload().at(0) == 16){
+            qInfo() << "multi part";
             multiPartMsg = 1;
             msgLength = static_cast<quint8>(frame.payload().at(1));
 
-            /*if(msgLength < 16){ //why is this here?
+            if(msgLength < 16){ //why is this here?
                 msgLength = 16;
-            }*/
-        } else if (multiPartMsg == 0 && frame.payload().at(0) != 48){
+            }
+        } else if (frame.payload().at(0) <16){
             multiPartMsg = 0;
+            qInfo() << "not mfult";
             parseECUResponse(frame.payload());
-            return;
+
         }
-        if(frame.payload().at(0) != 48){
+        if(frame.payload().at(0) != 48 && multiPartMsg == 1){
             multiPayload.append(frame.payload());
             if(msgLength <= multiPayload.length()){
+                multiPartMsg = 0;
                 parseECUResponse(multiPayload);
                 multiPayload.clear();
             }
-        } else {
-            return;
+        } else if (frame.payload().at(0) == 48){
+            qInfo() << "ack msg";
         }
     }
+    qInfo() << "exiting combine";
 }
 
 //converts the ecu response to a usable value
 void logger::parseECUResponse(QByteArray rxmsg)
 {
     qInfo() << "multi payload: " << rxmsg;
+    qInfo() << "el time: " << etimer.elapsed();
+
+    if(processing != 2){
+        etimer.restart();
+        processing = 1;
     if(logging == 1){
     //qDebug() << "rxmsg: " << rxmsg;
     //look for the starting point of the actual useful data. after the first "E8" byte
@@ -158,16 +172,21 @@ void logger::parseECUResponse(QByteArray rxmsg)
                 res[calcpos].setUnit(definition->getUnit(calcpos));
                 qInfo() << res[calcpos].getName() + ": " << res[calcpos].getValue();
                 emit paramUpdated(res[calcpos].getName(), res[calcpos].getValue());
+
                 calcpos++;
                 //break when all required params are converted, even if there are extra bytes at the end
                 if(calcpos >= definition->getNumParams()){
+                    qInfo() << "all params done";
                     break;
                 }
-
+                qInfo() << "for loop it";
             }
         }
-
+    qInfo() << "response fully parsed";
         emit ecuResponseParsed();
+    processing = 0;
     }
     }
+}
+
 }

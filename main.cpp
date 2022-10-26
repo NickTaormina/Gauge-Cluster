@@ -51,8 +51,8 @@ void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const Q
     }
 
     if(fr == 1){
-         QFile frameFile(framePath);
-         frameFile.open(QIODevice::WriteOnly | QIODevice::Append);
+        QFile frameFile(framePath);
+        frameFile.open(QIODevice::WriteOnly | QIODevice::Append);
           QTextStream fs(&frameFile);
           fs << frame << Qt::endl;
     }else {
@@ -135,8 +135,7 @@ int main(int argc, char *argv[])
     QObject::connect(&defWin, &defWindow::defsFilled, log, &logger::createParamArray);
 
 
-    QObject::connect(&shand, &serialHandler::serialFrameReceived, &can, &canbus::receiveSerialFrame);
-    QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
+
 
     rootContext->setContextProperty("defClass", &defWin);
     rootContext->setContextProperty("logger", log);
@@ -149,10 +148,9 @@ int main(int argc, char *argv[])
 
     gauges* gauge = new gauges(nullptr, main, &gr, &tr, &cfg[config::GAUGES], &hand, &_canData);
     QObject::connect(log, &logger::setParams, gauge, &gauges::setParamPointer);
-    QObject::connect(&can, &canbus::ecuResponse, log, &logger::combineECUResponse);
+
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
-    QObject::connect(gauge, &gauges::tripUpdated, &hand, &configHandler::storeTrip);
-    QObject::connect(gauge, &gauges::tripSwapped, &hand, &configHandler::swapTrip);
+
     defWin.fillDefs();
     qDebug() << "*reponse length: " << def.getRxMessageLength();
     rootContext->setContextProperty("gauge", gauge);
@@ -176,14 +174,22 @@ int main(int argc, char *argv[])
 
     //cannects can data to gauges
     //QObject::connect(&_canData, &canData::neutralSwitch, gauge, &gauges::updateNeutral);
-    QObject::connect(&can, &canbus::messageRead, &_canData, &canData::receiveCanData);
+
 
     QEventLoop loop;
-    QTimer::singleShot(1100, &loop, SLOT(quit()));
+    QTimer::singleShot(2400, &loop, SLOT(quit()));
     loop.exec();
+    QObject::connect(&_canData, &canData::usefulIDsFound, &shand, &serialHandler::setUsefulIDs);
+   _canData.getUsefulIDs();
     QObject::connect(log, &logger::paramUpdated, gauge, &gauges::updateParamDisplay);
-    QObject::connect(&_canData, &canData::paramValueChanged, gauge, &gauges::updateParamDisplay);
-
+     QObject::connect(&can, &canbus::messageRead, &_canData, &canData::receiveCanData);
+     QObject::connect(gauge, &gauges::tripUpdated, &hand, &configHandler::storeTrip);
+     QObject::connect(gauge, &gauges::tripSwapped, &hand, &configHandler::swapTrip);
+    QObject::connect(&can, &canbus::ecuResponse, log, &logger::combineECUResponse);
+     QObject::connect(&_canData, &canData::paramValueChanged, gauge, &gauges::updateParamDisplay);
+     QObject::connect(&shand, &serialHandler::serialFrameReceived, &can, &canbus::receiveSerialFrame);
+     QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
+     log->startLogging();
 
 
 

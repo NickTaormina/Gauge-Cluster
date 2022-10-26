@@ -39,7 +39,14 @@ void canData::fillData(canDef *def, int count)
        nameList.append(_def[i].getName());
        idList.append(_def[i].getFrameID());
     }
+    idList.append(2024);
     qDebug() << "*can id list: " << idList;
+
+}
+
+void canData::getUsefulIDs()
+{
+    emit usefulIDsFound(idList);
 }
 
 

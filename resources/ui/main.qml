@@ -15,7 +15,7 @@ Window{
     width:1920
     height: 720
     visible:true
-
+    flags: Qt.FramelessWindowHint
 
 
     Rectangle {

@@ -194,7 +194,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
                     if(count == 0){
                         payload.insert(0,16).toHex();
                         frame = QCanBusFrame(frameID, payload);
-                        //qDebug() << "writing start msg: " << frame.toString();
+                        qInfo() << "writing start msg: " << frame.toString();
                         serial->writeFrame(frame);
                     } else {
                         payload.insert(0, 33+(count-1)).toHex();
@@ -217,6 +217,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
 //sends the second "half" of the param request message after ecu acknowledgement
 void canbus::sendQueuedMessage()
 {
+    qInfo() << "sending queued msg";
     if(queuedMessage.length() <1){
         queuedMessage.clear();
         return;
@@ -229,9 +230,10 @@ void canbus::sendQueuedMessage()
         //if(!loop.isRunning()){
         QByteArray payload = queuedMessage.mid(0+(8*count), 8); 
         QCanBusFrame frame = QCanBusFrame(2016, payload);
-        //qDebug() << "sending frame: " << frame.toString();
-        //QThread::msleep(50);
+        qInfo() << "sending frame: " << frame.toString();
+        QThread::msleep(5);
         serial->writeFrame(frame);
+
 
 
         //QTimer::singleShot(5, &loop, SLOT(quit()));
@@ -262,7 +264,7 @@ void canbus::receiveSerialFrame(QCanBusFrame frame)
             emit ecuAck();
         } else {
             //sends ecu response to get processed into real data
-
+            qInfo() << "sending new frame for process";
             emit ecuResponse(frame);
         }
 

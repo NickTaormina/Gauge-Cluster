@@ -36,8 +36,9 @@ private:
     int msgLength;
     int multiPartMsg;
     QByteArray multiPayload;
-
+        int processing;
     int logging;
+    QElapsedTimer etimer;
 };
 
 #endif // LOGGER_H

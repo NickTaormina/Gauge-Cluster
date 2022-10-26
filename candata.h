@@ -25,12 +25,13 @@ signals:
     void reverseSwitch(QString status);
     void valueChanged(QString name, double value);
     void paramValueChanged(QString name, double value);
-
+    void usefulIDsFound(QList<uint> id);
     void rpmChanged(uint rpm);
     void speedChanged(double spd);
 public slots:
     void receiveCanData(QCanBusFrame frame);
     void fillData(canDef* def, int count);
+    void getUsefulIDs();
 private:
     QStringList nameList;
     QList<uint> idList;

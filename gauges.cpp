@@ -461,18 +461,19 @@ void gauges::sweepForward()
     if(tachNeedle){
         QPropertyAnimation *rpmAnim = new QPropertyAnimation(tachNeedle, "rotation");
 
-        sweepTimer->setInterval(1050);
+        sweepTimer->setInterval(1500);
 
         if(speedoNeedle){
             QPropertyAnimation *speedAnim = new QPropertyAnimation(speedoNeedle, "rotation");
-            speedAnim->setDuration(1000);
+            //connect(speedAnim, &QPropertyAnimation::finished, this, &gauges::sweepBack);
+            speedAnim->setDuration(900);
             speedAnim->setStartValue(minSpeedoRot);
             speedAnim->setEndValue(maxSpeedoRot+360);
             speedAnim->start();
         }
 
         sweepTimer->start();
-        rpmAnim->setDuration(940);
+        rpmAnim->setDuration(1000);
         rpmAnim->setStartValue(minTach);
         rpmAnim->setEndValue(maxTach + 360);
         rpmAnim->start();
@@ -513,9 +514,10 @@ void gauges::sweepBack()
 void gauges::updateParamDisplay(QString name, double value)
 {
     //convert to string to allow formatting
-    qDebug() << "update param display: " << name;
+    //qDebug() << "update param display: " << name;
 
     if(name == "AF Ratio"){
+        //qDebug() << "updating ratio: " << value;
         //ensures two decimals
         QString val = QString::number(value, 'f', 2);
         if(val.length()<3){
@@ -546,10 +548,18 @@ void gauges::updateParamDisplay(QString name, double value)
         if(bottomLeftValue){
             QString val = QString::number(value, 'f', 0);
         bottomLeftValue->setProperty("text", val);}
+    } else if(name == "Odometer"){
+        QString val = QString::number(value, 'f', 0);
+        if(val.length() < 6){
+            for(int x = val.length(); x<6; x++){
+                val.prepend("0");
+            }
+        }
+        odotext->setProperty("text", QVariant(val));
     }
 
     //refresh ui
-    QCoreApplication::processEvents();
+    //QCoreApplication::processEvents();
 }
 
 //changes the outside temperature readout
