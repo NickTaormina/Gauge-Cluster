@@ -19,7 +19,7 @@ class gauges : public QObject
     Q_OBJECT
 public:
     explicit gauges(QObject *parent = nullptr);
-    gauges(QObject *parent, QObject * main, gear* gear, trip* tr, config* cfg, configHandler *handler, canData *data);
+    gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configHandler *handler, canData *data);
 
 signals:
 void tripUpdated(QString trip, QString val);
@@ -39,6 +39,8 @@ public slots:
     void sweepBack();
     void updateParamDisplay(QString name, double value);
     void updateTemperatureText(QString t);
+    void updateCoolantGauge(double value);
+    void updateFuelBar(double value);
 
     //can indicators
     void updateLights(QString status);
@@ -127,6 +129,8 @@ private:
     QObject * bottomLeftValue;
     QObject * clockText;
     QObject * temperatureText;
+    QObject * coolantGauge;
+    QObject * fuelBar;
 
     //timers
     QTimer* timer;
@@ -146,6 +150,8 @@ private:
     int sweepFinished;
 
     QString activeTrip;
+    QString coolantFilePath;
+    QString fuelFilePath;
 
     //booleans
     int showAllSpeedNumbers;
@@ -155,7 +161,6 @@ private:
     QDateTime systime;
     //class objects
     gear* g;
-    trip* _trip;
 
     trip trA;
     trip trB;

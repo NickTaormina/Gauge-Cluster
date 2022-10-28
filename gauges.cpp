@@ -6,7 +6,7 @@ gauges::gauges(QObject *parent)
 {
 }
 
-gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg, configHandler * handler, canData * data)
+gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configHandler * handler, canData * data)
 {
     parent = nullptr;
     //timers
@@ -46,9 +46,7 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
     speed = 0;
 
     g = gear;
-    _trip = tr;
     _data = data;
-    activeTrip = "tripA";
 
 
 
@@ -79,6 +77,9 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, trip*tr, config * cfg
     bottomLeftValue = main->findChild<QObject*>("bottomLeftValue", Qt::FindChildrenRecursively);
     clockText = main->findChild<QObject*>("clockText", Qt::FindChildrenRecursively);
     temperatureText = main->findChild<QObject*>("temperatureText", Qt::FindChildrenRecursively);
+    fuelBar = main->findChild<QObject*>("fuelBarImage", Qt::FindChildrenRecursively);
+    coolantGauge = main->findChild<QObject*>("coolantBarImage", Qt::FindChildrenRecursively);
+
 
     //paramater display label init
     if(topLeftLabel){
@@ -162,9 +163,9 @@ void gauges::setRPM()
 
 void gauges::setRPMCAN(uint rpm)
 {
-    _rpm = rpm;
-    if(sweepFinished == 1){
 
+    if(sweepFinished == 1 && rpm >= 0 && rpm < 10000){
+        _rpm = rpm;
         int diff = 0;
         double percent = (double)(rpm)/maxRPM;
         double pos;
@@ -556,6 +557,8 @@ void gauges::updateParamDisplay(QString name, double value)
             }
         }
         odotext->setProperty("text", QVariant(val));
+    } else if (name == "Coolant Temp"){
+        updateCoolantGauge(value);
     }
 
     //refresh ui
@@ -568,6 +571,66 @@ void gauges::updateTemperatureText(QString t)
    QString tr = t + " F";
    temperatureText->setProperty("text", tr);
    weatherTimer.start(300000);
+}
+
+void gauges::updateCoolantGauge(double value)
+{
+    //TODO: change this for coolant bar (supra) vs coolant gauge (oem)
+    if(coolantGauge){
+    QString filePath = "coolantBar";
+    if(value < 100){
+        filePath.append("0");
+    } else if(value > 100 && value < 125){
+        filePath.append("1");
+    } else if(value >= 125 && value < 150 ){
+        filePath.append("2");
+    } else if (value >= 150 && value < 175) {
+        filePath.append("3");
+    } else if (value >= 175 && value < 220){
+        filePath.append("4");
+    } else if (value >= 220 && value < 235){
+        filePath.append("5");
+    } else if (value >= 235 && value < 250){
+        filePath.append("6");
+    } else {
+        filePath.append("7");
+    }
+    if(filePath != coolantFilePath){
+        qDebug() << "opening coolant: " << filePath;
+        coolantGauge->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/" + filePath + ".png");
+        coolantFilePath = filePath;
+    }
+    }
+}
+
+void gauges::updateFuelBar(double value)
+{
+    value = value/255;
+    //TODO: change this for coolant bar (supra) vs coolant gauge (oem)
+    if(fuelBar){
+    QString filePath = "fuelBar";
+    if(value < .05){
+        filePath.append("0");
+    } else if(value <.10){
+        filePath.append("1");
+    } else if(value <.25){
+        filePath.append("2");
+    } else if (value <.4) {
+        filePath.append("3");
+    } else if (value <.55){
+        filePath.append("4");
+    } else if (value <.7){
+        filePath.append("5");
+    } else if (value <.85){
+        filePath.append("6");
+    } else {
+        filePath.append("7");
+    }
+    if(filePath != fuelFilePath){
+        fuelBar->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/" + filePath + ".png");
+        fuelFilePath = filePath;
+    }
+    }
 }
 
 void gauges::sweepDone(){
@@ -746,9 +809,7 @@ void gauges::changeValues(){
         }
     }
 
-    if(rpmval >= 2400 && rpmval <= 2800){
-        updateReverse("Reverse");
-    }
+
 
     par[fklIndex].setValue(0);
     par[damIndex].setValue(1.0);

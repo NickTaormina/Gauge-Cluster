@@ -5,6 +5,7 @@
 serialHandler::serialHandler(QObject *parent)
     : QObject{parent}
 {
+    connected = 0;
     QSerialPortInfo info;
     serial = new QSerialPort(nullptr);
     QList<QSerialPortInfo>portList = info.availablePorts();
@@ -27,11 +28,66 @@ serialHandler::serialHandler(QObject *parent)
 
         if(!serial->open(QIODevice::ReadWrite)){
             qDebug() << "serial connection fail";
+            //emit serialConnected();
         } else {
             qDebug() << "serial connected";
 
             QObject::connect(serial, &QSerialPort::readyRead, this, &serialHandler::serialReceived);
+            emit serialConnected();
+            connected = 1;
+        }
+    }
 
+    lastSerial = 0;
+
+
+
+
+
+    serial->write("W: [2016] [01] [170] [0] [0] [0] [0] [0] [0] /");
+    //serial->write("WRITE:[2016] [02] [16] [03] [0] [0] [0] [0] [0] /");
+    //serial->write("WRITE:[2016] [16] [8] [168] [0] [0] [0] [9] [0] /");
+    //qDebug() << "frame: " << uartToFrame("[2016] [16] [8] [168] [0] [0] [0] [9] [0]").toString();
+    //serial->write("WRITE:[2016] [33]");
+
+
+    serialString = "";
+
+}
+
+serialHandler::serialHandler(QObject *parent, config *c)
+{
+    connected = 0;
+    QSerialPortInfo info;
+    serial = new QSerialPort(nullptr);
+    QList<QSerialPortInfo>portList = info.availablePorts();
+    if(portList.size() >= 1){
+        QString configPort = c->getValue("comPort");
+        qDebug() << "*config port: " << configPort;
+        for(int i = 0; i<portList.length(); i++){
+            qDebug() << "serial port: " << portList[i].portName();
+            if(portList[i].portName() == configPort){
+                qDebug() << "connecting to port: " << portList[i].portName();
+                serial->setPortName(portList[i].portName());
+            }
+        }
+
+        qDebug() << "*settings";
+        serial->setBaudRate(921600);
+        serial->setDataBits(QSerialPort::Data8);
+        serial->setParity(QSerialPort::NoParity);
+        serial->setStopBits(QSerialPort::OneStop);
+        serial->setFlowControl(QSerialPort::NoFlowControl);
+
+        if(!serial->open(QIODevice::ReadWrite)){
+            qDebug() << "serial connection fail";
+            //emit serialConnected();
+        } else {
+            qDebug() << "serial connected";
+
+            QObject::connect(serial, &QSerialPort::readyRead, this, &serialHandler::serialReceived);
+            emit serialConnected();
+            connected = 1;
         }
     }
 
@@ -74,6 +130,16 @@ bool serialHandler::waitForFramesReceived(int msecs)
 bool serialHandler::waitForBytesWritten(int msecs)
 {
     return serial->waitForBytesWritten(msecs);
+}
+
+//checks if theres a serial connection
+bool serialHandler::isConnected()
+{
+    if(connected == 1){
+        return true;
+    } else {
+        return false;
+    }
 }
 
 

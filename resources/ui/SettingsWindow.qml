@@ -164,5 +164,21 @@ Rectangle {
             gauge.resetTrip("tripB");
         }
     }
+    Button {
+        id: closeProgram
+        objectName: "killProgramBtn"
+        x: 341
+        y: 400
+        width: 102
+        height: 27
+        text: qsTr("Close Program")
+        background: Rectangle {
+            color: "#dbdbdb"
+            radius: 4
+        }
+        onClicked: {
+            Qt.quit();
+        }
+    }
 
 }

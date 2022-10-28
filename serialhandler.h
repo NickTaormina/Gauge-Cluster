@@ -7,14 +7,17 @@
 #include <QDebug>
 #include <QCanBus>
 #include <frames.h>
+#include "config.h"
 
 class serialHandler : public QObject
 {
     Q_OBJECT
 public:
     explicit serialHandler(QObject *parent = nullptr);
+    serialHandler(QObject * parent, config * c);
     bool waitForFramesReceived(int msecs);
     bool waitForBytesWritten(int msecs);
+    bool isConnected();
 public slots:
     void serialReceived();
     QCanBusFrame uartToFrame(QString msg);
@@ -22,6 +25,7 @@ public slots:
     void setUsefulIDs(QList<uint> id);
 signals:
     void serialFrameReceived(QCanBusFrame frame);
+    void serialConnected();
 
 private:
     QSerialPort *serial;
@@ -33,6 +37,7 @@ private:
     QCanBusFrame currentFrame;
 
     int lastSerial;
+    int connected;
 
     QString readSerial;
     QList<uint> idList;

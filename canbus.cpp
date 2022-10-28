@@ -286,7 +286,7 @@ bool canbus::isConnected()
         }
     }
     else{
-        if(serial){
+        if(serial->isConnected()){
             return true;
         }
     }

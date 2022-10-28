@@ -15,6 +15,7 @@ public:
     enum {
         DEFS, CAN, LOGGER, TRIP, GAUGES
     };
+    QMap<QString, QString> returnStoredConfig();
 
 
 

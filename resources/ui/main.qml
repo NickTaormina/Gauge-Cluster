@@ -512,6 +512,32 @@ Window{
             }
         }
 
+        Image {
+            id: coolantBarImage
+            objectName: "coolantBarImage"
+            x: 1595
+            y: 425
+            width: 220
+            height: 210
+            source: "file:///" + applicationDirPath + "/resources/images/coolantBar0.png"
+            sourceSize.height: 179
+            sourceSize.width: 182
+            fillMode: Image.Stretch
+        }
+        Image {
+            id: fuelBarImage
+            objectName: "fuelBarImage"
+            x: 130
+            y: 420
+            width: 210
+            height: 200
+            rotation: 0
+            source: "file:///" + applicationDirPath + "/resources/images/fuelBar0.png"
+            sourceSize.height: 168
+            sourceSize.width: 175
+            fillMode: Image.Stretch
+        }
+
 
 
 
@@ -551,8 +577,8 @@ Window{
 }
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.9}D{i:6;invisible:true}D{i:7;invisible:true}D{i:8;invisible:true}
-D{i:9;invisible:true}D{i:41}
+    D{i:0;formeditorZoom:0.9}D{i:7;invisible:true}D{i:6;invisible:true}D{i:9;invisible:true}
+D{i:8;invisible:true}
 }
 ##^##*/
 

@@ -281,6 +281,8 @@ void configHandler::parseConfig()
             cat = config::TRIP;
          } else if (category.tagName() == "gauges"){
             cat = config::GAUGES;
+         } else if (category.tagName() == "canDevice"){
+             cat = config::CAN;
          }
          QDomElement sub = category.firstChild().toElement();
          qDebug() << "*sub: " << sub.tagName();

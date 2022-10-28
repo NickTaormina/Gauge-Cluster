@@ -10,6 +10,7 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
 {
     parent = nullptr;
     timer = new QTimer(this);
+    loggerTimer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &logger::sendLogMessage);
     res = par;
     can = bus;
@@ -18,6 +19,9 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
     qDebug() << "*logger object initialized";
     logging = 0;
     processing = 0;
+    loggerTimer->setInterval(500);
+    loggerTimer->setSingleShot(false);
+    connect(loggerTimer, &QTimer::timeout, this, &logger::sendLogMessage);
     etimer.start();
 }
 
@@ -27,13 +31,16 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
 void logger::sendLogMessage(){
     if(!can->isConnected()){
         qDebug() << "can't log. no device";
-        timer->stop();
+        stopLogging();
         return;
 
     }
     if(definition->getTxLength() > 0){
         qInfo() << "tx bytes" << definition->getTxBytes().toHex();
-
+        if(loggerTimer->isActive()){
+            loggerTimer->stop();
+            loggerTimer->start();
+        }
             //send the bytes
             can->writeFrames(fr.string2Uint("000007E0"), definition->getTxBytes());
 
@@ -48,13 +55,14 @@ void logger::startLogging()
 {
     if(logging == 0){
         logging = 1;
-        sendLogMessage();
-        timer->start(100);
-        //QObject::connect(this, &logger::ecuResponseParsed, this, &logger::sendLogMessage);
+        //timer->start(100);
+        loggerTimer->start();
+        QObject::connect(this, &logger::ecuResponseParsed, this, &logger::sendLogMessage);
 
     } else {
         stopLogging();
         timer->stop();
+        loggerTimer->stop();
     }
 }
 
@@ -65,6 +73,7 @@ void logger::stopLogging()
     logging = 0;
     QObject::disconnect(this, &logger::ecuResponseParsed, this, &logger::sendLogMessage);
     timer->stop();
+    loggerTimer->stop();
 
 }
 

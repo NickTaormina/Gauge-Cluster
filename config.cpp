@@ -18,4 +18,9 @@ QString config::getValue(QString key)
     return storedConfig.value(key);
 }
 
+QMap<QString, QString> config::returnStoredConfig()
+{
+    return storedConfig;
+}
+
 

@@ -38,6 +38,7 @@ private:
     QByteArray multiPayload;
         int processing;
     int logging;
+    QTimer * loggerTimer;
     QElapsedTimer etimer;
 };
 
