@@ -19,6 +19,9 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configH
     connect(speedTime, &QTimer::timeout, this, &gauges::updateSpeedText);
     connect(&_weather, &weather::tempRead, this, &gauges::updateTemperatureText); //update temp text when weather report read
     connect(&weatherTimer, &QTimer::timeout, this, &gauges::updateWeatherStatus); //update weather every 5 min
+    shiftLightTimer.setSingleShot(false);
+    connect(&shiftLightTimer, &QTimer::timeout, this, &gauges::showShiftLight);
+    connect(this, &gauges::rpmUpdated, this, &gauges::flashShiftLight);
 
     //initialize config values
     qDebug() << "*gauge values set: ";
@@ -33,6 +36,7 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configH
     animDuration = cfg->getValue("generalAnimationDuration").toInt(nullptr, 10);
     showAllSpeedNumbers = cfg->getValue("generalShowAllSpeedDigits").toInt(nullptr, 10);
     initialGaugeSweep = cfg->getValue("generalStartupGaugeSweep").toInt(nullptr, 10);
+
     qDebug() << "*gauge sweep: " << initialGaugeSweep;
 
 
@@ -42,8 +46,12 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configH
     currSpeed = 0;
     rpmval = 0;
     speedval = 0;
-    odoval = 0;
+    qDebug() << "odometer: " << cfg->getValue("generalOdometer");
+    odoval = cfg->getValue("generalOdometer").toInt(nullptr, 10);
+
     speed = 0;
+    shiftLightMin = cfg->getValue("generalShiftLightThreshold").toUInt(nullptr, 10);
+    shiftLightFlashInterval = cfg->getValue("generalShiftLightFlashTimer").toUInt(nullptr, 10);
 
     g = gear;
     _data = data;
@@ -60,6 +68,7 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configH
     geartext = main->findChild<QObject*>("gearText", Qt::FindChildrenRecursively);
     tripNum = main->findChild<QObject*>("tripNum", Qt::FindChildrenRecursively);
     statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
+    shiftLight = main->findChild<QObject*>("shiftLight", Qt::FindChildrenRecursively);
 
     //finds ui status elements to control. ex: turn signals
     leftSignal = main->findChild<QObject*>("leftSignal", Qt::FindChildrenRecursively);
@@ -120,6 +129,7 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configH
     activeTrip = cfg->getValue("generalActiveTrip");
     qDebug() << "*activeTrip: " << activeTrip;
     tripNum->setProperty("text", getActiveTripNum());
+    updateParamDisplay("Odometer", (double)odoval);
 }
 
 
@@ -190,6 +200,7 @@ void gauges::setRPMCAN(uint rpm)
                 rpmtext->setProperty("text", rpm);
             }
         }
+        emit rpmUpdated(rpm);
 
 
         currRPMPos = pos;
@@ -334,6 +345,12 @@ void gauges::resetTrip(QString tr) //TODO: multiple trips
         emit tripUpdated("tripB", "0");
     }
 
+}
+
+void gauges::setShiftThreshold(QString val)
+{
+    shiftLightMin = val.toInt(nullptr, 10);
+    emit shiftThresholdChanged(val);
 }
 
 //finds the rpm parameter
@@ -556,7 +573,10 @@ void gauges::updateParamDisplay(QString name, double value)
                 val.prepend("0");
             }
         }
-        odotext->setProperty("text", QVariant(val));
+        if(val != odotext->property("text").toString()){
+            emit odometerUpdated(val);
+            odotext->setProperty("text", QVariant(val));
+        }
     } else if (name == "Coolant Temp"){
         updateCoolantGauge(value);
     }
@@ -631,6 +651,37 @@ void gauges::updateFuelBar(double value)
         fuelFilePath = filePath;
     }
     }
+}
+
+void gauges::flashShiftLight(uint rpm)
+{
+    if(rpm > shiftLightMin){
+        if(!shiftLightTimer.isActive()){
+            shiftLight->setProperty("visible", true);
+            shiftLightTimer.start(shiftLightFlashInterval);
+        }
+    } else {
+        shiftLightTimer.stop();
+        shiftLight->setProperty("visible", false);
+    }
+}
+
+void gauges::showShiftLight()
+{
+    if(shiftLight->property("visible") == true){
+        shiftLight->setProperty("visible", false);
+    } else {
+        shiftLight->setProperty("visible", true);
+    }
+}
+
+QString gauges::getShiftThreshold()
+{
+    return QString::number(shiftLightMin, 10);
+}
+QString gauges::getShiftTimer()
+{
+    return QString::number(shiftLightFlashInterval, 10);
 }
 
 void gauges::sweepDone(){

@@ -46,7 +46,20 @@ Window{
                 anchors.horizontalCenter: parent.horizontalCenter
                 fillMode: Image.PreserveAspectCrop
             }
-
+            Image {
+                id: shiftLight
+                objectName: "shiftLight"
+                x: 247
+                y: 119
+                width: 407
+                height: 496
+                source: "file:///" + applicationDirPath + "/resources/images/shift light.png"
+                visible: false
+                rotation: 0
+                sourceSize.height: 422
+                sourceSize.width: 346
+                fillMode: Image.PreserveAspectCrop
+            }
             Rectangle {
                 id: tachNeedleRect
                 objectName: "tachneedle"
@@ -541,6 +554,8 @@ Window{
 
 
 
+
+
     }
 
     Label {
@@ -577,8 +592,8 @@ Window{
 }
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.9}D{i:7;invisible:true}D{i:6;invisible:true}D{i:9;invisible:true}
-D{i:8;invisible:true}
+    D{i:0;formeditorZoom:0.9}D{i:8;invisible:true}D{i:7;invisible:true}D{i:10;invisible:true}
+D{i:9;invisible:true}
 }
 ##^##*/
 

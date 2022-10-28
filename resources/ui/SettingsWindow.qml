@@ -8,6 +8,7 @@ Rectangle {
     color: "#5c5c5c"
     anchors.centerIn: parent
 
+
     Button {
         id: leftBtn
         x: 30
@@ -179,6 +180,64 @@ Rectangle {
         onClicked: {
             Qt.quit();
         }
+    }
+
+    Label {
+        id: shiftLabel
+        x: 30
+        y: 238
+        width: 102
+        height: 20
+        text: qsTr("Shift Light")
+        horizontalAlignment: Text.AlignHCenter
+        font.pointSize: 12
+    }
+
+    TextInput {
+        id: shiftThreshInput
+        x: 72
+        y: 264
+        width: 60
+        height: 20
+        text: gauge.getShiftThreshold()
+        font.pixelSize: 12
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        cursorVisible: false
+        maximumLength: 4
+        mouseSelectionMode: TextInput.SelectCharacters
+        MouseArea{
+            anchors.fill: parent;
+            cursorShape: Qt.IBeamCursor;
+            onClicked: mouse.accepted = false;
+            onPressed: mouse.accepted = false;
+            onReleased: mouse.accepted = false;
+            propagateComposedEvents: true;
+            onPositionChanged: mouse.accepted = false;
+            onPressAndHold: mouse.accepted = false;
+        }
+        onAccepted:{
+            gauge.setShiftThreshold(shiftThreshInput.text);
+            cursorVisible: false;
+            focus: false;
+            activeFocus: false;
+            settingsMainItem.forceActiveFocus();
+            nextItemInFocusChain();
+
+            Qt.BlankCursor;
+        }
+
+    }
+
+    Label {
+        id: label
+        x: 25
+        y: 266
+        width: 48
+        height: 16
+        text: qsTr("RPM")
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
     }
 
 }

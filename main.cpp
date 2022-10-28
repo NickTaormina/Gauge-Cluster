@@ -166,6 +166,9 @@ int main(int argc, char *argv[])
     QObject::connect(log, &logger::paramUpdated, gauge, &gauges::updateParamDisplay);
     QObject::connect(&can, &canbus::messageRead, &_canData, &canData::receiveCanData);
     QObject::connect(gauge, &gauges::tripUpdated, &hand, &configHandler::storeTrip);
+    QObject::connect(gauge, &gauges::odometerUpdated, &hand, &configHandler::storeOdometer);
+    QObject::connect(gauge, &gauges::shiftThresholdChanged, &hand, &configHandler::storeShiftLightThreshold);
+    QObject::connect(gauge, &gauges::shiftTimerChanged, &hand, &configHandler::storeShiftLightTimer);
     QObject::connect(gauge, &gauges::tripSwapped, &hand, &configHandler::swapTrip);
     QObject::connect(&can, &canbus::ecuResponse, log, &logger::combineECUResponse);
     QObject::connect(&_canData, &canData::paramValueChanged, gauge, &gauges::updateParamDisplay);

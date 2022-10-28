@@ -37,8 +37,10 @@ public slots:
     void parseConfig();
     void fillCan(canDef * d);
     void swapTrip(QString trip);
-
+    void storeOdometer(QString val);
+    void storeShiftLightThreshold(QString val);
     int getCanCount();
+    void storeShiftLightTimer(QString val);
 private:
     QString applicationDir;
     QString _defPath;

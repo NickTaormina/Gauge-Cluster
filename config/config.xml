@@ -5,14 +5,15 @@
     </defs>
     <canDevice>
         <useJ2534>0</useJ2534>
-        <baudRate>600000</baudRate>
+        <comPort>COM6</comPort>
+        <baudRate>921600</baudRate>
     </canDevice>
     <logger>
         <rate>100</rate>
         <cel>00008E00008F00009000009100009200009300009400009500009600009700009800009900009A00009B00009C00009D00009E00009F0000A00000A10000A20000A30000A40000A50000A60000A70000A80000A90000AA0000AB0000AC0000AD</cel>
     </logger>
     <trip>
-        <tripA>0</tripA>
+        <tripA>10.5</tripA>
         <tripB>0</tripB>
     </trip>
     <gauges>
@@ -23,6 +24,9 @@
             <showKnock>1</showKnock>
             <startupGaugeSweep>1</startupGaugeSweep>
             <activeTrip>tripA</activeTrip>
+            <odometer>79502</odometer>
+            <shiftLightThreshold>6000</shiftLightThreshold>
+            <shiftLightFlashTimer>75</shiftLightFlashTimer>
         </general>
         <tach>
             <minRot>270</minRot>

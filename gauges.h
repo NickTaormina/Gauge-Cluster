@@ -23,13 +23,20 @@ public:
 
 signals:
 void tripUpdated(QString trip, QString val);
+void odometerUpdated(QString val);
 void tripSwapped(QString trip);
+void rpmUpdated(uint rpm);
+void shiftThresholdChanged(QString val);
+void shiftTimerChanged(QString val);
+
 public slots:
     void setRPM();
     void setRPMCAN(uint rpm);
     void setSpeed();
     Q_INVOKABLE void setParamPointer(parameter * parameter, int length);
     Q_INVOKABLE void resetTrip(QString tr);
+    Q_INVOKABLE void setShiftThreshold(QString val);
+
     void startTimer();
     void updateValue();
     void startTest();
@@ -42,6 +49,11 @@ public slots:
     void updateCoolantGauge(double value);
     void updateFuelBar(double value);
 
+    void flashShiftLight(uint rpm);
+    void showShiftLight();
+
+    Q_INVOKABLE QString getShiftThreshold();
+
     //can indicators
     void updateLights(QString status);
     void updateTurnSignals(QString status);
@@ -53,6 +65,7 @@ public slots:
     QString getActiveTripNum();
     void updateActiveTripDistance(int speed, qint64 time);
     Q_INVOKABLE void switchActiveTrip();
+    Q_INVOKABLE QString getShiftTimer();
 private:
 
     int minRPM;
@@ -112,6 +125,7 @@ private:
     QObject * geartext;
     QObject * tripNum;
     QObject * statustext;
+    QObject * shiftLight;
 
     //ui status objects
     QObject * leftSignal;
@@ -138,6 +152,7 @@ private:
     QTimer* speedTime;
     QTimer* sweepTimer;
     QTimer weatherTimer;
+    QTimer shiftLightTimer;
     QElapsedTimer elapsedTimer;
     qint64 elapsed;
 
@@ -148,6 +163,9 @@ private:
     void updateSpeedText();
     int animDuration;
     int sweepFinished;
+
+    uint shiftLightMin;
+    int shiftLightFlashInterval;
 
     QString activeTrip;
     QString coolantFilePath;

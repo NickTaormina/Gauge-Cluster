@@ -229,6 +229,8 @@ void configHandler::storeTrip(QString trip, QString val)
 
 }
 
+
+
 void configHandler::swapTrip(QString trip){
     QFile f(configPath);
     f.open(QIODevice::ReadWrite);
@@ -242,6 +244,102 @@ void configHandler::swapTrip(QString trip){
                     QDomElement newNode = configXml.createElement("activeTrip");
                     QDomText newText = configXml.createTextNode(trip);
                     qDebug() << "*writing active trip: " << trip;
+                    newNode.appendChild(newText);
+                    parent.replaceChild(newNode, trEl);
+                    break;
+                }
+                trEl = trEl.nextSibling().toElement();
+            }
+            break;
+        }
+        xt = xt.nextSibling().toElement();
+    }
+    QDomElement tr;
+    f.resize(0);
+    QTextStream stream;
+    stream.setDevice(&f);
+    configXml.save(stream, 4);
+    f.close();
+}
+
+void configHandler::storeOdometer(QString val)
+{
+    QFile f(configPath);
+    f.open(QIODevice::ReadWrite);
+    QDomElement xt = configXml.firstChild().firstChild().toElement();
+    while(!xt.isNull()){
+        if(xt.tagName() == "gauges"){
+            QDomElement parent = xt.firstChild().toElement();
+            QDomElement trEl = parent.firstChild().toElement();
+            while(!trEl.isNull()){
+                if(trEl.tagName() == "odometer"){
+                    QDomElement newNode = configXml.createElement("odometer");
+                    QDomText newText = configXml.createTextNode(val);
+                    qDebug() << "*writing odometer: " << val;
+                    newNode.appendChild(newText);
+                    parent.replaceChild(newNode, trEl);
+                    break;
+                }
+                trEl = trEl.nextSibling().toElement();
+            }
+            break;
+        }
+        xt = xt.nextSibling().toElement();
+    }
+    QDomElement tr;
+    f.resize(0);
+    QTextStream stream;
+    stream.setDevice(&f);
+    configXml.save(stream, 4);
+    f.close();
+}
+
+void configHandler::storeShiftLightThreshold(QString val)
+{
+    QFile f(configPath);
+    f.open(QIODevice::ReadWrite);
+    QDomElement xt = configXml.firstChild().firstChild().toElement();
+    while(!xt.isNull()){
+        if(xt.tagName() == "gauges"){
+            QDomElement parent = xt.firstChild().toElement();
+            QDomElement trEl = parent.firstChild().toElement();
+            while(!trEl.isNull()){
+                if(trEl.tagName() == "shiftLightThreshold"){
+                    QDomElement newNode = configXml.createElement("shiftLightThreshold");
+                    QDomText newText = configXml.createTextNode(val);
+                    qDebug() << "*writing shift light thresh: " << val;
+                    newNode.appendChild(newText);
+                    parent.replaceChild(newNode, trEl);
+                    break;
+                }
+                trEl = trEl.nextSibling().toElement();
+            }
+            break;
+        }
+        xt = xt.nextSibling().toElement();
+    }
+    QDomElement tr;
+    f.resize(0);
+    QTextStream stream;
+    stream.setDevice(&f);
+    configXml.save(stream, 4);
+    f.close();
+}
+
+void configHandler::storeShiftLightTimer(QString val)
+{
+    QFile f(configPath);
+    f.open(QIODevice::ReadWrite);
+    QDomElement xt = configXml.firstChild().firstChild().toElement();
+    while(!xt.isNull()){
+        if(xt.tagName() == "gauges"){
+            QDomElement parent = xt.firstChild().toElement();
+            QDomElement trEl = parent.firstChild().toElement();
+            while(!trEl.isNull()){
+                if(trEl.tagName() == "shiftLightFlashTimer"){
+                    QDomElement newNode = configXml.createElement("shiftLightFlashTimer");
+                    QDomText newText = configXml.createTextNode(val);
+                    qDebug() << "*writing shift light thresh: " << val;
                     newNode.appendChild(newText);
                     parent.replaceChild(newNode, trEl);
                     break;
