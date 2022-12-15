@@ -8,6 +8,7 @@
 #include <QCanBus>
 #include <frames.h>
 #include "config.h"
+#include <QTimer>
 
 class serialHandler : public QObject
 {
@@ -38,9 +39,11 @@ private:
 
     int lastSerial;
     int connected;
-
+    int counter;
     QString readSerial;
     QList<uint> idList;
+
+
 };
 
 #endif // SERIALHANDLER_H

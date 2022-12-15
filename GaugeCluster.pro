@@ -18,6 +18,7 @@ SOURCES += main.cpp \
     gear.cpp \
     logger.cpp \
     parameter.cpp \
+    paramdisplay.cpp \
     serialhandler.cpp \
     trip.cpp \
     weather.cpp
@@ -49,6 +50,13 @@ HEADERS += \
     gear.h \
     logger.h \
     parameter.h \
+    paramdisplay.h \
     serialhandler.h \
     trip.h \
     weather.h
+
+DISTFILES += \
+    config/can.xml \
+    config/cobb2.xml \
+    config/config.xml \
+    config/ratios.xml

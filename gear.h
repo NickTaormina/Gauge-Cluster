@@ -24,14 +24,17 @@ public slots:
     void setRatioR(float r);
     void setFinalDrive(float fd);
     void setTireDiameter(float td);
+    uint calcNextGearRPM(int speed);
+    uint calcDownshiftRPM(int speed);
 private:
-    QDomDocument xml;
+
     QList<float> ratios;
     float ratioR;
     float finalDrive;
     float tireDiameter;
+    float circumference;
     int numGears;
-    void parseRatios();
+    int currentGear;
 
 };
 

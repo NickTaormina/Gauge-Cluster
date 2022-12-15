@@ -5,74 +5,29 @@
 serialHandler::serialHandler(QObject *parent)
     : QObject{parent}
 {
-    connected = 0;
-    QSerialPortInfo info;
-    serial = new QSerialPort(nullptr);
-    QList<QSerialPortInfo>portList = info.availablePorts();
-    if(portList.size() >= 1){
-
-        for(int i = 0; i<portList.length(); i++){
-            qDebug() << "serial port: " << portList[i].portName();
-            if(portList[i].portName() == "COM6"){
-                qDebug() << "connecting to port: " << portList[i].portName();
-                serial->setPortName(portList[i].portName());
-            }
-        }
-
-        qDebug() << "*settings";
-        serial->setBaudRate(921600);
-        serial->setDataBits(QSerialPort::Data8);
-        serial->setParity(QSerialPort::NoParity);
-        serial->setStopBits(QSerialPort::OneStop);
-        serial->setFlowControl(QSerialPort::NoFlowControl);
-
-        if(!serial->open(QIODevice::ReadWrite)){
-            qDebug() << "serial connection fail";
-            //emit serialConnected();
-        } else {
-            qDebug() << "serial connected";
-
-            QObject::connect(serial, &QSerialPort::readyRead, this, &serialHandler::serialReceived);
-            emit serialConnected();
-            connected = 1;
-        }
-    }
-
-    lastSerial = 0;
-
-
-
-
-
-    serial->write("W: [2016] [01] [170] [0] [0] [0] [0] [0] [0] /");
-    //serial->write("WRITE:[2016] [02] [16] [03] [0] [0] [0] [0] [0] /");
-    //serial->write("WRITE:[2016] [16] [8] [168] [0] [0] [0] [9] [0] /");
-    //qDebug() << "frame: " << uartToFrame("[2016] [16] [8] [168] [0] [0] [0] [9] [0]").toString();
-    //serial->write("WRITE:[2016] [33]");
-
-
-    serialString = "";
+    qDebug() << "serial handler wrong constructor";
 
 }
 
 serialHandler::serialHandler(QObject *parent, config *c)
 {
+
     connected = 0;
     QSerialPortInfo info;
     serial = new QSerialPort(nullptr);
     QList<QSerialPortInfo>portList = info.availablePorts();
     if(portList.size() >= 1){
         QString configPort = c->getValue("comPort");
-        qDebug() << "*config port: " << configPort;
+        qDebug() << "config port: " << configPort;
         for(int i = 0; i<portList.length(); i++){
-            qDebug() << "serial port: " << portList[i].portName();
-            if(portList[i].portName() == configPort){
+            qDebug() << "serial port found: " << portList[i].portName();
+            if(1){
                 qDebug() << "connecting to port: " << portList[i].portName();
                 serial->setPortName(portList[i].portName());
             }
         }
 
-        qDebug() << "*settings";
+        qDebug() << "* init serial settings";
         serial->setBaudRate(921600);
         serial->setDataBits(QSerialPort::Data8);
         serial->setParity(QSerialPort::NoParity);
@@ -83,6 +38,10 @@ serialHandler::serialHandler(QObject *parent, config *c)
             qDebug() << "serial connection fail";
             //emit serialConnected();
         } else {
+            serial->clear();
+            serial->flush();
+            serial->write("T:/");
+            serial->flush();
             qDebug() << "serial connected";
 
             QObject::connect(serial, &QSerialPort::readyRead, this, &serialHandler::serialReceived);
@@ -91,17 +50,21 @@ serialHandler::serialHandler(QObject *parent, config *c)
         }
     }
 
+    counter = 1;
     lastSerial = 0;
 
 
 
 
 
-    serial->write("W: [2016] [01] [170] [0] [0] [0] [0] [0] [0] /");
+    //serial->write("W: [2016] [01] [170] [0] [0] [0] [0] [0] [0] /");
     //serial->write("WRITE:[2016] [02] [16] [03] [0] [0] [0] [0] [0] /");
     //serial->write("WRITE:[2016] [16] [8] [168] [0] [0] [0] [9] [0] /");
     //qDebug() << "frame: " << uartToFrame("[2016] [16] [8] [168] [0] [0] [0] [9] [0]").toString();
     //serial->write("WRITE:[2016] [33]");
+    //serial->write("W: [642] [45] [178] [0] [139] [139] [17] [42] [0] /");
+
+
 
 
     serialString = "";
@@ -162,7 +125,10 @@ void serialHandler::serialReceived()
         //readSerial.append(serialString);
 
     }
-
+    if(serialString.contains("penis")){
+        qDebug() << "esp error";
+        rxbuffer.clear();
+    }
     QStringList bufferSplit = serialString.split("\\");
     //qDebug() << "serial: " << serialString;
     int cleared = 1;
@@ -265,8 +231,8 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
     }
     QByteArray payload;
 
-        if(idList.contains(frame.frameId())){
-
+        //if(idList.contains(frame.frameId())){
+        if(1){
 
     while(i < msg.length()){
 
@@ -293,7 +259,8 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
         }
         }
     frame.setPayload(payload);
-    //qInfo() << frame.toString();
+    qInfo() << frame.toString();
+    //qDebug() << frame.toString();
     return frame;
 
 }
@@ -330,6 +297,17 @@ void serialHandler::writeFrame(QCanBusFrame frame)
     serialMsg.append(payload);
     serialMsg.append("/");
     //qDebug() << "serial write: " << serialMsg;
+    /*QString ct = QString::number(counter, 10);
+    QString msg = "W: [640] [1] [" + ct + "] [16] [0] [0] [0] [0] [0] /";
+    //QString msg = "W: [642] [45] [" + ct + "] [0] [139] [139] [17] [42] [0] /";
+    serial->write(msg.toStdString().c_str());
+    counter = counter + 1;
+    if(counter > 16){
+        counter = 1;
+    }*/
+
+
+
     serial->write(serialMsg.toStdString().c_str());
     serial->flush();
 
@@ -339,4 +317,5 @@ void serialHandler::setUsefulIDs(QList<uint> id)
 {
     idList = id;
 }
+
 

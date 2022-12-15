@@ -247,11 +247,12 @@ void canbus::sendQueuedMessage()
 //sends messages based on frame content
 void canbus::receiveSerialFrame(QCanBusFrame frame)
 {
-    if(frame.frameId() == 864){
+    if(frame.frameId() == 321){
         //qDebug() << "door frame: " << frame.toString();
     }
     if(frame.frameId() == 2016){
         qInfo() << "written: " << frame.toString();
+        //qDebug() << "written: " << frame.toString();
     }
     if(frame.frameId() == 2024){
         qInfo() << "ecu response: " << frame.toString();

@@ -23,6 +23,7 @@ signals:
     void handbrake(QString status);
     void neutralSwitch(QString status);
     void reverseSwitch(QString status);
+    void clutchSwitch(QString status);
     void valueChanged(QString name, double value);
     void paramValueChanged(QString name, double value);
     void usefulIDsFound(QList<uint> id);

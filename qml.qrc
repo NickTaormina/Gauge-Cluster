@@ -1,7 +1,86 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources\ui\main.qml</file>
-        <file>resources\ui\DefinitionWindow.qml</file>
-		<file>resources\ui\SettingsWindow.qml</file>
+        <file>resources/fonts/Exo/static/Exo-Black.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-BlackItalic.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-Bold.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-BoldItalic.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-ExtraBold.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-ExtraBoldItalic.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-ExtraLight.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-ExtraLightItalic.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-Italic.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-Light.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-LightItalic.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-Medium.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-MediumItalic.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-Regular.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-SemiBold.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-SemiBoldItalic.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-Thin.ttf</file>
+        <file>resources/fonts/Exo/static/Exo-ThinItalic.ttf</file>
+        <file>resources/fonts/Exo/Exo-Italic-VariableFont_wght.ttf</file>
+        <file>resources/fonts/Exo/Exo-VariableFont_wght.ttf</file>
+        <file>resources/fonts/Exo/OFL.txt</file>
+        <file>resources/fonts/Exo/README.txt</file>
+        <file>resources/fonts/Michroma/Michroma-Regular.ttf</file>
+        <file>resources/fonts/Michroma/OFL.txt</file>
+        <file>resources/images/arrowChevron.png</file>
+        <file>resources/images/BMW-Z4-M40i-vs-Toyota-Supra-16-of-18.png</file>
+        <file>resources/images/centerRedBox.png</file>
+        <file>resources/images/coolantBar0.png</file>
+        <file>resources/images/coolantBar1.png</file>
+        <file>resources/images/coolantBar2.png</file>
+        <file>resources/images/coolantBar3.png</file>
+        <file>resources/images/coolantBar4.png</file>
+        <file>resources/images/coolantBar5.png</file>
+        <file>resources/images/coolantBar6.png</file>
+        <file>resources/images/coolantBar7.png</file>
+        <file>resources/images/fuelBar0.png</file>
+        <file>resources/images/fuelBar1.png</file>
+        <file>resources/images/fuelBar2.png</file>
+        <file>resources/images/fuelBar3.png</file>
+        <file>resources/images/fuelBar4.png</file>
+        <file>resources/images/fuelBar5.png</file>
+        <file>resources/images/fuelBar6.png</file>
+        <file>resources/images/fuelBar7.png</file>
+        <file>resources/images/lightsOff.svg</file>
+        <file>resources/images/lightsOn.svg</file>
+        <file>resources/images/MPHGauge.png</file>
+        <file>resources/images/needle.jpg</file>
+        <file>resources/images/needle.png</file>
+        <file>resources/images/needle.svg</file>
+        <file>resources/images/offSignal.svg</file>
+        <file>resources/images/onSignal.svg</file>
+        <file>resources/images/redline leftTick2.png</file>
+        <file>resources/images/redline rightTick2.png</file>
+        <file>resources/images/RPMGauge.png</file>
+        <file>resources/images/shift light.png</file>
+        <file>resources/images/shift target.png</file>
+        <file>resources/images/speedo.png</file>
+        <file>resources/images/speedo.svg</file>
+        <file>resources/images/tach-01.jpg</file>
+        <file>resources/images/tach-01.svg</file>
+        <file>resources/images/tach.bmp</file>
+        <file>resources/images/tach.png</file>
+        <file>resources/images/tach.svg</file>
+        <file>resources/images/tach2 - Copy.png</file>
+        <file>resources/images/tripImage.png</file>
+        <file>resources/ui/back.png</file>
+        <file>resources/ui/DefinitionWindow.qml</file>
+        <file>resources/ui/main.qml</file>
+        <file>resources/ui/main.qml.bak</file>
+        <file>resources/ui/main.qml.pecygY</file>
+        <file>resources/ui/main.qml.TzwEcC</file>
+        <file>resources/ui/main.qml.usrcHc</file>
+        <file>resources/ui/Michroma-Regular.ttf</file>
+        <file>resources/ui/MusicPlayer.qml</file>
+        <file>resources/ui/play.png</file>
+        <file>resources/ui/SettingsWindow.qml</file>
+        <file>resources/ui/skip.png</file>
+        <file>config/can.xml</file>
+        <file>config/cobb2.xml</file>
+        <file>config/config.xml</file>
+        <file>config/ratios.xml</file>
+        <file>resources/ui/LogObject.qml</file>
     </qresource>
 </RCC>

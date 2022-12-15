@@ -1,5 +1,5 @@
 #include "parameter.h"
-#include <qDebug>
+#include "qdebug.h"
 parameter::parameter(QObject *parent)
     : QObject{parent}
 {

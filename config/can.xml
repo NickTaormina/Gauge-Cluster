@@ -33,6 +33,10 @@
 		<id>642</id>
 		<byte length = "1">5</byte>
 		<targets>
+                <target name="left">16</target>
+                <target name="right">32</target>
+                <target name="hazard">48</target>
+                <target name="off">0</target>
 			<target name="left">17</target>
 			<target name="right">33</target>
 			<target name="hazard">49</target>
@@ -88,9 +92,12 @@
 	<param name="Neutral Switch">
 		<id>321</id>
 		<byte length = "1">6</byte>
+		<bits>
+			<bit>7</bit>
+		</bits>
 		<targets>
-			<target name="Neutral">27</target>
-			<target name="Gear">20</target>
+			<target name="Neutral">1</target>
+			<target name="Gear">0</target>
 		</targets>
 	</param>
 	<param name="Handbrake">
@@ -134,4 +141,11 @@
 			<target name="Out">89</target>
 		</targets>
 	</param>
+        <param name="Vehicle Speed">
+                <id>209</id>
+                <byte length = "2">01</byte>
+                <conv>0.03495</conv>
+                <offset>0</offset>
+                <bigEndian>0</bigEndian>
+        </param>
 </CAN>

@@ -13,13 +13,15 @@
 #include <QDateTime>
 #include "weather.h"
 #include "confighandler.h"
+#include "defwindow.h"
+#include "paramdisplay.h"
 
 class gauges : public QObject
 {
     Q_OBJECT
 public:
     explicit gauges(QObject *parent = nullptr);
-    gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configHandler *handler, canData *data);
+    gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configHandler *handler, canData *data, defWindow * defwin);
 
 signals:
 void tripUpdated(QString trip, QString val);
@@ -30,12 +32,11 @@ void shiftThresholdChanged(QString val);
 void shiftTimerChanged(QString val);
 
 public slots:
-    void setRPM();
     void setRPMCAN(uint rpm);
-    void setSpeed();
     Q_INVOKABLE void setParamPointer(parameter * parameter, int length);
     Q_INVOKABLE void resetTrip(QString tr);
     Q_INVOKABLE void setShiftThreshold(QString val);
+    Q_INVOKABLE void toggleThrottleBar();
 
     void startTimer();
     void updateValue();
@@ -45,9 +46,12 @@ public slots:
     void sweepForward();
     void sweepBack();
     void updateParamDisplay(QString name, double value);
+    void updateCANParam(QString name, double value);
     void updateTemperatureText(QString t);
     void updateCoolantGauge(double value);
     void updateFuelBar(double value);
+    void updateTargetShiftRPM(uint rpm);
+
 
     void flashShiftLight(uint rpm);
     void showShiftLight();
@@ -59,15 +63,22 @@ public slots:
     void updateTurnSignals(QString status);
     void updateNeutral(QString status);
     void updateReverse(QString status);
+    void updateClutch(QString status);
+    void updateHandbrake(QString status);
     void setSpeedCAN(double speed);
+
+    void onShiftTimerTimeout();
 
     void updateWeatherStatus();
     QString getActiveTripNum();
     void updateActiveTripDistance(int speed, qint64 time);
     Q_INVOKABLE void switchActiveTrip();
     Q_INVOKABLE QString getShiftTimer();
+
+    void fadeInGauges();
 private:
 
+    //gauges constants
     int minRPM;
     int maxRPM;
     int maxTach;
@@ -79,18 +90,33 @@ private:
     int rpmIndex;
     int speedIndex;
     int odoIndex;
+
+    //param values
     parameter * par;
     int paramLength;
-    int currRPM;
-    int currSpeed;
-    int speed;
-    int _rpm;
-    double currRPMPos;
-    double currSpeedPos;
-
     int fbkIndex;
     int fklIndex;
     int damIndex;
+
+
+    //current values
+    int prevSpeed;
+    int _speed;
+    int _rpm;
+    double prevRPMPos;
+    double prevSpeedPos;
+    int accelPos;
+    QString currentGear;
+
+    //switches
+    bool neutral;
+    bool clutch;
+    bool reverse;
+    bool handbrake;
+
+    bool changeGear;
+
+
 
     void findSpeedIndex();
     void findRPMIndex();
@@ -103,6 +129,8 @@ private:
 
     void sweepDone();
     void updateClock();
+
+    void initUIElements();
 
 
     //parameter display
@@ -117,6 +145,7 @@ private:
 
     //ui gauge objects
     QObject * tachNeedle;
+    QObject * speedoHandler;
     QObject * speedoNeedle;
     QObject * fuelNeedle;
     QObject * rpmtext;
@@ -126,6 +155,10 @@ private:
     QObject * tripNum;
     QObject * statustext;
     QObject * shiftLight;
+    QObject * shiftTargetRect;
+    QObject * neutralText;
+    QObject * refText;
+    QObject * clutchText;
 
     //ui status objects
     QObject * leftSignal;
@@ -133,6 +166,8 @@ private:
     QObject * lightIndicator;
 
     //ui parameter objects
+    QObject * statusRect;
+    QObject * statusVerticalBar;
     QObject * topLeftLabel;
     QObject * topLeftValue;
     QObject * topRightLabel;
@@ -145,6 +180,7 @@ private:
     QObject * temperatureText;
     QObject * coolantGauge;
     QObject * fuelBar;
+    QObject * throttleBar;
 
     //timers
     QTimer* timer;
@@ -153,6 +189,8 @@ private:
     QTimer* sweepTimer;
     QTimer weatherTimer;
     QTimer shiftLightTimer;
+    QTimer clockTimer;
+    QTimer * shiftTimer;
     QElapsedTimer elapsedTimer;
     qint64 elapsed;
 
@@ -163,6 +201,7 @@ private:
     void updateSpeedText();
     int animDuration;
     int sweepFinished;
+    int shiftTimerDuration;
 
     uint shiftLightMin;
     int shiftLightFlashInterval;
@@ -185,6 +224,8 @@ private:
     //configHandler * _cfgHand;
     canData * _data;
     weather _weather;
+    paramDisplay* _paramDisplay;
+
 signals:
 };
 

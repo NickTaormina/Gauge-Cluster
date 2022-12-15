@@ -18,6 +18,7 @@
 QString logPath;
 QString framePath;
 
+
 //debug log handler.
 void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg){
     QString txt;
@@ -33,6 +34,7 @@ void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const Q
         }
         break;
     case QtInfoMsg: //save frame processing data as info into a sep file
+        //frame = QString("") + QDateTime::currentDateTime().toString("mm.ss") + ": " + msg;
         frame = QString("") + msg;
         fr = 1;
         break;
@@ -146,7 +148,7 @@ int main(int argc, char *argv[])
     QObject* main = obj.at(0);
     QObject * statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
-    gauges* gauge = new gauges(nullptr, main, &gr, &cfg[config::GAUGES], &hand, &_canData);
+    gauges* gauge = new gauges(nullptr, main, &gr, &cfg[config::GAUGES], &hand, &_canData, &defWin);
     QObject::connect(log, &logger::setParams, gauge, &gauges::setParamPointer);
 
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
@@ -172,11 +174,12 @@ int main(int argc, char *argv[])
     QObject::connect(gauge, &gauges::tripSwapped, &hand, &configHandler::swapTrip);
     QObject::connect(&can, &canbus::ecuResponse, log, &logger::combineECUResponse);
     QObject::connect(&_canData, &canData::paramValueChanged, gauge, &gauges::updateParamDisplay);
+    QObject::connect(&_canData, &canData::valueChanged, gauge, &gauges::updateCANParam);
     QObject::connect(&shand, &serialHandler::serialFrameReceived, &can, &canbus::receiveSerialFrame);
     QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
-    log->startLogging();
+    //log->startLogging();
 
-
+    qInfo() << "test";
 
     //gauge->gaugeSweep();
     return app.exec();

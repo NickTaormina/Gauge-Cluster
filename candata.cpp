@@ -69,6 +69,8 @@ void canData::emitter(QString name, QString status)
         emit neutralSwitch(status);
     } else if(name == "Reverse Switch"){
         emit reverseSwitch(status);
+    } else if(name == "Clutch Switch"){
+        emit clutchSwitch(status);
     }
 }
 
@@ -77,8 +79,8 @@ void canData::valueEmitter(QString name, double value)
 {
     if(name == "Vehicle Speed"){
         emit speedChanged(value);
-    } else if (name == "Oil Temp"){
-        emit paramValueChanged(name, value);
+    } else {
+        emit valueChanged(name, value);
     }
 }
 
@@ -211,6 +213,7 @@ void canData::bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int
 {
     QStringList bytes;
     bytes.append(_def[index].getBytes());
+    //qDebug() << "bit: " << _def[index].getName();
     int length = b.length();
     //error checking for small payload
     if(p.length() < bytes.at(0).toInt(nullptr, 10)){
@@ -219,13 +222,17 @@ void canData::bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int
         if(length == 1){
             int bitIndex = b.at(0).toInt(nullptr, 10);
             QString bit = QString::number(p.at(bytes.at(0).toUInt(nullptr, 10)), 2);
+            //qDebug() << bit;
             if(bit.length() < 8){
                 for(int i = bit.length(); i<8; i++){
                     bit.prepend("0");
                 }
             }
+            //qDebug() << "processed: " << bit;
             bitIndex = 8-bitIndex-1;
+            //qDebug() << "bit index: " << bitIndex;
             QString valString = (bit.at(bitIndex));
+            //qDebug() << "val string: " << valString;
             uint val = valString.toUInt(nullptr, 10);
             if(t.contains(val)){
                 QString status = t.value(val);

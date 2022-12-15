@@ -240,4 +240,33 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
     }
 
+    Label {
+        id: miscLabel
+        x: 341
+        y: 161
+        width: 102
+        height: 20
+        text: qsTr("Misc")
+        horizontalAlignment: Text.AlignHCenter
+        font.pointSize: 12
+    }
+
+    Button {
+        id: toggleThrottleBtn
+        x: 341
+        y: 187
+        width: 102
+        height: 27
+        text: qsTr("Accel Bar Toggle")
+        objectName: "resetTripBBtn"
+        background: Rectangle {
+            color: "#dbdbdb"
+            radius: 4
+        }
+        onClicked:{
+            gauge.toggleThrottleBar();
+        }
+    }
+
+
 }

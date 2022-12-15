@@ -6,22 +6,37 @@ gauges::gauges(QObject *parent)
 {
 }
 
-gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configHandler * handler, canData * data)
+gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configHandler *handler, canData *data, defWindow * defwin)
 {
+    //store objects
     parent = nullptr;
+    g = gear;
+    _data = data;
+
     //timers
     timer = new QTimer(this);
     testtimer = new QTimer(this);
     speedTime = new QTimer(this);
     sweepTimer = new QTimer(this);
+    shiftTimer = new QTimer(this);
+    shiftLightTimer.setSingleShot(false);
+    shiftTimer->setSingleShot(true);
+    clockTimer.setInterval(1000);
+
+
+    //timer connects
     connect(timer, &QTimer::timeout, this, &gauges::updateValue);
     connect(testtimer, &QTimer::timeout, this, &gauges::changeValues);
     connect(speedTime, &QTimer::timeout, this, &gauges::updateSpeedText);
     connect(&_weather, &weather::tempRead, this, &gauges::updateTemperatureText); //update temp text when weather report read
     connect(&weatherTimer, &QTimer::timeout, this, &gauges::updateWeatherStatus); //update weather every 5 min
-    shiftLightTimer.setSingleShot(false);
     connect(&shiftLightTimer, &QTimer::timeout, this, &gauges::showShiftLight);
     connect(this, &gauges::rpmUpdated, this, &gauges::flashShiftLight);
+    connect(shiftTimer, &QTimer::timeout, this, &gauges::onShiftTimerTimeout);
+    connect(&clockTimer, &QTimer::timeout, this, &gauges::updateClock);
+    connect(sweepTimer, &QTimer::timeout, this, &gauges::fadeInGauges);
+
+
 
     //initialize config values
     qDebug() << "*gauge values set: ";
@@ -36,29 +51,33 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configH
     animDuration = cfg->getValue("generalAnimationDuration").toInt(nullptr, 10);
     showAllSpeedNumbers = cfg->getValue("generalShowAllSpeedDigits").toInt(nullptr, 10);
     initialGaugeSweep = cfg->getValue("generalStartupGaugeSweep").toInt(nullptr, 10);
-
-    qDebug() << "*gauge sweep: " << initialGaugeSweep;
-
-
-
-    currRPMPos = minTach;
-    currSpeedPos = minSpeedoRot;
-    currSpeed = 0;
-    rpmval = 0;
-    speedval = 0;
-    qDebug() << "odometer: " << cfg->getValue("generalOdometer");
-    odoval = cfg->getValue("generalOdometer").toInt(nullptr, 10);
-
-    speed = 0;
+    qDebug() << "*gauge sweep setting: " << initialGaugeSweep;
     shiftLightMin = cfg->getValue("generalShiftLightThreshold").toUInt(nullptr, 10);
     shiftLightFlashInterval = cfg->getValue("generalShiftLightFlashTimer").toUInt(nullptr, 10);
+    odoval = cfg->getValue("generalOdometer").toInt(nullptr, 10);
+    activeTrip = cfg->getValue("generalActiveTrip");
+    shiftTimerDuration = cfg->getValue("generalShiftTargetTimer").toInt(nullptr, 10);
+    qDebug() << "shift timer duration: " << shiftTimerDuration;
 
-    g = gear;
-    _data = data;
+
+    //initialize temp vars to avoid error
+    prevRPMPos = minTach;
+    prevSpeedPos = minSpeedoRot;
+    prevSpeed = 0;
+    rpmval = 0;
+    speedval = 0;
+    _speed = 0;
+    _rpm = 0;
+
+
+
+
+
 
 
 
     //find ui gauge elements to control. should probably move these to QML
+    shiftTargetRect = main->findChild<QObject*>("speedoHandler", Qt::FindChildrenRecursively);
     tachNeedle = main->findChild<QObject*>("tachneedle", Qt::FindChildrenRecursively);
     speedoNeedle = main->findChild<QObject*>("speedoneedle", Qt::FindChildrenRecursively);
     fuelNeedle = main->findChild<QObject*>("fuelneedle", Qt::FindChildrenRecursively);
@@ -68,14 +87,28 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configH
     geartext = main->findChild<QObject*>("gearText", Qt::FindChildrenRecursively);
     tripNum = main->findChild<QObject*>("tripNum", Qt::FindChildrenRecursively);
     statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
+    statustext->setProperty("text", "");
     shiftLight = main->findChild<QObject*>("shiftLight", Qt::FindChildrenRecursively);
+    shiftTargetRect = main->findChild<QObject*>("shiftTargetRect", Qt::FindChildrenRecursively);
+    neutralText = main->findChild<QObject*>("neutralText", Qt::FindChildrenRecursively);
+    refText = main->findChild<QObject*>("refText", Qt::FindChildrenRecursively);
+    clutchText = main->findChild<QObject*>("clutchText", Qt::FindChildrenRecursively);
 
     //finds ui status elements to control. ex: turn signals
     leftSignal = main->findChild<QObject*>("leftSignal", Qt::FindChildrenRecursively);
     rightSignal = main->findChild<QObject*>("rightSignal", Qt::FindChildrenRecursively);
     lightIndicator = main->findChild<QObject*>("lightIndicator", Qt::FindChildrenRecursively);
 
+    //finds ui can parameter objects
+    clockText = main->findChild<QObject*>("clockText", Qt::FindChildrenRecursively);
+    temperatureText = main->findChild<QObject*>("temperatureText", Qt::FindChildrenRecursively);
+    fuelBar = main->findChild<QObject*>("fuelBarImage", Qt::FindChildrenRecursively);
+    coolantGauge = main->findChild<QObject*>("coolantBarImage", Qt::FindChildrenRecursively);
+    throttleBar = main->findChild<QObject*>("throttleBar", Qt::FindChildrenRecursively);
+
     //finds ui parameter objects (from logger)
+    statusRect = main->findChild<QObject*>("statusRect", Qt::FindChildrenRecursively);
+    statusVerticalBar = main->findChild<QObject*>("statusVerticalBar", Qt::FindChildrenRecursively);
     topLeftLabel = main->findChild<QObject*>("topLeftLabel", Qt::FindChildrenRecursively);
     topRightLabel = main->findChild<QObject*>("topRightLabel", Qt::FindChildrenRecursively);
     bottomLeftLabel = main->findChild<QObject*>("bottomLeftLabel", Qt::FindChildrenRecursively);
@@ -84,22 +117,26 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configH
     topRightValue = main->findChild<QObject*>("topRightValue", Qt::FindChildrenRecursively);
     bottomRightValue = main->findChild<QObject*>("bottomRightValue", Qt::FindChildrenRecursively);
     bottomLeftValue = main->findChild<QObject*>("bottomLeftValue", Qt::FindChildrenRecursively);
-    clockText = main->findChild<QObject*>("clockText", Qt::FindChildrenRecursively);
-    temperatureText = main->findChild<QObject*>("temperatureText", Qt::FindChildrenRecursively);
-    fuelBar = main->findChild<QObject*>("fuelBarImage", Qt::FindChildrenRecursively);
-    coolantGauge = main->findChild<QObject*>("coolantBarImage", Qt::FindChildrenRecursively);
 
+    initUIElements();
 
     //paramater display label init
     if(topLeftLabel){
-    topLeftText = "AF Ratio";
-    topLeftLabel->setProperty("text", topLeftText);}
-    topRightText = "AF Learning";
-    topRightLabel->setProperty("text", topRightText);
-    bottomRightText = "Oil Temp";
-    bottomRightLabel->setProperty("text", bottomRightText);
-    bottomLeftText = "Intake Temp";
-    bottomLeftLabel->setProperty("text", bottomLeftText);
+        topLeftText = "AF Ratio";
+        topLeftLabel->setProperty("text", topLeftText);
+    }
+    if(topRightLabel){
+        topRightText = "AF Learning";
+        topRightLabel->setProperty("text", topRightText);
+    }
+    if(bottomRightLabel){
+        bottomRightText = "Oil Temp";
+        bottomRightLabel->setProperty("text", bottomRightText);
+    }
+    if(bottomLeftLabel){
+        bottomLeftText = "Intake Temp";
+        bottomLeftLabel->setProperty("text", bottomLeftText);
+    }
 
     //set the gear value on startup
     geartext->setProperty("text", "N");
@@ -111,70 +148,86 @@ gauges::gauges(QObject *parent, QObject *main, gear *gear, config * cfg, configH
         gaugeSweep();
     }
 
+
+    //can info connects
     QObject::connect(_data, &canData::turnSignal, this, &gauges::updateTurnSignals);
     QObject::connect(_data, &canData::lights, this, &gauges::updateLights);
     QObject::connect(_data, &canData::reverseSwitch, this, &gauges::updateReverse);
     QObject::connect(_data, &canData::rpmChanged, this, &gauges::setRPMCAN);
     QObject::connect(_data, &canData::speedChanged, this, &gauges::setSpeedCAN);
     QObject::connect(_data, &canData::neutralSwitch, this, &gauges::updateNeutral);
-    QObject::connect(_data, &canData::usefulFrameReceived, this, &gauges::updateClock);
-    updateClock();
+    QObject::connect(_data, &canData::clutchSwitch, this, &gauges::updateClutch);
+    QObject::connect(_data, &canData::handbrake, this, &gauges::updateHandbrake);
 
-    //fill local trip info and update display
+
+
+
+
+    //fill trip & odo info and update display
     handler->fillTrip(&trA, "tripA");
     handler->fillTrip(&trB, "tripB");
     qDebug() << "*trip A: " << trA.getTrip();
     qDebug() << "*trip B: " << trB.getTrip();
-
-    activeTrip = cfg->getValue("generalActiveTrip");
+    qDebug() << "*odometer: " << odoval;
     qDebug() << "*activeTrip: " << activeTrip;
     tripNum->setProperty("text", getActiveTripNum());
     updateParamDisplay("Odometer", (double)odoval);
+
+
+    //start the clock
+    updateClock();
+    clockTimer.start();
+
+
+
+    //test variables
+    /*_speed=40;
+    _rpm = 3000;
+    currentGear = "3";
+    QTimer::singleShot(3000, this, [this](){
+        qDebug() << "clutch in";
+        updateClutch("In");
+    });*/
+
+
+
+    QStringList paramList = defwin->selectedParams();
+
+        paramList.append("Oil Temp");
+
+
+        QStringList filter;
+        filter.append("Odometer");
+        filter.append("Vehicle Speed");
+        filter.append("Dynamic Advance Multiplier");
+
+        QMap<QString, QString> rename;
+        rename.insert("AF Learning 1", "AF Learning");
+        rename.insert("Intake Manifold Temperature", "Intake Temp");
+        rename.insert("Dynamic Advance Multiplier", "DAM");
+        rename.insert("Feedback Knock Correction", "FBK");
+        rename.insert("Fine Knock Learn", "FKL");
+    _paramDisplay = new paramDisplay(statusRect, qmlEngine(main), paramList);
+        _paramDisplay->setFilterList(filter, 0);
+        _paramDisplay->initDisplay();
+        _paramDisplay->setParamRename(rename);
+
+
 }
 
 
 
-//updates the tach
-void gauges::setRPM()
-{
-    if(rpmIndex > -1 && sweepFinished == 1){
-        int rpm = (int)par[rpmIndex].getValue();
-
-
-
-        int diff = 0;
-        double percent = (double)(rpm)/maxRPM;
-        double pos;
-
-        if(maxTach > minTach){ //TODO: implement this correctly
-            diff = minTach - maxTach;
-            pos = minTach + (percent*diff);
-
-        } else {
-            diff = (minTach + maxTach)-180;
-            pos = (double)minTach + (double)(percent*diff);
-        }
-
-        QPropertyAnimation *rpmAnim = new QPropertyAnimation(tachNeedle, "rotation");
-        rpmAnim->setDuration(100);
-        rpmAnim->setStartValue(currRPMPos);
-        rpmAnim->setEndValue(pos);
-        rpmAnim->start();
-        if(rpm < maxRPM){
-            if(rpmtext){
-            rpmtext->setProperty("text", rpm);
-            }
-        }
-
-        currRPMPos = pos;
-    } else {
-    }
-}
-
+//updates the tach with can data
 void gauges::setRPMCAN(uint rpm)
 {
 
     if(sweepFinished == 1 && rpm >= 0 && rpm < 10000){
+        //qDebug() << "_rpm: " << _rpm << " rpm: " << rpm;
+        /*
+        if(_rpm > 0 && ((rpm/_rpm) > 10 || (rpm/_rpm) < .1) && (_rpm) < .95*static_cast<quint8>(maxRPM) && !clutch){
+            qDebug() << "returning: " << rpm/_rpm;
+            return;
+        }*/
         _rpm = rpm;
         int diff = 0;
         double percent = (double)(rpm)/maxRPM;
@@ -188,12 +241,15 @@ void gauges::setRPMCAN(uint rpm)
             diff = (minTach + maxTach)-180;
             pos = (double)minTach + (double)(percent*diff);
         }
+
         if(tachNeedle){
+            tachNeedle->setProperty("rotation", pos);
+            /*
             QPropertyAnimation *rpmAnim = new QPropertyAnimation(tachNeedle, "rotation");
             rpmAnim->setDuration(animDuration/4);
             rpmAnim->setStartValue(currRPMPos);
             rpmAnim->setEndValue(pos);
-            rpmAnim->start();
+            rpmAnim->start();*/
         }
         if(rpm < (uint)maxRPM){
             if(rpmtext){
@@ -201,59 +257,28 @@ void gauges::setRPMCAN(uint rpm)
             }
         }
         emit rpmUpdated(rpm);
+        refText->setProperty("visible", false);
+        QTimer::singleShot(5, this, [this](){
+            refText->setProperty("visible", true);
+        });
 
 
-        currRPMPos = pos;
+        prevRPMPos = pos;
     } else {
     }
 }
 
-//updates the speed analog gauge
-void gauges::setSpeed()
-{
-    if(speedIndex > -1 && sweepFinished == 1){
-        if(speedTime->isActive()){
-            speedTime->setInterval(5);
-        }
-        speed = (int)par[speedIndex].getValue();
-        int diff = 0;
-        double percent = (double)speed/maxSpeed;
-        double pos = minSpeedoRot;
-        if(maxSpeedoRot > minSpeedoRot){
-            diff = maxSpeedoRot - minSpeedoRot;
-            pos = minSpeedoRot + (percent*diff);
-        } else {
-            diff = (minSpeedoRot + maxSpeedoRot)-180;
-            pos = (double)minSpeedoRot + (double)(percent*diff);
-        }
-        int speedDelta = speed - currSpeed;
-        if(speedDelta != 0){
-            int speedDuration = (animDuration/(speedDelta))/2;
-            speedTime->start(speedDuration);
-            if(speedoNeedle){
-                QPropertyAnimation *speedAnim = new QPropertyAnimation(speedoNeedle, "rotation");
-                speedAnim->setDuration(animDuration);
-                speedAnim->setStartValue(currSpeedPos);
-                speedAnim->setEndValue(pos);
-                speedAnim->start();
-            }
-            currSpeed = speed;
-        }
-        currSpeedPos = pos;
-    } else {
-    }
-}
 
 //updates the speed analog gauge from passive CAN read
 void gauges::setSpeedCAN(double spd)
 {
-    speed = spd;
+    _speed = spd;
     if(sweepFinished == 1){
         if(speedTime->isActive()){
             speedTime->setInterval(5);
         }
         int diff = 0;
-        double percent = (double)speed/maxSpeed;
+        double percent = (double)_speed/maxSpeed;
         double pos = minSpeedoRot;
         if(maxSpeedoRot > minSpeedoRot){
             diff = maxSpeedoRot - minSpeedoRot;
@@ -262,22 +287,33 @@ void gauges::setSpeedCAN(double spd)
             diff = (minSpeedoRot + maxSpeedoRot)-180;
             pos = (double)minSpeedoRot + (double)(percent*diff);
         }
-        int speedDelta = speed - currSpeed;
+        int speedDelta = _speed - prevSpeed;
         if(speedDelta != 0){
             int speedDuration = abs((20/(speedDelta))/2);
             speedTime->start(speedDuration);
             if(speedoNeedle){
                 QPropertyAnimation *speedAnim = new QPropertyAnimation(speedoNeedle, "rotation");
                 speedAnim->setDuration(animDuration);
-                speedAnim->setStartValue(currSpeedPos);
+                speedAnim->setStartValue(prevSpeedPos);
                 speedAnim->setEndValue(pos);
                 speedAnim->start();
             }
-            currSpeed = speed;
+            prevSpeed = _speed;
         }
-        currSpeedPos = pos;
+        prevSpeedPos = pos;
         updateTrip();
     }
+}
+
+void gauges::onShiftTimerTimeout()
+{
+   // qDebug() << "shift timer timeout";
+    shiftTimer->stop();
+   /* statustext->setProperty("text", "next gear");
+    QTimer::singleShot(500, this, [this](){
+        statustext->setProperty("text", "");
+    });*/
+    updateTargetShiftRPM(g->calcNextGearRPM(_speed));
 }
 
 //updates the weather readouts with new data
@@ -288,11 +324,11 @@ void gauges::updateWeatherStatus()
 
 //updates the middle speed readout
 void gauges::updateSpeedText(){
-    if(speed < maxSpeed){
+    if(_speed < maxSpeed){
         int s = speedtext->property("text").toInt(nullptr);
-        if(s >= speed){
+        if(s >= _speed){
             speedTime->stop();
-            speedtext->setProperty("text", speed);
+            speedtext->setProperty("text", _speed);
         } else{
             speedtext->setProperty("text", (s + 1));
         }
@@ -327,14 +363,14 @@ void gauges::switchActiveTrip(){
     }else {
         activeTrip = "tripA";
     }
-    qDebug() << "active trip: " << activeTrip;
+    qDebug() << "*active trip: " << activeTrip;
     emit tripSwapped(activeTrip);
     tripNum->setProperty("text", getActiveTripNum());
 }
 //resets the given trip
 void gauges::resetTrip(QString tr) //TODO: multiple trips
 {
-    qDebug()<< "reset trip: " << tr;
+    qDebug()<< "*reset trip: " << tr;
     if(tr == "tripA"){
         trA.resetTrip();
         tripNum->setProperty("text", getActiveTripNum());
@@ -347,10 +383,22 @@ void gauges::resetTrip(QString tr) //TODO: multiple trips
 
 }
 
+//sets the shift threshold varable from settings window
 void gauges::setShiftThreshold(QString val)
 {
     shiftLightMin = val.toInt(nullptr, 10);
     emit shiftThresholdChanged(val);
+}
+
+//toggles if throttle bar visible from settings window
+void gauges::toggleThrottleBar()
+{
+    qDebug() << "*toggle throttle bar: ";
+    if(throttleBar->property("visible") == QVariant(true)){
+        throttleBar->setProperty("visible", false);
+    } else {
+        throttleBar->setProperty("visible", true);
+    }
 }
 
 //finds the rpm parameter
@@ -391,9 +439,14 @@ void gauges::findOdoIndex()
 void gauges::updateGear()
 {
     if(g){
-        QString currgear = g->calcGear(_rpm, speed);
-        //qInfo() << "update gear: " << _rpm << " : " << speed;
-        geartext->setProperty("text", currgear);
+        if(!clutch && !neutral && !reverse){
+            currentGear = g->calcGear(_rpm, _speed);
+            //qInfo() << "update gear: " << _rpm << " : " << speed;
+            geartext->setProperty("text", currentGear);
+        } else if (neutral && !reverse){
+            geartext->setProperty("text", "N");
+        }
+
 
     }
 }
@@ -435,8 +488,8 @@ void gauges::updateActiveTripDistance(int speed, qint64 time){
 //updates the trip value in cluster
 void gauges::updateTrip()
 {
-    qDebug() << "*speed: " << speed << " elapsed time: " << elapsedTimer.elapsed();
-    updateActiveTripDistance(speed, elapsedTimer.elapsed());
+    //qDebug() << "*speed: " << _speed << " elapsed time: " << elapsedTimer.elapsed();
+    updateActiveTripDistance(_speed, elapsedTimer.elapsed());
     elapsedTimer.restart();
     tripNum->setProperty("text", getActiveTripNum());
     //qDebug() << activeTrip << ": " << getActiveTripNum();
@@ -449,9 +502,10 @@ void gauges::updateTrip()
 //displays knock message if there is a knock event (fbk/fkl/dam not normal)
 void gauges::showKnock()
 {
+    /*
     if(par[fklIndex].getValue() == 0 && par[fbkIndex].getValue() == 0 && par[damIndex].getValue() == 1){
-        statustext->setProperty("text", "");
-        statustext->setProperty("visible", false);
+        //statustext->setProperty("text", "");
+        //statustext->setProperty("visible", false);
         return;
     } else {
         QString str;
@@ -469,7 +523,7 @@ void gauges::showKnock()
         statustext->setProperty("text", (QVariant)str);
         statustext->setProperty("visible", true);
 
-    }
+    } */
 }
 
 
@@ -529,72 +583,64 @@ void gauges::sweepBack()
     }
 }
 
+//used to update display for AP params
 void gauges::updateParamDisplay(QString name, double value)
 {
-    //convert to string to allow formatting
-    //qDebug() << "update param display: " << name;
 
-    if(name == "AF Ratio"){
-        //qDebug() << "updating ratio: " << value;
-        //ensures two decimals
-        QString val = QString::number(value, 'f', 2);
-        if(val.length()<3){
-            val.append(".");
-        }
-        if(val.length()<5){
-            for(int i = val.length(); i<5; i++){
-                val.append("0");
-            }
-        }
-        if(topLeftValue){
-        topLeftValue->setProperty("text", val);
-
-        }
-    }else if (name == "AF Learning 1"){
-        if(topRightValue){
-            QString val = QString::number(value, 'f', 2);
-        topRightValue->setProperty("text", val);}
-    } else if (name == "Oil Temp"){
-        value = 1.8*value + 32;
-
-            QString val = QString::number(value, 'f', 0);
-            if(bottomRightValue){
-            bottomRightValue->setProperty("text", val);}
+    if(name == "Odometer"){
+           QString val = QString::number(value, 'f', 0);
+           if(val.length() < 6){
+               for(int x = val.length(); x<6; x++){
+                   val.prepend("0");
+               }
+           }
+           if(val != odotext->property("text").toString()){
+               emit odometerUpdated(val);
+               odotext->setProperty("text", QVariant(val));
+           }
+       } else {
+           _paramDisplay->updateValue(name, value);
+       }
 
 
-    } else if (name == "Intake Manifold Temperature"){
-        if(bottomLeftValue){
-            QString val = QString::number(value, 'f', 0);
-        bottomLeftValue->setProperty("text", val);}
-    } else if(name == "Odometer"){
-        QString val = QString::number(value, 'f', 0);
-        if(val.length() < 6){
-            for(int x = val.length(); x<6; x++){
-                val.prepend("0");
-            }
-        }
-        if(val != odotext->property("text").toString()){
-            emit odometerUpdated(val);
-            odotext->setProperty("text", QVariant(val));
-        }
+}
+
+//updates gauges with can values
+void gauges::updateCANParam(QString name, double value)
+{
+    if (name == "Oil Temp"){
+        _paramDisplay->updateValue(name, value);
     } else if (name == "Coolant Temp"){
+        value = 1.8*value + 32;
         updateCoolantGauge(value);
-    }
+    } else if (name == "Fuel"){
+        updateFuelBar(value);
+    } else if (name == "Accelerator Position"){
+        accelPos = qRound(value);
+        throttleBar->setProperty("value", QVariant(value/100));
+        if(shiftTimer->isActive() && value > 25){
+            shiftTimer->stop();
+            //qDebug() << "downshift";
 
-    //refresh ui
-    //QCoreApplication::processEvents();
+            updateTargetShiftRPM(g->calcDownshiftRPM(_speed));
+        }
+    }
 }
 
 //changes the outside temperature readout
 void gauges::updateTemperatureText(QString t)
 {
+
    QString tr = t + " F";
    temperatureText->setProperty("text", tr);
-   weatherTimer.start(300000);
+   weatherTimer.start(600000);
+
 }
 
+//updates the coolant gauge given temperature value
 void gauges::updateCoolantGauge(double value)
 {
+
     //TODO: change this for coolant bar (supra) vs coolant gauge (oem)
     if(coolantGauge){
     QString filePath = "coolantBar";
@@ -623,10 +669,10 @@ void gauges::updateCoolantGauge(double value)
     }
 }
 
+//updates the fuel gauge with CAN data
 void gauges::updateFuelBar(double value)
 {
-    value = value/255;
-    //TODO: change this for coolant bar (supra) vs coolant gauge (oem)
+    value = value/255; //turns raw value into a percent
     if(fuelBar){
     QString filePath = "fuelBar";
     if(value < .05){
@@ -653,9 +699,62 @@ void gauges::updateFuelBar(double value)
     }
 }
 
+//paints the shift target rpm marker
+void gauges::updateTargetShiftRPM(uint rpm)
+{
+   // qDebug() << "shift target call";
+    if(rpm > 1200 && currentGear != "N" && currentGear != "R" && _speed > 10){
+        /*
+        clutchText->setProperty("text", "updateTarget");
+        clutchText->setProperty("visible", true);
+        QTimer::singleShot(500, this, [this](){
+            clutchText->setProperty("text", "clutch");
+            clutchText->setProperty("visible", false);
+        });*/
+        double percent = (double)(rpm)/maxRPM;
+        double pos;
+        int diff = 0;
+
+        if(maxTach > minTach){ //TODO: implement this correctly
+            diff = minTach - maxTach;
+            pos = minTach + (percent*diff);
+
+        } else {
+            diff = (minTach + maxTach)-180;
+            pos = (double)minTach + (double)(percent*diff);
+        }
+
+        if(shiftTargetRect){
+            if(shiftTargetRect->property("visible")==false){
+                //qDebug() << "not visible rn";
+                shiftTargetRect->setProperty("rotation", pos);
+                shiftTargetRect->setProperty("opacity", 0);
+                shiftTargetRect->setProperty("visible", true);
+                QPropertyAnimation *anim = new QPropertyAnimation(shiftTargetRect, "opacity");
+                anim->setDuration(100);
+                anim->setStartValue(0);
+                anim->setEndValue(1.0);
+                anim->start();
+                QTimer::singleShot(1350, this, [this](){ //fadeout animation
+                    QPropertyAnimation *anim = new QPropertyAnimation(shiftTargetRect, "opacity");
+                    anim->setDuration(100);
+                    anim->setStartValue(1.0);
+                    anim->setEndValue(0);
+                    anim->start();
+                });
+                QTimer::singleShot(1500, this, [this](){
+                   shiftTargetRect->setProperty("visible", false);
+                });
+            }
+        }
+    }
+}
+
+
+//controls the shift light flashing
 void gauges::flashShiftLight(uint rpm)
 {
-    if(rpm > shiftLightMin){
+    if(rpm >= shiftLightMin){
         if(!shiftLightTimer.isActive()){
             shiftLight->setProperty("visible", true);
             shiftLightTimer.start(shiftLightFlashInterval);
@@ -666,6 +765,7 @@ void gauges::flashShiftLight(uint rpm)
     }
 }
 
+//toggles shift light visibility
 void gauges::showShiftLight()
 {
     if(shiftLight->property("visible") == true){
@@ -675,18 +775,60 @@ void gauges::showShiftLight()
     }
 }
 
+//get the shift light rpm setting
 QString gauges::getShiftThreshold()
 {
     return QString::number(shiftLightMin, 10);
 }
+//get the shift light flash interval
 QString gauges::getShiftTimer()
 {
     return QString::number(shiftLightFlashInterval, 10);
 }
 
+//fades in the param display after gauge sweep
+void gauges::fadeInGauges()
+{
+    qDebug() << "*fading in ui elements";
+
+    if(statusRect){
+        QPropertyAnimation *anim = new QPropertyAnimation(topLeftValue, "opacity");
+        anim->setDuration(500);
+        anim->setStartValue(0);
+        anim->setEndValue(1.0);
+        anim->start();
+    }
+
+
+    if(throttleBar){
+        QPropertyAnimation *speedAnim = new QPropertyAnimation(throttleBar, "opacity");
+        speedAnim->setDuration(500);
+        speedAnim->setStartValue(0);
+        speedAnim->setEndValue(1.0);
+        speedAnim->start();
+    }
+
+    if(temperatureText){
+        QPropertyAnimation *speedAnim = new QPropertyAnimation(temperatureText, "opacity");
+        speedAnim->setDuration(500);
+        speedAnim->setStartValue(0);
+        speedAnim->setEndValue(1.0);
+        speedAnim->start();
+    }
+
+    if(speedtext){
+        QPropertyAnimation *speedAnim = new QPropertyAnimation(speedtext, "opacity");
+        speedAnim->setDuration(500);
+        speedAnim->setStartValue(0);
+        speedAnim->setEndValue(1.0);
+        speedAnim->start();
+    }
+
+}
+
+//calls functions after gauge sweep (broken)
 void gauges::sweepDone(){
     sweepFinished = 1;
-
 }
 
 //updates the cluster clock
@@ -702,6 +844,44 @@ void gauges::updateClock()
     }
     QString time = QString(hour + ":" + minute);
     clockText->setProperty("text", time);
+}
+
+//controls the animations for ui start (but not after gauge sweep)
+void gauges::initUIElements()
+{
+    if(statusVerticalBar){
+        QPropertyAnimation *anim = new QPropertyAnimation(statusVerticalBar, "height");
+        anim->setDuration(500);
+        anim->setStartValue(0);
+        anim->setEndValue(170);
+        anim->start();
+    }
+
+    if(geartext){
+        QPropertyAnimation *speedAnim = new QPropertyAnimation(geartext, "opacity");
+        speedAnim->setDuration(750);
+        speedAnim->setStartValue(0);
+        speedAnim->setEndValue(1.0);
+        speedAnim->start();
+    }
+
+    if(odotext){
+        QPropertyAnimation *speedAnim = new QPropertyAnimation(odotext, "opacity");
+        speedAnim->setDuration(500);
+        speedAnim->setStartValue(0);
+        speedAnim->setEndValue(1.0);
+        speedAnim->start();
+    }
+
+    if(coolantGauge){
+        QPropertyAnimation *speedAnim = new QPropertyAnimation(coolantGauge, "opacity");
+        speedAnim->setDuration(500);
+        speedAnim->setStartValue(0);
+        speedAnim->setEndValue(1.0);
+        speedAnim->start();
+    }
+
+
 }
 
 //updates the light indicator based on light status
@@ -724,20 +904,19 @@ void gauges::updateLights(QString status)
 //shows which turn signals are on/off
 void gauges::updateTurnSignals(QString status)
 {
-    //qDebug() << "updating turn signals";
     if(status == "left"){
-        leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
-        rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
+        leftSignal->setProperty("visible", true);
+        rightSignal->setProperty("visible", false);
     } else if (status == "right"){
-        leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
-        rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
+        leftSignal->setProperty("visible", false);
+        rightSignal->setProperty("visible", true);
     } else if (status == "hazard"){
-        leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
-        rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/onSignal.svg");
+        leftSignal->setProperty("visible", true);
+        rightSignal->setProperty("visible", true);
     } else{
         //off
-        leftSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
-        rightSignal->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/offSignal.svg");
+        leftSignal->setProperty("visible", false);
+        rightSignal->setProperty("visible", false);
     }
 }
 
@@ -745,8 +924,28 @@ void gauges::updateTurnSignals(QString status)
 void gauges::updateNeutral(QString status)
 {
     if(status == "Neutral"){
-        geartext->setProperty("text", "N");
+        neutral = true;
+        //qDebug() << QDateTime::currentDateTime().toString("mm.ss") + ": neutral";
+        if(neutralText){
+            /*
+            neutralText->setProperty("visible", true);
+            neutralText->setProperty("text", "Neutral");
+            neutralText->setProperty("opacity", 1.0);*/
+        }
+        if(!reverse){
+            geartext->setProperty("text", "N");
+            return;
+        }
+
     } else {
+        //qDebug() << QDateTime::currentDateTime().toString("mm.ss") + ": not";
+        neutral = false;
+        if(neutralText){
+            /*
+        neutralText->setProperty("visible", false);
+        neutralText->setProperty("text", "");
+        neutralText->setProperty("opacity", 0);*/
+        }
         updateGear();
     }
 }
@@ -755,9 +954,42 @@ void gauges::updateNeutral(QString status)
 void gauges::updateReverse(QString status)
 {
     if(status == "Reverse"){
+        reverse = true;
+        //qDebug() << "reverse";
         geartext->setProperty("text", "R");
     } else {
+        reverse = false;
         updateGear();
+    }
+}
+
+void gauges::updateClutch(QString status)
+{
+    if(status == "In"){
+        if(!changeGear){
+            changeGear = true;
+            if(!shiftTimer->isActive()){
+                shiftTimer->start(shiftTimerDuration);
+            }
+        }
+        //qDebug() << "clutch in";
+        clutch = true;
+        //clutchText->setProperty("visible", true);
+
+    } else {
+        clutch = false;
+        changeGear = false;
+        //clutchText->setProperty("visible", false);
+        shiftTimer->stop();
+    }
+}
+
+void gauges::updateHandbrake(QString status)
+{
+    if(status == "engaged"){
+        handbrake = true;
+    } else {
+        handbrake = false;
     }
 }
 
@@ -769,8 +1001,9 @@ void gauges::gaugeSweep()
 }
 
 
-
+//possibly deprecated
 void gauges::startTimer(){
+    qDebug() << "gauges::startTimer called";
     if(!timer->isActive()){
         qDebug() << "timer started";
         rpmval = 0;
@@ -785,6 +1018,7 @@ void gauges::startTimer(){
 //starts/stops the test sweep
 void gauges::startTest(){
     if(!testtimer->isActive()){
+        par[fbkIndex].setValue(-1.41);
         qDebug() << "timer started";
         rpmval = 0;
         speedval = 0;
@@ -815,14 +1049,14 @@ void gauges::setOdometer()
     odotext->setProperty("text", (QVariant)str);
 }
 
-//updates all gauges based on ecu response data
+//DEPRECATED: updates all gauges based on ecu response data
 void gauges::updateValue()
 {
     if(speedIndex > -1){
-        setRPM();
-        setSpeed();
         setOdometer();
-        updateGear();
+        if(!neutral && !reverse){
+            updateGear();
+        }
         updateTrip();
         showKnock();
     }
@@ -852,6 +1086,7 @@ void gauges::changeValues(){
         double fbk = par[fbkIndex].getValue();
         if(fbk < 0){
             par[fbkIndex].setValue(fbk + 0.35);
+
             qDebug() << fbk;
         }
         if(fbk < 0.1 && fbk >-0.1){
@@ -860,8 +1095,9 @@ void gauges::changeValues(){
         }
     }
 
-
-
+    if(fbkIndex > 0){
+        updateParamDisplay("Feedback Knock Correction", par[fbkIndex].getValue());
+    }
     par[fklIndex].setValue(0);
     par[damIndex].setValue(1.0);
     odoval = odoval + 2;

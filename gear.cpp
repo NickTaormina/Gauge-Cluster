@@ -6,6 +6,8 @@ gear::gear(QObject *parent)
 {
 
     numGears = 6;
+    circumference = 1;
+    currentGear = 3;
 
 }
 
@@ -13,22 +15,20 @@ gear::gear(QObject *parent)
 
 QString gear::calcGear(int rpm, int speed)
 {
-    int found = 0;
+
     if(ratios.length()>0){
-        float circumference = (float)(tireDiameter/12)*(M_PI);
         float speedInFPM = (speed*5280)/(60);
         float wheelRPM = speedInFPM/circumference;
         float rpmRatio = rpm/finalDrive;
         float gear = rpmRatio/wheelRPM;
+
         for(int i = 0; i<ratios.length(); i++){
-            //qDebug() << "ratio: " << ratios.at(i)/gear;
-            if(ratios.at(i)/gear >0.9 && ratios.at(i)/gear <1.1){
-                i = i+1;
+            //qDebug() << "speed: " << speed << " | rpm: " << rpm << " | ratio: " << ratios.at(i)/gear;
+            if(ratios.at(i)/gear >0.87 && ratios.at(i)/gear <1.13){
+                i = i+1; // turn index into real gear number. index 3 is gear 4
+                currentGear = i;
                 return QString::number(i);
             }
-        }
-        if(ratioR/gear > .99 && ratioR/gear < 1.01){ //TODO: fix reverrse indicator
-            return "N";
         }
 
     }
@@ -37,6 +37,9 @@ QString gear::calcGear(int rpm, int speed)
 
 QList<float> gear::getRatios()
 {
+    for(int i = 0; i<ratios.length(); i++){
+        qDebug() << "ratio: " << i << " : " << ratios.at(i);
+    }
     return ratios;
 }
 
@@ -68,32 +71,34 @@ void gear::setFinalDrive(float fd)
 void gear::setTireDiameter(float td)
 {
     tireDiameter = td;
+    circumference = (float)(tireDiameter/12)*(M_PI);
 }
 
-void gear::parseRatios()
+uint gear::calcNextGearRPM(int speed)
 {
-    QDomElement root = xml.documentElement();
-    QDomElement ratio = root.firstChild().toElement();
-    while(!ratio.isNull()){
-        if(ratio.tagName() == "one"){
-            ratios.append(ratio.text().toFloat(nullptr));
-        } else if(ratio.tagName() == "two"){
-            ratios.append(ratio.text().toFloat(nullptr));
-        } else if(ratio.tagName() == "three"){
-            ratios.append(ratio.text().toFloat(nullptr));
-        } else if(ratio.tagName() == "four"){
-           ratios.append(ratio.text().toFloat(nullptr));
-        } else if(ratio.tagName() == "five"){
-            ratios.append(ratio.text().toFloat(nullptr));
-        } else if(ratio.tagName() == "six"){
-            ratios.append(ratio.text().toFloat(nullptr));
-        } else if(ratio.tagName() == "R"){
-            ratioR = ratio.text().toFloat(nullptr);
-        } else if(ratio.tagName().toLower() == "final"){
-            finalDrive = ratio.text().toFloat(nullptr);
-        } else if(ratio.tagName().toLower() == "tire"){
-            tireDiameter = ratio.text().toFloat(nullptr);
+   // qDebug() << "next gear rpm: " << currentGear;
+    if(ratios.length()>0 && currentGear >0 && circumference !=1){
+        float speedInFPM = (speed*5280)/(60);
+        float wheelRPM = speedInFPM/circumference;
+        if(currentGear < 6){
+            return ratios.at(currentGear)*wheelRPM*finalDrive;
         }
-        ratio = ratio.nextSibling().toElement();
     }
+
+    return 0;
 }
+uint gear::calcDownshiftRPM(int speed)
+{
+    qDebug() << "downshift rpm: " << currentGear;
+    if(ratios.length()>0 && currentGear >1 && circumference !=1){
+        float speedInFPM = (speed*5280)/(60);
+        float wheelRPM = speedInFPM/circumference;
+        if(currentGear < 6){
+            return ratios.at(currentGear-2)*wheelRPM*finalDrive;
+        }
+    }
+
+    return 0;
+}
+
+

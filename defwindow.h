@@ -6,7 +6,7 @@
 #include <QtXml>
 #include <QList>
 #include "definition.h"
-#include "configHandler.h"
+#include "confighandler.h"
 
 
 class defWindow : public QObject
