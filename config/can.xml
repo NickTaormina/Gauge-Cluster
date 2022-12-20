@@ -32,27 +32,32 @@
 	<param name="Turn Signals">
 		<id>642</id>
 		<byte length = "1">5</byte>
-		<targets>
-                <target name="left">16</target>
-                <target name="right">32</target>
-                <target name="hazard">48</target>
-                <target name="off">0</target>
-			<target name="left">17</target>
-			<target name="right">33</target>
-			<target name="hazard">49</target>
-			<target name="off">1</target>
-		</targets>
+                <targets>
+                    <target name="left">16</target>
+                    <target name="right">32</target>
+                    <target name="hazard">48</target>
+                    <target name="off">0</target>
+                    <target name="left">17</target>
+                    <target name="right">33</target>
+                    <target name="hazard">49</target>
+                    <target name="off">1</target>
+                </targets>
 	</param>
 	<param name="Lights">
 		<id>338</id>
 		<byte length = "1">7</byte>
-		<targets>
-			<target name="off">128</target>
-			<target name="park">132</target>
-			<target name="on">140</target>
-			<target name="flash">152</target>
-			<target name="toggle">156</target>
-		</targets>
+                <targets>
+                        <target name="off">128</target>
+                        <target name="park">132</target>
+                        <target name="on">140</target>
+                        <target name="flash">152</target>
+                        <target name="toggle">156</target>
+                        <target name="off">129</target>
+                        <target name="park">133</target>
+                        <target name="on">141</target>
+                        <target name="flash">153</target>
+                        <target name="toggle">157</target>
+                </targets>
 	</param>
 	<param name="Defrost">
 		<id>640</id>
@@ -92,12 +97,25 @@
 	<param name="Neutral Switch">
 		<id>321</id>
 		<byte length = "1">6</byte>
-		<bits>
-			<bit>7</bit>
-		</bits>
 		<targets>
-			<target name="Neutral">1</target>
+			<target name="Neutral">7</target>
+			<target name="Neutral">39</target>
+			<target name="Neutral">63</target>
 			<target name="Gear">0</target>
+		</targets>
+	</param>
+	<param name="Gear">
+		<id>321</id>
+		<byte length = "1">6</byte>
+		<targets>
+			<target name="Neutral">7</target>
+			<target name="Neutral">39</target>
+			<target name="1">1</target>
+			<target name="2">2</target>
+			<target name="3">3</target>
+			<target name="4">4</target>
+			<target name="5">5</target>
+			<target name="6">6</target>
 		</targets>
 	</param>
 	<param name="Handbrake">
@@ -134,11 +152,14 @@
 		</targets>
 	</param>
 	<param name="Clutch Switch">
-		<id>324</id>
-		<byte length = "1">2</byte>
+		<id>320</id>
+		<byte length = "1">1</byte>
+		<bits>
+			<bit>7</bit>
+		</bits>
 		<targets>
-			<target name="In">90</target>
-			<target name="Out">89</target>
+			<target name="In">1</target>
+			<target name="Out">0</target>
 		</targets>
 	</param>
         <param name="Vehicle Speed">
