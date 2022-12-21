@@ -159,6 +159,7 @@ private:
     QObject * neutralText;
     QObject * refText;
     QObject * clutchText;
+    QObject * fuelText;
 
     //ui status objects
     QObject * leftSignal;

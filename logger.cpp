@@ -19,7 +19,7 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
     qDebug() << "*logger object initialized";
     logging = 0;
     processing = 0;
-    loggerTimer->setInterval(60);
+    loggerTimer->setInterval(100);
     loggerTimer->setSingleShot(false);
     connect(loggerTimer, &QTimer::timeout, this, &logger::sendLogMessage);
     etimer.start();
@@ -30,6 +30,7 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
 //sends an ecu request based on defs
 void logger::sendLogMessage(){
     //qInfo() << "sending log message";
+    //qDebug() << "log message";
     if(!can->isConnected()){
         qDebug() << "can't log. no device";
         stopLogging();
@@ -57,6 +58,7 @@ void logger::startLogging()
         logging = 1;
         //timer->start(100);
         loggerTimer->start();
+        qDebug() << "started logging";
         //QObject::connect(this, &logger::ecuResponseParsed, this, &logger::sendLogMessage);
 
     } else {

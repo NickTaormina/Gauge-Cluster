@@ -119,7 +119,9 @@ void serialHandler::serialReceived()
         serialString += QString::fromStdString(rxbuffer.toStdString());
     }
     //serialString.replace(readSerial, "");
-    //Debug() << "serial received";
+    //qDebug() << "serial received" << serialString;
+
+
     if(serialString.contains("\\")){
         rxbuffer.clear();
         //readSerial.append(serialString);
@@ -200,68 +202,65 @@ void serialHandler::serialReceived()
 //returns a filled frame from given esp32 message
 QCanBusFrame serialHandler::uartToFrame(QString msg)
 {
+    //qDebug() << msg;
     QCanBusFrame frame;
     int i = 0;
-
+    if(msg.length() < 5){
+        return frame;
+    }
     //loop for frame id
     while(i < msg.length()){
-
-        if(msg.at(i) == "["){
-            QString tmp;
-            int x = 1;
-            while(x<6){
-                //qDebug() << "msg length: " << msg.length() << " i+x: " << i+x;
-                if(msg.length()-1 < i+x){
-                    //qDebug() << "ERROR";
-                    return frame;
-                    break;
-                }
-                if(msg.at(i+x) != "]"){
-                    tmp.append(msg.at(i+x));
-                    x = x + 1;
+        if(msg.at(i) == "R"){
+            if(msg.at(i+1)==":"){
+                QString tmp;
+                int x = 2;
+                if(!msg.at(i+x+2).isNull()){
+                    tmp.append(msg.mid(i+x,3));
+                    frame.setFrameId(tmp.toUInt(nullptr, 16));
                 } else {
-                    frame.setFrameId(tmp.toUInt(nullptr, 10));
-                    break;
+                    qDebug() << "invalid uart msg: length";
+                    return frame;
                 }
+                i = i+x+3;
+                break;
+            } else {
+                qDebug() << "invalid uart msg, R:";
+                return frame;
             }
-            i = i + x;
-            break;
         }
         i = i + 1;
     }
+
     QByteArray payload;
-
-        //if(idList.contains(frame.frameId())){
-        if(1){
-
-    while(i < msg.length()){
-
-            if(msg.at(i) == "["){
-                QString tmp;
-                int x = 1;
-                while(x<5){
-                    //qDebug() << "msg length: " << msg.length() << " i+x: " << i+x;
-                    if(msg.length()-1 < i+x){
-                        break;
-                    }
-                    if(msg.at(i+x) != "]" && !msg.at(i+x).isNull()){
-                        tmp.append(msg.at(i+x));
-                        x = x + 1;
-                    } else {
-                        payload.append(tmp.toUInt(nullptr, 10));
-                        tmp.clear();
+    //if(idList.contains(frame.frameId())){
+    if(1){
+        if(!msg.at(i).isNull()){
+            int payLength = msg.length() - i;
+            if(payLength % 2 == 0){
+                while(i<msg.length()){
+                    QString tmp;
+                    if(msg.length() >= i+2){
+                        tmp.append(msg.mid(i,2));
+                        payload.append(tmp.toUInt(nullptr, 16));
+                        i = i + 2;
+                    }else{
                         break;
                     }
                 }
-                i = i + x;
             }
-            i = i + 1;
+
+            if(payload.length() > 8){
+                qDebug() << "frame payload length error";
+                return frame;
+            }
         }
-        }
+    }
+
     frame.setPayload(payload);
     qInfo() << frame.toString();
     //qDebug() << frame.toString();
     return frame;
+
 
 }
 
