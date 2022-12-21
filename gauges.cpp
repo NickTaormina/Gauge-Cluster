@@ -93,7 +93,6 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     neutralText = main->findChild<QObject*>("neutralText", Qt::FindChildrenRecursively);
     refText = main->findChild<QObject*>("refText", Qt::FindChildrenRecursively);
     clutchText = main->findChild<QObject*>("clutchText", Qt::FindChildrenRecursively);
-    fuelText = main->findChild<QObject*>("fuelText", Qt::FindChildrenRecursively);
 
     //finds ui status elements to control. ex: turn signals
     leftSignal = main->findChild<QObject*>("leftSignal", Qt::FindChildrenRecursively);
@@ -615,7 +614,7 @@ void gauges::updateCANParam(QString name, double value)
         value = 1.8*value + 32;
         updateCoolantGauge(value);
     } else if (name == "Fuel"){
-        updateFuelBar(1-value);
+        updateFuelBar(value);
     } else if (name == "Accelerator Position"){
         accelPos = qRound(value);
         throttleBar->setProperty("value", QVariant(value/100));
@@ -673,9 +672,7 @@ void gauges::updateCoolantGauge(double value)
 //updates the fuel gauge with CAN data
 void gauges::updateFuelBar(double value)
 {
-    QString text = QString::number(value*100);
-    text.append("%");
-    fuelText->setProperty("text", text);
+    value = value/255; //turns raw value into a percent
     if(fuelBar){
     QString filePath = "fuelBar";
     if(value < .05){
@@ -898,9 +895,6 @@ void gauges::updateLights(QString status)
         //icon visible (dimmed)
         lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
         lightIndicator->setProperty("opacity", 0.7);
-    } else if (status == "flash" || status == "toggle") {
-        lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/highbeam.png");
-        lightIndicator->setProperty("opacity", 1.0);
     } else{
         //off: icon not visible
         lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOff.svg");
