@@ -612,10 +612,9 @@ void gauges::updateCANParam(QString name, double value)
     if (name == "Oil Temp"){
         _paramDisplay->updateValue(name, value);
     } else if (name == "Coolant Temp"){
-        value = 1.8*value + 32;
         updateCoolantGauge(value);
     } else if (name == "Fuel"){
-        updateFuelBar(1-value);
+        updateFuelBar(value);
     } else if (name == "Accelerator Position"){
         accelPos = qRound(value);
         throttleBar->setProperty("value", QVariant(value/100));
@@ -673,8 +672,9 @@ void gauges::updateCoolantGauge(double value)
 //updates the fuel gauge with CAN data
 void gauges::updateFuelBar(double value)
 {
-    QString text = QString::number(value*100);
-    text.append("%");
+    value = value/218;
+    value = 1 - value;
+    QString text = QString::number(value);
     fuelText->setProperty("text", text);
     if(fuelBar){
     QString filePath = "fuelBar";

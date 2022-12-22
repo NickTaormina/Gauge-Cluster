@@ -2,19 +2,19 @@
 	<param name="Coolant Temp">
 		<id>864</id>
 		<byte length = "1">3</byte>
-		<conv>1</conv>
+                <conv>1.8</conv>
 		<offset>-40</offset>
 	</param>
 	<param name="Oil Temp">
 		<id>864</id>
 		<byte length = "1">2</byte>
-		<conv>1</conv>
+                <conv>1.8</conv>
 		<offset>-40</offset>
 	</param>
 	<param name="Fuel">
 		<id>642</id>
 		<byte length = "1">0</byte>
-		<conv>0.004587</conv>
+                <conv>1</conv>
 		<offset>-37</offset>
 	</param>
 	<param name="Accelerator Position">

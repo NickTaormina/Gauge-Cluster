@@ -1,4 +1,5 @@
-QT += quick core xml serialbus serialport
+QT += quick core xml serialbus serialport location
+QTPLUGINS += osm mapboxgl
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -55,8 +56,13 @@ HEADERS += \
     trip.h \
     weather.h
 
-DISTFILES += \
-    config/can.xml \
-    config/cobb2.xml \
-    config/config.xml \
-    config/ratios.xml
+
+CONFIG += DESTDIR
+CONFIG += file_copies
+DESTDIR = $$OUT_PWD/debug/
+configfiles.path = $$DESTDIR
+configfiles.files += config/
+resourcefiles.path=$$DESTDIR
+resourcefiles.files += resources/
+COPIES += configfiles
+COPIES += resourcefiles

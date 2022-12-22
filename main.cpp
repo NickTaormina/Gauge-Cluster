@@ -93,6 +93,9 @@ int main(int argc, char *argv[])
     engine.load(url);
 
 
+    if(!QDir("logs").exists()){
+        QDir().mkdir("logs");
+    }
     //error logging setup
     logPath = QCoreApplication::applicationDirPath() + "/logs/"+ "log-" + QDateTime::currentDateTime().toString("dd.MM.hh.mm.ss") + ".txt";
     framePath = QCoreApplication::applicationDirPath() + "/logs/"+ "frames-" + QDateTime::currentDateTime().toString("dd.MM.hh.mm.ss") + ".txt";
