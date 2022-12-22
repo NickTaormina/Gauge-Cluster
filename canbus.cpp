@@ -30,121 +30,8 @@ QCanBusDevice *canbus::dev()
     }
 }
 
-//connects to j2534 device. only supports a single device rn
-void canbus::connectToCanDevice()
-{
-    if(useJ2534 == 1){
-        if(QCanBus::instance()->plugins().contains(QStringLiteral("passthrucan"))){
-            //j2534 available
-            printf("passthru plugin found");
-            const auto adapters = QCanBus::instance()->
-                    availableDevices(QStringLiteral("passthrucan"));
-            for (const QCanBusDeviceInfo &info : adapters){
-                printf("device");
-                    _devList.append(info.name());
-                //list available adapters in ui. info.name replaced with driver on linux
-            }
-        } else {
-            qDebug() << "no passthru plugin";
-        }
-        if(_devList.length() > 0){
-            if(_devList.length() == 1){
-                qDebug() << "*one device found: " << _devList.at(0);
-                _dev = QCanBus::instance()->createDevice(QStringLiteral("passthrucan"), _devList.at(0));
-                if(_dev){
-                    _dev->connectDevice();
-                } else {
-                    qDebug() << "failed to add selected can device";
-                }
-            } else {
-                qDebug() << "multiple devices found: " << _devList;
-                //TODO: add a way to choose the device
-            }
-        } else {
-            qDebug() << "no devices found";
-        }
-    } else {
-        qDebug() << "*using esp32-can";
-    }
-}
-
-//returns bytes from all received frames (j3534)
-QByteArray canbus::readFrames()
-{
-
-    QByteArray rxmsg;
-    if(useJ2534 == 1){
-        _dev->waitForFramesReceived(200);
-        if(_dev){
-            while(_dev->framesAvailable()){
-                const QCanBusFrame frame = _dev->readFrame();
-                rxmsg.append(frame.payload());
-                qDebug() << "payload: " << frame.payload();
-            }
-        } else {
-            printf("no can device");
-        }
-    } else {
-        //rxmsg = serial->waitForEcuResponse(200);
-        qDebug() << "*tried to read from esp32:";
-    }
-    qDebug() << "*rxmsg" << rxmsg;
-    return rxmsg;
-}
-
-//only returns frames from certain id (j2534 only)
-QByteArray canbus::readFrames(uint frameID)
-{
-    QByteArray rxmsg;
-    _dev->waitForFramesReceived(100);
-    if(_dev){
-        while(_dev->framesAvailable()){
-            const QCanBusFrame frame = _dev->readFrame();
-            if(frame.frameId() == frameID){
-                rxmsg.append(frame.payload());
-            }
-            qDebug() << "*payload: " << frame.payload();
-        }
-    } else {
 
 
-        printf("no can device");
-    }
-    qDebug() << "*rxmsg" << rxmsg;
-    return rxmsg;
-}
-
-
-//message with given filter. ignore flag determines if if keeps or ignores msg starting with filter (j2534 only)
-QByteArray canbus::readFrames(uint frameID, char filter, int ignore)
-{
-    QByteArray rxmsg;
-    if(useJ2534 == 1){
-        _dev->waitForFramesReceived(100);
-        if(_dev){
-            while(_dev->framesAvailable()){
-                const QCanBusFrame frame = _dev->readFrame();
-                if(ignore == 1 && frame.frameId() == frameID && frame.payload().at(0) != filter){
-                    rxmsg.append(frame.payload());
-                    qDebug() << "filtered payload: " << frame.payload().toHex();
-                } else if (ignore == 0 && frame.frameId() == frameID && frame.payload().at(0) == filter){
-                    rxmsg.append(frame.payload());
-                    qDebug() << "filtered payload: " << frame.payload().toHex();
-                }
-
-            }
-        } else {
-            printf("no can device");
-        }
-        qDebug() << "rxmsg" << rxmsg;
-
-    } else {
-        //rxmsg = serial->waitForEcuResponse(220);
-        //qDebug() << "tried to read from esp32:";
-    }
-    qDebug() << "rxmsg" << rxmsg;
-    return rxmsg;
-}
 
 //formats tx bytes and sends to ecu
 void canbus::writeFrames(uint frameID, QByteArray bytes)
@@ -294,6 +181,11 @@ bool canbus::isConnected()
 
 
     return false;
+}
+
+void canbus::sendSlot(QCanBusFrame frame)
+{
+    writeFrames(frame.frameId(), frame.payload());
 }
 
 

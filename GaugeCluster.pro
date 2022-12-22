@@ -14,6 +14,7 @@ SOURCES += main.cpp \
     confighandler.cpp \
     definition.cpp \
     defwindow.cpp \
+    ecucomm.cpp \
     frames.cpp \
     gauges.cpp \
     gear.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     confighandler.h \
     definition.h \
     defwindow.h \
+    ecucomm.h \
     frames.h \
     gauges.h \
     gear.h \

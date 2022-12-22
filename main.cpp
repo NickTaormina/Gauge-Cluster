@@ -13,6 +13,7 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include "serialhandler.h"
+#include "ecucomm.h"
 #include <QtGlobal>
 
 QString logPath;
@@ -133,8 +134,8 @@ int main(int argc, char *argv[])
 
     serialHandler shand(nullptr, &cfg[config::CAN]);
     canbus can(nullptr, cfg, &shand);
+    ecuComm _ecuComm(nullptr, &can);
     parameter* par;
-    can.connectToCanDevice();
     logger* log= new logger(nullptr, &can, par, &def);
     cel c(nullptr, &can, &cfg[config::LOGGER]);
     QObject::connect(&defWin, &defWindow::defsFilled, log, &logger::createParamArray);
@@ -182,7 +183,8 @@ int main(int argc, char *argv[])
     QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
     //log->startLogging();
 
-    qInfo() << "test";
+    qDebug() << "main call: " << _ecuComm.getFuelLevel();
+
 
     //gauge->gaugeSweep();
     return app.exec();

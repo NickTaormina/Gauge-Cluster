@@ -15,13 +15,10 @@ public:
     explicit canbus(QObject *parent = nullptr);
     canbus(QObject *parent, config * c, serialHandler * s);
     QCanBusDevice* dev();
-    void connectToCanDevice();
-    QByteArray readFrames();
-    QByteArray readFrames(uint frameID);
-    QByteArray readFrames(uint frameID, char filter, int ignore);
     void writeFrames(uint frameID, QByteArray bytes);
     bool isConnected();
 public slots:
+    void sendSlot(QCanBusFrame frame);
     void sendQueuedMessage();
     void receiveSerialFrame(QCanBusFrame frame);
 signals:

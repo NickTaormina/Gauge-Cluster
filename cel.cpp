@@ -26,22 +26,22 @@ void cel::readCELS()
     */
     //init request expects 02E8FF
     can->writeFrames(fr.string2Uint("000007E0"), fr.string2Bytes("05A80000006200"));
-    rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("02"), 0); //02E8FF
+    //rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("02"), 0); //02E8FF
     qDebug() << "cel init receive: " << rxmsg;
 
     //second init
     can->writeFrames(fr.string2Uint("000007E0"), fr.string2Bytes("02010000000000"));
-    rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("06"), 0); //expects 064100BE3DA813
+    //rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("06"), 0); //expects 064100BE3DA813
     qDebug() << "cel init receive: " << rxmsg;
 
     //third init
     can->writeFrames(fr.string2Uint("000007E0"), fr.string2Bytes("01030000000000"));
-    rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("02"), 0); //expects 02430000000000
+    //rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("02"), 0); //expects 02430000000000
     qDebug() << "cel init receive: " << rxmsg;
 
     //fourth init
     can->writeFrames(fr.string2Uint("000007E0"), fr.string2Bytes("01070000000000"));
-    rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("02"), 0); //expects 02470000000000
+    //rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("02"), 0); //expects 02470000000000
     qDebug() << "cel init receive: " << rxmsg;
 
     //trans init
@@ -51,14 +51,14 @@ void cel::readCELS()
 
     //ecu ID request
     can->writeFrames(fr.string2Uint("000007E0"), fr.string2Bytes("01AA0000000000"));
-    rxmsg = can->readFrames(fr.string2Uint("000007E8")); //expects long message. ecu ID starts on byte 7 (including page#). its 7 bytes long including page #
+    //rxmsg = can->readFrames(fr.string2Uint("000007E8")); //expects long message. ecu ID starts on byte 7 (including page#). its 7 bytes long including page #
     //there is an 04 at pos 1 on page 27 and a 20 pos 1 on page 28
     qDebug() << "cel init receive: " << rxmsg;
 
 
     //first set. asks for a bunch of params in long message then expects 00s back
     can->writeFrames(fr.string2Uint("000007E0"), celbytes);
-    rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("48"), 1);
+    //rxmsg = can->readFrames(fr.string2Uint("000007E8"), fr.string2Uint("48"), 1);
     qDebug() << "received cel message: " << rxmsg;
 
     //everything here and after expects 00 values in return only
