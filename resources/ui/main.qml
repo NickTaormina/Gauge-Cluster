@@ -10,8 +10,9 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.15
-import QtPositioning 5.15
 import QtLocation 5.15
+import QtPositioning 5.15
+
 
 Window{
     id:root
@@ -463,6 +464,67 @@ Window{
                 font.bold: true
             }
         }
+
+        Rectangle{
+            id: cruiseRect
+            objectName: "cruiseRect"
+            width: 480
+            rotation: 0
+            height: 75
+            color: "#00ffffff"
+            border.color: "#00000000"
+            //opacity: 0
+            border.width: 0
+            anchors.bottom: speedoHandler.top
+            anchors.bottomMargin: 0
+            anchors.horizontalCenterOffset: 0
+            anchors.horizontalCenter: speedoHandler.horizontalCenter
+            Label {
+                id: cruiseText
+                objectName: "cruiseText"
+                width: cruiseText.paintedWidth
+                visible: false
+                height: 50
+                color: "#468250"
+                text: qsTr("49")
+                anchors.verticalCenter: parent.bottom
+                anchors.verticalCenterOffset: 15
+                anchors.right: parent.right
+                anchors.rightMargin: 140
+                verticalAlignment: Text.AlignVCenter
+                font.bold: true
+                font.pointSize: 26
+                font.family: "Michroma"
+            }
+            Image {
+                id: cruiseImage
+                objectName: "cruiseImage"
+                height: 30
+                visible: false
+                anchors.verticalCenter: cruiseText.verticalCenter
+                anchors.verticalCenterOffset: -2
+                anchors.right: cruiseText.left
+                source: "file:///" + applicationDirPath + "/resources/images/cruiseImage.png"
+                anchors.rightMargin: 5
+                sourceSize.height: 192
+                sourceSize.width: 256
+                fillMode: Image.PreserveAspectFit
+            }
+            Image {
+                id: setImage
+                objectName: "setImage"
+                height: 8
+                visible: false
+                anchors.top: cruiseImage.bottom
+                anchors.horizontalCenter: cruiseImage.horizontalCenter
+                source: "file:///" + applicationDirPath + "/resources/images/cruiseSetImage.png"
+                sourceSize.height: 50
+                sourceSize.width: 256
+                fillMode: Image.PreserveAspectFit
+            }
+
+        }
+
         Rectangle {
             id: statusRect
             objectName: "statusRect"
@@ -835,8 +897,8 @@ Window{
 }
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.9}D{i:10;invisible:true}D{i:12;invisible:true}D{i:11;invisible:true}
-D{i:13;invisible:true}D{i:47}
+    D{i:0;autoSize:true;formeditorZoom:0.9;height:480;width:640}D{i:10;invisible:true}
+D{i:12;invisible:true}D{i:11;invisible:true}D{i:13;invisible:true}
 }
 ##^##*/
 
