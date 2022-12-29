@@ -269,13 +269,14 @@ void canData::fuelProcess(QByteArray p)
         }
         //qDebug() << "byte5: " << byte5;
         //get last 4 bits of byte 5
-        byte2 = byte2.remove(0, 3);
+        byte2 = byte2.remove(0, 4);
         //qDebug() << "byte5 cut: " << byte5;
 
         QString fuelByte = byte2+byte1;
-        //qDebug() << "rpmByte:" << rpmByte;
+        //qDebug() << "rpmByte:" << fuelByte;
         float fuel = fuelByte.toUInt(nullptr, 2);
         fuel = fuel/2;
+        //qDebug() << "fuel: " << fuel;
         emit fuelChanged(fuel);
     }
 }

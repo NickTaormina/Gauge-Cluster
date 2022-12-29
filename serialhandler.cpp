@@ -28,7 +28,7 @@ serialHandler::serialHandler(QObject *parent, config *c)
         }
 
         qDebug() << "* init serial settings";
-        serial->setBaudRate(921600);
+        serial->setBaudRate(2000000);
         serial->setDataBits(QSerialPort::Data8);
         serial->setParity(QSerialPort::NoParity);
         serial->setStopBits(QSerialPort::OneStop);

@@ -411,7 +411,8 @@ void gauges::setFuelCAN(float fuel)
 {
     double value;
     int diff = fuelResMin-fuelResMax;
-    value = (double)fuel/(double)diff;
+    value = (double)(fuel-fuelResMax)/(double)diff;
+    //qDebug() << "value: " << value;
     value = 1-value;
     if(value < 0){
         value = 0;
@@ -419,7 +420,7 @@ void gauges::setFuelCAN(float fuel)
     if(value > 1){
         value = 1;
     }
-    qDebug() << "fuel percent: " << value;
+    //qDebug() << "fuel percent: " << value;
     updateFuelBar(value);
 }
 

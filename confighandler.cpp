@@ -8,27 +8,20 @@ configHandler::configHandler(QObject *parent)
     : QObject{parent}
 {
     applicationDir = QCoreApplication::applicationDirPath();
-    configPath = ":/config/config.xml";
-    ratioPath =  ":/config/ratios.xml"; //TODO: put this in the config instead of here
+    configPath = applicationDir + "/config/config.xml";
+    ratioPath = applicationDir + "/config/ratios.xml"; //TODO: put this in the config instead of here
+    canPath = applicationDir + "/config/can.xml";
     setDefPath();
-    canPath =  ":/config/can.xml";
-
 }
 
 configHandler::configHandler(QObject *parent, config *c)
 {
     applicationDir = QCoreApplication::applicationDirPath();
-    configPath = ":/config/config.xml";
-    ratioPath =  ":/config/ratios.xml"; //TODO: put this in the config instead of here
+    configPath = applicationDir + "/config/config.xml";
+    ratioPath = applicationDir + "/config/ratios.xml"; //TODO: put this in the config instead of here
     setDefPath();
-    canPath =  ":/config/can.xml";
+    canPath = applicationDir + "/config/can.xml";
     cfg = c;
-
-
-
-
-
-
 }
 
 
@@ -540,7 +533,7 @@ void configHandler::setDefPath()
             while(!category.isNull()){
                 if(category.tagName() == "defFile"){
                     qDebug() << "*" << category.text();
-                    _defPath = ":/config/cobb2.xml";
+                    _defPath = applicationDir + category.text();
                     break;
                 }
                 category = category.nextSibling().toElement();
