@@ -59,6 +59,8 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     shiftTimerDuration = cfg->getValue("generalShiftTargetTimer").toInt(nullptr, 10);
     qDebug() << "shift timer duration: " << shiftTimerDuration;
 
+    fuelResMin = 383;
+    fuelResMax = 19;
 
     //initialize temp vars to avoid error
     prevRPMPos = minTach;
@@ -155,6 +157,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     QObject::connect(_data, &canData::lights, this, &gauges::updateLights);
     QObject::connect(_data, &canData::reverseSwitch, this, &gauges::updateReverse);
     QObject::connect(_data, &canData::rpmChanged, this, &gauges::setRPMCAN);
+    QObject::connect(_data, &canData::fuelChanged, this, &gauges::setFuelCAN);
     QObject::connect(_data, &canData::speedChanged, this, &gauges::setSpeedCAN);
     QObject::connect(_data, &canData::neutralSwitch, this, &gauges::updateNeutral);
     QObject::connect(_data, &canData::clutchSwitch, this, &gauges::updateClutch);
@@ -212,6 +215,8 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
         _paramDisplay->setFilterList(filter, 0);
         _paramDisplay->initDisplay();
         _paramDisplay->setParamRename(rename);
+
+
 
 
 }
@@ -400,6 +405,22 @@ void gauges::toggleThrottleBar()
     } else {
         throttleBar->setProperty("visible", true);
     }
+}
+
+void gauges::setFuelCAN(float fuel)
+{
+    double value;
+    int diff = fuelResMin-fuelResMax;
+    value = (double)fuel/(double)diff;
+    value = 1-value;
+    if(value < 0){
+        value = 0;
+    }
+    if(value > 1){
+        value = 1;
+    }
+    qDebug() << "fuel percent: " << value;
+    updateFuelBar(value);
 }
 
 //finds the rpm parameter
@@ -613,8 +634,6 @@ void gauges::updateCANParam(QString name, double value)
         _paramDisplay->updateValue(name, value);
     } else if (name == "Coolant Temp"){
         updateCoolantGauge(value);
-    } else if (name == "Fuel"){
-        updateFuelBar(value);
     } else if (name == "Accelerator Position"){
         accelPos = qRound(value);
         throttleBar->setProperty("value", QVariant(value/100));
@@ -669,13 +688,11 @@ void gauges::updateCoolantGauge(double value)
     }
 }
 
-//updates the fuel gauge with CAN data
+//updates the fuel gauge given percent fuel
 void gauges::updateFuelBar(double value)
 {
-    value = value/218;
-    value = 1 - value;
-    QString text = QString::number(value);
-    fuelText->setProperty("text", text);
+    //QString text = QString::number(value);
+    //fuelText->setProperty("text", text);
     if(fuelBar){
     QString filePath = "fuelBar";
     if(value < .05){

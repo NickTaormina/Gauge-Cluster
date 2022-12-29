@@ -246,6 +246,40 @@ void canData::bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int
 
 }
 
+//processes fuel frame and returns resistance
+void canData::fuelProcess(QByteArray p)
+{
+    if(p.length() < 6){
+        return;
+    } else {
+        QString byte1 = QString::number(static_cast<quint8>(p.at(0)), 2);
+        //add padding zeroes if needed
+        if(byte1.length() <8){
+            for(int i = byte1.length(); i<8; i++){
+                byte1.prepend("0");
+            }
+        }
+        //qDebug() << "byte4: " << byte4;
+        QString byte2 = QString::number(static_cast<quint8>(p.at(1)), 2);
+       // qDebug() << "byte5 raw:" << byte5;
+        if(byte2.length() <8){
+            for(int i = byte2.length(); i<8; i++){
+                byte2.prepend("0");
+            }
+        }
+        //qDebug() << "byte5: " << byte5;
+        //get last 4 bits of byte 5
+        byte2 = byte2.remove(0, 3);
+        //qDebug() << "byte5 cut: " << byte5;
+
+        QString fuelByte = byte2+byte1;
+        //qDebug() << "rpmByte:" << rpmByte;
+        float fuel = fuelByte.toUInt(nullptr, 2);
+        fuel = fuel/2;
+        emit fuelChanged(fuel);
+    }
+}
+
 //sends useful frame to be given a value and emitted
 void canData::processUsefulFrame(QCanBusFrame frame)
 {
@@ -258,6 +292,11 @@ void canData::processUsefulFrame(QCanBusFrame frame)
     //rpm processing is hard coded in, because its too complicated for config
     if(frame.frameId() == 321){
         rpmProcess(frame.payload());
+    }
+
+    //fuel processing
+    if(frame.frameId() == 642){
+        fuelProcess(frame.payload());
     }
     QByteArray payload = frame.payload();
     for(int i = 0; i<indexes.length(); i++){

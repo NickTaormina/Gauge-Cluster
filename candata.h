@@ -29,6 +29,7 @@ signals:
     void usefulIDsFound(QList<uint> id);
     void rpmChanged(uint rpm);
     void speedChanged(double spd);
+    void fuelChanged(float fuel); // resistance
 public slots:
     void receiveCanData(QCanBusFrame frame);
     void fillData(canDef* def, int count);
@@ -45,6 +46,8 @@ private:
     void valueProcess(QByteArray p, int index);
     void rpmProcess(QByteArray p);
     void bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int index);
+
+    void fuelProcess(QByteArray p);
 
 signals:
     void usefulFrameReceived(QCanBusFrame frame);

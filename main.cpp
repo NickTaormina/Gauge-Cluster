@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
     QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
     //log->startLogging();
 
-    qDebug() << "main call: " << _ecuComm.getFuelLevel();
+    //qDebug() << "main call: " << _ecuComm.getFuelLevel();
 
 
     //gauge->gaugeSweep();

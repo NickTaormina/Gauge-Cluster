@@ -38,6 +38,7 @@ public slots:
     Q_INVOKABLE void setShiftThreshold(QString val);
     Q_INVOKABLE void toggleThrottleBar();
 
+    void setFuelCAN(float fuel);
     void startTimer();
     void updateValue();
     void startTest();
@@ -226,6 +227,10 @@ private:
     canData * _data;
     weather _weather;
     paramDisplay* _paramDisplay;
+
+
+    int fuelResMin;
+    int fuelResMax;
 
 signals:
 };

@@ -538,17 +538,7 @@ Window{
             color: "#00ffffff"
             border.color: "#00000000"
             border.width: 0
-            Map {
-                    id: map
-                    visible:false
-                    anchors.fill: parent
-                    plugin: Plugin { name: "mapboxgl"
-                        PluginParameter{name: "mapboxgl.access_token"; value: "eyJ1Ijoibmlja3Rhb3JtaW5hIiwiYSI6ImNsYnd5aDlxNDBlMzQzcHFkMGJ6cjVrZ3EifQ.2YlXvQbYZAPnEBNB_seA3Q"}
 
-                    }
-                    center: QtPositioning.coordinate(29.6098, -82.371)
-                    zoomLevel: 12
-                }
 
             Rectangle {
                 id: verticalBar
