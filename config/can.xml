@@ -35,6 +35,12 @@
 		<conv>1</conv>
 		<offset>0</offset>
 	</param>
+        <param name="Ambient Temp">
+                <id>642</id>
+                <byte length = "1">3</byte>
+                <conv>1</conv>
+                <offset>-50</offset>
+        </param>
 	<param name="Turn Signals">
 		<id>642</id>
 		<byte length = "1">5</byte>

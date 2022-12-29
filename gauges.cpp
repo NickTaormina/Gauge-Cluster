@@ -28,8 +28,8 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     connect(timer, &QTimer::timeout, this, &gauges::updateValue);
     connect(testtimer, &QTimer::timeout, this, &gauges::changeValues);
     connect(speedTime, &QTimer::timeout, this, &gauges::updateSpeedText);
-    connect(&_weather, &weather::tempRead, this, &gauges::updateTemperatureText); //update temp text when weather report read
-    connect(&weatherTimer, &QTimer::timeout, this, &gauges::updateWeatherStatus); //update weather every 5 min
+    //connect(&_weather, &weather::tempRead, this, &gauges::updateTemperatureText); //update temp text when weather report read
+    //connect(&weatherTimer, &QTimer::timeout, this, &gauges::updateWeatherStatus); //update weather every 5 min
     connect(&shiftLightTimer, &QTimer::timeout, this, &gauges::showShiftLight);
     connect(this, &gauges::rpmUpdated, this, &gauges::flashShiftLight);
     connect(shiftTimer, &QTimer::timeout, this, &gauges::onShiftTimerTimeout);
@@ -634,6 +634,9 @@ void gauges::updateCANParam(QString name, double value)
         _paramDisplay->updateValue(name, value);
     } else if (name == "Coolant Temp"){
         updateCoolantGauge(value);
+    } else if (name == "Ambient Temp"){
+        QString tr = QString::number(value) + " F";
+        temperatureText->setProperty("text", tr);
     } else if (name == "Accelerator Position"){
         accelPos = qRound(value);
         throttleBar->setProperty("value", QVariant(value/100));
@@ -646,13 +649,13 @@ void gauges::updateCANParam(QString name, double value)
     }
 }
 
-//changes the outside temperature readout
+//changes the outside temperature readout (deprecated)
 void gauges::updateTemperatureText(QString t)
 {
 
    QString tr = t + " F";
-   temperatureText->setProperty("text", tr);
-   weatherTimer.start(600000);
+   //temperatureText->setProperty("text", tr);
+   //weatherTimer.start(600000);
 
 }
 
