@@ -232,6 +232,9 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
     }
 
     QByteArray payload;
+    if(frame.frameId() == 321){
+        qInfo() << "rpm: " << msg;
+    }
     //if(idList.contains(frame.frameId())){
     if(1){
         if(!msg.at(i).isNull()){
