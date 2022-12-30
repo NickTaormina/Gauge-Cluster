@@ -887,6 +887,7 @@ void gauges::fadeInGauges()
 //calls functions after gauge sweep (broken)
 void gauges::sweepDone(){
     sweepFinished = 1;
+    setRPMCAN(3000);
 }
 
 //updates the cluster clock
