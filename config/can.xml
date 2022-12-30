@@ -55,6 +55,21 @@
                     <target name="off">1</target>
                 </targets>
 	</param>
+        <param name="Cruise Off">
+                <id>864</id>
+                <byte length = "1">5</byte>
+                <targets>
+                    <target name="off">192</target>
+                    <target name="cancel">208</target>
+                    <target name="active">240</target>
+                </targets>
+        </param>
+        <param name="Cruise Speed">
+                <id>864</id>
+                <byte length = "1">7</byte>
+                <conv>0.621371</conv>
+                <offset>0</offset>
+        </param>
 	<param name="Lights">
 		<id>338</id>
 		<byte length = "1">7</byte>
