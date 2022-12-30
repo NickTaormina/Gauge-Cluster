@@ -82,5 +82,6 @@
         <file>config/config.xml</file>
         <file>config/ratios.xml</file>
         <file>resources/ui/LogObject.qml</file>
+        <file>resources/ui/map.qml</file>
     </qresource>
 </RCC>

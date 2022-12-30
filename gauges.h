@@ -169,6 +169,7 @@ private:
     QObject * cruiseText;
     QObject * cruiseImage;
     QObject * setImage;
+    QObject * brakeImage;
 
     //ui status objects
     QObject * leftSignal;
@@ -248,6 +249,8 @@ private:
     int cruiseSpeed;
     int cruiseEnabled;
     int cruiseActive;
+
+
 
 signals:
 };

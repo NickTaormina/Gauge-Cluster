@@ -10,8 +10,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.15
-import QtLocation 5.15
-import QtPositioning 5.15
+
 
 
 Window{
@@ -465,6 +464,20 @@ Window{
             }
         }
 
+        Image {
+            id: brakeImage
+            objectName: "brakeImage"
+            visible: false
+            anchors.horizontalCenter: tachRect.horizontalCenter
+            anchors.horizontalCenterOffset: 100
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 75
+            source: "file:///" + applicationDirPath + "/resources/images/brake.png"
+            width:  50
+            sourceSize.height: 256
+            sourceSize.width: 256
+            fillMode: Image.PreserveAspectFit
+        }
         Rectangle{
             id: cruiseRect
             objectName: "cruiseRect"
@@ -542,11 +555,11 @@ Window{
 
             Image {
                 id: screenChangeUp
-                visible: false
+                visible: true
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.horizontalCenterOffset: .5
                 anchors.verticalCenter: parent.top
-                anchors.verticalCenterOffset: -40
+                anchors.verticalCenterOffset: 5
                 width: 25
                 height: 35
                 source: "file:///" + applicationDirPath + "/resources/images/arrowChevron.png"
@@ -564,16 +577,16 @@ Window{
                 opacity: .3
                 source: screenChangeUp
                 color: "#c8c8c8"
-                visible: false
+                visible: true
             }
 
             Image {
                 id: screenChangeDown
-                visible: false
+                visible: true
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.horizontalCenterOffset: .5
                 anchors.verticalCenter: parent.bottom
-                anchors.verticalCenterOffset: 40
+                anchors.verticalCenterOffset: 0
                 width: 25
                 height: 35
                 source: "file:///" + applicationDirPath + "/resources/images/arrowChevron.png"
@@ -592,7 +605,7 @@ Window{
                 opacity: .3
                 source: screenChangeDown
                 color: "#c8c8c8"
-                visible: false
+                visible: true
             }
 
 

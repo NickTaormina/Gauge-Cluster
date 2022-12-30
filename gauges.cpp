@@ -12,6 +12,8 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     parent = nullptr;
     g = gear;
     _data = data;
+    handbrake = false;
+
 
     //timers
     timer = new QTimer(this);
@@ -81,6 +83,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
 
 
     //find ui gauge elements to control. should probably move these to QML
+
     shiftTargetRect = main->findChild<QObject*>("speedoHandler", Qt::FindChildrenRecursively);
     tachNeedle = main->findChild<QObject*>("tachneedle", Qt::FindChildrenRecursively);
     speedoNeedle = main->findChild<QObject*>("speedoneedle", Qt::FindChildrenRecursively);
@@ -101,6 +104,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     cruiseText = main->findChild<QObject*>("cruiseText", Qt::FindChildrenRecursively);
     cruiseImage = main->findChild<QObject*>("cruiseImage", Qt::FindChildrenRecursively);
     setImage = main->findChild<QObject*>("setImage", Qt::FindChildrenRecursively);
+    brakeImage = main->findChild<QObject*>("brakeImage", Qt::FindChildrenRecursively);
 
     //finds ui status elements to control. ex: turn signals
     leftSignal = main->findChild<QObject*>("leftSignal", Qt::FindChildrenRecursively);
@@ -116,6 +120,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
 
     //finds ui parameter objects (from logger)
     statusRect = main->findChild<QObject*>("statusRect", Qt::FindChildrenRecursively);
+
 
 
     initUIElements();
@@ -1041,6 +1046,10 @@ void gauges::updateHandbrake(QString status)
         handbrake = true;
     } else {
         handbrake = false;
+    }
+
+    if(brakeImage){
+        brakeImage->setProperty("visible", handbrake);
     }
 }
 
