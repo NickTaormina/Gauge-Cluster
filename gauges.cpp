@@ -96,6 +96,9 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     refText = main->findChild<QObject*>("refText", Qt::FindChildrenRecursively);
     clutchText = main->findChild<QObject*>("clutchText", Qt::FindChildrenRecursively);
     fuelText = main->findChild<QObject*>("fuelText", Qt::FindChildrenRecursively);
+    cruiseText = main->findChild<QObject*>("cruiseText", Qt::FindChildrenRecursively);
+    cruiseImage = main->findChild<QObject*>("cruiseImage", Qt::FindChildrenRecursively);
+    setImage = main->findChild<QObject*>("setImage", Qt::FindChildrenRecursively);
 
     //finds ui status elements to control. ex: turn signals
     leftSignal = main->findChild<QObject*>("leftSignal", Qt::FindChildrenRecursively);
@@ -310,6 +313,8 @@ void gauges::setSpeedCAN(double spd)
         updateTrip();
     }
 }
+
+
 
 void gauges::onShiftTimerTimeout()
 {
@@ -635,6 +640,8 @@ void gauges::updateCANParam(QString name, double value)
         _paramDisplay->updateValue(name, value);
     } else if (name == "Coolant Temp"){
         updateCoolantGauge(value);
+    } else if (name == "Cruise Speed"){
+        updateCruiseSpeed(value);
     } else if (name == "Ambient Temp"){
         QString tr = QString::number(value) + " F";
         temperatureText->setProperty("text", tr);
@@ -770,6 +777,39 @@ void gauges::updateTargetShiftRPM(uint rpm)
                    shiftTargetRect->setProperty("visible", false);
                 });
             }
+        }
+    }
+}
+
+void gauges::updateCruiseStatus(QString status)
+{
+    if(status == "off"){
+        cruiseEnabled = 0;
+        cruiseActive = 0;
+        cruiseImage->setProperty("visible", false);
+        setImage->setProperty("visible", false);
+    } else if(status == "cancel"){
+        cruiseEnabled = 1;
+        cruiseActive = 0;
+        cruiseImage->setProperty("visible", true);
+        setImage->setProperty("visible", false);
+    } else if(status == "active"){
+        cruiseEnabled = 1;
+        cruiseActive = 1;
+        cruiseImage->setProperty("visible", true);
+        setImage->setProperty("visible", true);
+    }
+}
+
+void gauges::updateCruiseSpeed(double speed)
+{
+    cruiseSpeed = speed;
+    if(cruiseText){
+        cruiseText->setProperty("text", QString::number(cruiseSpeed));
+        if(cruiseEnabled == 1){
+            cruiseText->setProperty("visible", true);
+        } else {
+            cruiseText->setProperty("visible", false);
         }
     }
 }

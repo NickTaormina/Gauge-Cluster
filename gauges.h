@@ -52,6 +52,8 @@ public slots:
     void updateCoolantGauge(double value);
     void updateFuelBar(double value);
     void updateTargetShiftRPM(uint rpm);
+    void updateCruiseSpeed(double speed);
+
 
 
     void flashShiftLight(uint rpm);
@@ -67,6 +69,7 @@ public slots:
     void updateClutch(QString status);
     void updateHandbrake(QString status);
     void setSpeedCAN(double speed);
+    void updateCruiseStatus(QString status);
 
     void onShiftTimerTimeout();
 
@@ -161,6 +164,9 @@ private:
     QObject * refText;
     QObject * clutchText;
     QObject * fuelText;
+    QObject * cruiseText;
+    QObject * cruiseImage;
+    QObject * setImage;
 
     //ui status objects
     QObject * leftSignal;
@@ -231,6 +237,12 @@ private:
 
     int fuelResMin;
     int fuelResMax;
+
+
+    //cruise control
+    int cruiseSpeed;
+    int cruiseEnabled;
+    int cruiseActive;
 
 signals:
 };

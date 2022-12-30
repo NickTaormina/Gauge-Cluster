@@ -55,7 +55,7 @@
                     <target name="off">1</target>
                 </targets>
 	</param>
-        <param name="Cruise Off">
+        <param name="Cruise Control">
                 <id>864</id>
                 <byte length = "1">5</byte>
                 <targets>
