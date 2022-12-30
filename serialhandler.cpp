@@ -40,7 +40,6 @@ serialHandler::serialHandler(QObject *parent, config *c)
         } else {
             serial->clear();
             serial->flush();
-            serial->write("T:/");
             serial->flush();
             qDebug() << "serial connected";
 
