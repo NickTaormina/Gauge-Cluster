@@ -62,6 +62,8 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     fuelResMin = 383;
     fuelResMax = 19;
 
+    fuelBarMin = 7;
+
     //initialize temp vars to avoid error
     prevRPMPos = minTach;
     prevSpeedPos = minSpeedoRot;
@@ -699,30 +701,49 @@ void gauges::updateCoolantGauge(double value)
     }
 }
 
+//averages fuel readings to prevent gauge jumpiness
+double gauges::getFuelAvg(double value)
+{
+    if(fuelSamples > 100){
+        fuelSamples = 1;
+        return fuelValueAvg;
+    }
+    fuelSamples = fuelSamples + 1;
+    return (fuelValueAvg + (1/fuelSamples)*(value-fuelValueAvg));
+}
+
 //updates the fuel gauge given percent fuel
 void gauges::updateFuelBar(double value)
 {
+    value = getFuelAvg(value);
+    int bar = 0;
     //QString text = QString::number(value);
     //fuelText->setProperty("text", text);
     if(fuelBar){
     QString filePath = "fuelBar";
     if(value < .05){
-        filePath.append("0");
+        bar = 0;
     } else if(value <.10){
-        filePath.append("1");
+        bar = 1;
     } else if(value <.25){
-        filePath.append("2");
+        bar = 2;
     } else if (value <.4) {
-        filePath.append("3");
+        bar = 3;
     } else if (value <.55){
-        filePath.append("4");
+        bar = 4;
     } else if (value <.7){
-        filePath.append("5");
+        bar = 5;
     } else if (value <.85){
-        filePath.append("6");
+        bar = 6;
     } else {
-        filePath.append("7");
+        bar = 7;
     }
+
+    if(bar < fuelBarMin){
+        fuelBarMin = bar;
+    }
+
+    filePath.append(QString::number(fuelBarMin));
     if(filePath != fuelFilePath){
         fuelBar->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/" + filePath + ".png");
         fuelFilePath = filePath;
@@ -947,6 +968,8 @@ void gauges::initUIElements()
 
 
 }
+
+
 
 //updates the light indicator based on light status
 void gauges::updateLights(QString status)

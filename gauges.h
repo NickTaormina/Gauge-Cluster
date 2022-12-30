@@ -136,6 +136,8 @@ private:
 
     void initUIElements();
 
+    double getFuelAvg(double value);
+
 
     //parameter display
     QString topLeftText;
@@ -237,6 +239,9 @@ private:
 
     int fuelResMin;
     int fuelResMax;
+    int fuelSamples;
+    int fuelBarMin;
+    double fuelValueAvg;
 
 
     //cruise control
