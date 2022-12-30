@@ -528,31 +528,17 @@ Window{
         Rectangle {
             id: statusRect
             objectName: "statusRect"
-            x: 1150
+            x: 1120
             opacity: 1
             y: 270
             width: 500
-            height: 180
+            height: 280
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 0
             color: "#00ffffff"
-            border.color: "#00000000"
+            border.color: "#ffffff"
             border.width: 0
 
-
-            Rectangle {
-                id: verticalBar
-                objectName: "statusVerticalBar"
-                visible: false
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                opacity: 1
-                x: 203
-                y: 10
-                width: 2
-                height: 0
-                color: "#6fffffff"
-            }
 
             Image {
                 id: screenChangeUp
@@ -609,154 +595,9 @@ Window{
                 visible: false
             }
 
-            Rectangle {
-                id: horizontalBar1
-                visible: false
-                opacity: verticalBar.opacity
-                x: 80
-                y: 13
-                width: (verticalBar.height/170)*400
-                height: 1
-                color: "#6fffffff"
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
 
-            }
 
-            Label {
-                id: topLeftValue
-                visible: false
-                x: 45
-                y: 40
-                width: 200
-                objectName: "topLeftValue"
-                opacity: 0
-                color: "#c5c5c5"
-                text: qsTr("")
-                font.family: "Michroma"
-                font.pointSize: 24
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            Label {
-                id: topRightValue
-                x: 255
-                visible: false
-                y: 40
-                width: 200
-                objectName: "topRightValue"
-                opacity: topLeftValue.opacity
-                color: "#c5c5c5"
-                text: qsTr("")
-                font.pointSize: 24
-                font.family: "Michroma"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            Label {
-                id: bottomRightValue
-                x: 255
-                visible: false
-                y: 120
-                width: 200
-                color: "#c5c5c5"
-                objectName: "bottomRightValue"
-                opacity: topLeftValue.opacity
-                text: qsTr("")
-                font.pointSize: 24
-                font.family: "Michroma"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            Label {
-                id: bottomLeftValue
-                x: 45
-                y: 120
-                visible: false
-                width: 200
-                color: "#c5c5c5"
-                objectName: "bottomLeftValue"
-                opacity: topLeftValue.opacity
-                text: qsTr("")
-                font.pointSize: 24
-                font.family: "Michroma"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            Label {
-                id: topLeftLabel
-                objectName: "topLeftLabel"
-                opacity: topLeftValue.opacity
-                x: 60
-                y: 10
-                visible: false
-                width: 170
-                height: 30
-                color: "#c5c5c5"
-                text: qsTr("AF Ratio")
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                wrapMode: Text.NoWrap
-                font.pointSize: 14
-                font.family: "Michroma"
-            }
-            Label {
-                id: topRightLabel
-                x: 275
-                y: 10
-                visible: false
-                width: 170
-                opacity: topLeftValue.opacity
-                height: 30
-                objectName: "topRightLabel"
-                color: "#c5c5c5"
-                text: qsTr("AF Learn")
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                wrapMode: Text.NoWrap
-                font.pointSize: 14
-                font.family: "Michroma"
-            }
-            Label {
-                id: bottomRightLabel
-                x: 275
-                visible: false
-                y: 90
-                opacity: topLeftValue.opacity
-                width: 170
-                objectName: "bottomRightLabel"
-                height: 30
-                color: "#c5c5c5"
-                text: qsTr("Oil Temp")
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                wrapMode: Text.NoWrap
-                font.pointSize: 14
-                font.family: "Michroma"
-            }
-            Label {
-                id: bottomLeftLabel
-                x: 60
-                visible: false
-                y: 90
-                opacity: topLeftValue.opacity
-                width: 170
-                height: 30
-                color: "#c5c5c5"
-                objectName: "bottomLeftLabel"
-                text: qsTr("Intake Temp")
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                wrapMode: Text.NoWrap
-                font.pointSize: 14
-                font.family: "Michroma"
-            }
         }
-
         Image {
             id: coolantBarImage
             objectName: "coolantBarImage"
@@ -845,46 +686,47 @@ Window{
             }
         }
 
-    }
-
-
-
-    Label {
-        id: clockText
-        objectName: "clockText"
-        x: 1200
-        y: 138
-        width: 200
-        height: 50
-        color: "#c5c5c5"
-        text: qsTr("")
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.family: "Michroma"
-        font.pointSize: 22
-    }
-
-    Label {
-        id: tempText
-        objectName: "temperatureText"
-        opacity: 0
-        x: 1400
-        y: 138
-        width: 200
-        height: 50
-        color: "#c5c5c5"
-        text: qsTr(" F")
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.pointSize: 20
-        font.family: "Michroma"
-    }
 
 
 
 
+        Label {
+            id: clockText
+            objectName: "clockText"
+            x: 1200
+            y: 138
+            width: 200
+            height: 50
+            color: "#c5c5c5"
+            text: qsTr("")
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            font.family: "Michroma"
+            font.pointSize: 22
+        }
 
-}
+        Label {
+            id: tempText
+            objectName: "temperatureText"
+            opacity: 0
+            x: 1400
+            y: 138
+            width: 200
+            height: 50
+            color: "#c5c5c5"
+            text: qsTr(" F")
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            font.pointSize: 20
+            font.family: "Michroma"
+        }
+
+
+
+
+
+        }
+ }
 /*##^##
 Designer {
     D{i:0;autoSize:true;formeditorZoom:0.9;height:480;width:640}D{i:10;invisible:true}

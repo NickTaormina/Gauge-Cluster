@@ -156,10 +156,10 @@ void paramDisplay::initDisplay()
         QQmlComponent component(_engine, QUrl(QStringLiteral("qrc:/resources/ui/LogObject.qml")), _parent);
         QObject* base = component.create();
         //test1->setParent(qobject_cast<QQuickItem*>(topLeftLabel));
-        base->setProperty("x", width*i - 10);
+        base->setProperty("x", width*i+20);
         qDebug() << "setting width: " << i << " : " << width;
         base->setProperty("width", width);
-        base->setProperty("y", 0);
+        base->setProperty("y", (280/2)-(210/2)+5); //center vertically in the status rect
 
         paramLabels.append(base->findChild<QObject*>("paramLabel1", Qt::FindChildrenRecursively));
         paramValues.append(base->findChild<QObject*>("paramValue1", Qt::FindChildrenRecursively));

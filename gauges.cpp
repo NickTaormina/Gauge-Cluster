@@ -116,35 +116,10 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
 
     //finds ui parameter objects (from logger)
     statusRect = main->findChild<QObject*>("statusRect", Qt::FindChildrenRecursively);
-    statusVerticalBar = main->findChild<QObject*>("statusVerticalBar", Qt::FindChildrenRecursively);
-    topLeftLabel = main->findChild<QObject*>("topLeftLabel", Qt::FindChildrenRecursively);
-    topRightLabel = main->findChild<QObject*>("topRightLabel", Qt::FindChildrenRecursively);
-    bottomLeftLabel = main->findChild<QObject*>("bottomLeftLabel", Qt::FindChildrenRecursively);
-    bottomRightLabel = main->findChild<QObject*>("bottomRightLabel", Qt::FindChildrenRecursively);
-    topLeftValue = main->findChild<QObject*>("topLeftValue", Qt::FindChildrenRecursively);
-    topRightValue = main->findChild<QObject*>("topRightValue", Qt::FindChildrenRecursively);
-    bottomRightValue = main->findChild<QObject*>("bottomRightValue", Qt::FindChildrenRecursively);
-    bottomLeftValue = main->findChild<QObject*>("bottomLeftValue", Qt::FindChildrenRecursively);
+
 
     initUIElements();
 
-    //paramater display label init
-    if(topLeftLabel){
-        topLeftText = "AF Ratio";
-        topLeftLabel->setProperty("text", topLeftText);
-    }
-    if(topRightLabel){
-        topRightText = "AF Learning";
-        topRightLabel->setProperty("text", topRightText);
-    }
-    if(bottomRightLabel){
-        bottomRightText = "Oil Temp";
-        bottomRightLabel->setProperty("text", bottomRightText);
-    }
-    if(bottomLeftLabel){
-        bottomLeftText = "Intake Temp";
-        bottomLeftLabel->setProperty("text", bottomLeftText);
-    }
 
     //set the gear value on startup
     geartext->setProperty("text", "N");
@@ -876,13 +851,6 @@ void gauges::fadeInGauges()
 {
     qDebug() << "*fading in ui elements";
 
-    if(statusRect){
-        QPropertyAnimation *anim = new QPropertyAnimation(topLeftValue, "opacity");
-        anim->setDuration(500);
-        anim->setStartValue(0);
-        anim->setEndValue(1.0);
-        anim->start();
-    }
 
 
     if(throttleBar){
@@ -934,13 +902,6 @@ void gauges::updateClock()
 //controls the animations for ui start (but not after gauge sweep)
 void gauges::initUIElements()
 {
-    if(statusVerticalBar){
-        QPropertyAnimation *anim = new QPropertyAnimation(statusVerticalBar, "height");
-        anim->setDuration(500);
-        anim->setStartValue(0);
-        anim->setEndValue(170);
-        anim->start();
-    }
 
     if(geartext){
         QPropertyAnimation *speedAnim = new QPropertyAnimation(geartext, "opacity");
