@@ -403,7 +403,7 @@ Window{
 
             Image {
                 id: screenChangeUp
-                visible: true
+                visible: false
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.horizontalCenterOffset: .5
                 anchors.verticalCenter: parent.top
@@ -425,12 +425,12 @@ Window{
                 opacity: .3
                 source: screenChangeUp
                 color: "#c8c8c8"
-                visible: true
+                visible: false
             }
 
             Image {
                 id: screenChangeDown
-                visible: true
+                visible: false
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.horizontalCenterOffset: .5
                 anchors.verticalCenter: parent.bottom
@@ -453,7 +453,7 @@ Window{
                 opacity: .3
                 source: screenChangeDown
                 color: "#c8c8c8"
-                visible: true
+                visible: false
             }
 
 
