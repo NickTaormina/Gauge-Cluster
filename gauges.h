@@ -55,6 +55,8 @@ public slots:
     void updateCruiseSpeed(double speed);
     void updateGearFromCAN(QString status);
 
+    void showCEL(QString status);
+
 
 
     void flashShiftLight(uint rpm);
@@ -171,6 +173,7 @@ private:
     QObject * cruiseImage;
     QObject * setImage;
     QObject * brakeImage;
+    QObject * celImage;
 
     //ui status objects
     QObject * leftSignal;

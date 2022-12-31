@@ -311,7 +311,26 @@ Window{
                 font.bold: true
             }
         }
+        Image {
+            id: celImage
+            objectName: "celImage"
+            visible: false
+            anchors.horizontalCenter: tach.horizontalCenter
+            anchors.horizontalCenterOffset: 100
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 25
+            source: "file:///" + applicationDirPath + "/resources/images/cel.png"
+            width:  50
+            sourceSize.height: 256
+            sourceSize.width: 256
+            fillMode: Image.PreserveAspectFit
+            ColorOverlay {
+                anchors.fill: celImage
+                source: celImage
+                color: "#ffcc00"
+            }
 
+        }
         Image {
             id: brakeImage
             objectName: "brakeImage"

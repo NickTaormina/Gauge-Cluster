@@ -105,6 +105,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     cruiseImage = main->findChild<QObject*>("cruiseImage", Qt::FindChildrenRecursively);
     setImage = main->findChild<QObject*>("setImage", Qt::FindChildrenRecursively);
     brakeImage = main->findChild<QObject*>("brakeImage", Qt::FindChildrenRecursively);
+    celImage = main->findChild<QObject*>("celImage", Qt::FindChildrenRecursively);
 
     //finds ui status elements to control. ex: turn signals
     leftSignal = main->findChild<QObject*>("leftSignal", Qt::FindChildrenRecursively);
@@ -150,6 +151,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     QObject::connect(_data, &canData::fuelChanged, this, &gauges::setFuelCAN);
     QObject::connect(_data, &canData::cruiseStatusChanged, this, &gauges::updateCruiseStatus);
     QObject::connect(_data, &canData::gearChanged, this, &gauges::updateGearFromCAN);
+    QObject::connect(_data, &canData::checkEngineLight, this, &gauges::showCEL);
 
 
 
@@ -816,6 +818,15 @@ void gauges::updateGearFromCAN(QString status)
 {
     if(!reverse){
         geartext->setProperty("text", status);
+    }
+}
+
+void gauges::showCEL(QString status)
+{
+    if(status == "cel"){
+        celImage->setProperty("visible", true);
+    } else {
+        celImage->setProperty("visible", false);
     }
 }
 
