@@ -55,13 +55,26 @@
                     <target name="off">1</target>
                 </targets>
 	</param>
-        <param name="Cruise Control">
+        <param name="Cruise">
                 <id>864</id>
                 <byte length = "1">5</byte>
+                <bits>
+                        <bit>4</bit>
+                </bits>
                 <targets>
-                    <target name="off">192</target>
-                    <target name="cancel">208</target>
-                    <target name="active">240</target>
+                        <target name="off">0</target>
+                        <target name="on">1</target>
+                </targets>
+        </param>
+        <param name="Cruise Active">
+                <id>864</id>
+                <byte length = "1">5</byte>
+                <bits>
+                        <bit>5</bit>
+                </bits>
+                <targets>
+                        <target name="inactive">0</target>
+                        <target name="active">1</target>
                 </targets>
         </param>
         <param name="Cruise Speed">

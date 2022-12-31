@@ -788,16 +788,17 @@ void gauges::updateCruiseStatus(QString status)
         cruiseActive = 0;
         cruiseImage->setProperty("visible", false);
         setImage->setProperty("visible", false);
-    } else if(status == "cancel"){
+    } else if(status == "on"){
         cruiseEnabled = 1;
-        cruiseActive = 0;
         cruiseImage->setProperty("visible", true);
-        setImage->setProperty("visible", false);
     } else if(status == "active"){
         cruiseEnabled = 1;
         cruiseActive = 1;
         cruiseImage->setProperty("visible", true);
         setImage->setProperty("visible", true);
+    } else if(status == "inactive"){
+        cruiseActive = 0;
+        setImage->setProperty("visible", false);
     }
 }
 
