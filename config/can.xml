@@ -11,12 +11,12 @@
                 <conv>1.8</conv>
 		<offset>-40</offset>
 	</param>
-	<param name="Fuel">
-		<id>642</id>
-		<byte length = "1">0</byte>
-                <conv>1</conv>
-		<offset>-37</offset>
-	</param>
+        <param name="Boost">
+                <id>864</id>
+                <byte length = "1">4</byte>
+                <conv>0.31</conv>
+                <offset>-15</offset>
+        </param>
 	<param name="Accelerator Position">
 		<id>320</id>
 		<byte length = "1">0</byte>

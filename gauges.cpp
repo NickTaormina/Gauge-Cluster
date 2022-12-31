@@ -719,7 +719,7 @@ void gauges::updateFuelBar(double value)
         fuelBarMin = bar;
     }
 
-    filePath.append(QString::number(fuelBarMin));
+    filePath.append(QString::number(bar));
     if(filePath != fuelFilePath){
         fuelBar->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/" + filePath + ".png");
         fuelFilePath = filePath;

@@ -72,7 +72,7 @@ void canData::emitter(QString name, QString status)
     } else if(name == "Clutch Switch"){
         emit clutchSwitch(status);
     } else if (name == "CEL"){
-        if(status == "cel"){qDebug() << "CEL";}
+        emit checkEngineLight(status);
     } else if (name == "Cruise Control"){
         emit cruiseStatusChanged(status);
     }

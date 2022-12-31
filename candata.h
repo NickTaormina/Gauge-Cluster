@@ -32,6 +32,7 @@ signals:
     void fuelChanged(float fuel); // resistance
     void gearChanged(QString status);
     void cruiseStatusChanged(QString status);
+    void checkEngineLight(QString status);
 public slots:
     void receiveCanData(QCanBusFrame frame);
     void fillData(canDef* def, int count);
