@@ -30,6 +30,8 @@ signals:
     void rpmChanged(uint rpm);
     void speedChanged(double spd);
     void fuelChanged(float fuel); // resistance
+    void gearChanged(QString status);
+    void cruiseStatusChanged(QString status);
 public slots:
     void receiveCanData(QCanBusFrame frame);
     void fillData(canDef* def, int count);
@@ -48,6 +50,7 @@ private:
     void bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int index);
 
     void fuelProcess(QByteArray p);
+    void gearProcess(QByteArray p);
 
 signals:
     void usefulFrameReceived(QCanBusFrame frame);

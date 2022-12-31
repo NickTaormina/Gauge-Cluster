@@ -71,6 +71,10 @@ void canData::emitter(QString name, QString status)
         emit reverseSwitch(status);
     } else if(name == "Clutch Switch"){
         emit clutchSwitch(status);
+    } else if (name == "CEL"){
+        if(status == "cel"){qDebug() << "CEL";}
+    } else if (name == "Cruise Control"){
+        emit cruiseStatusChanged(status);
     }
 }
 
@@ -209,6 +213,7 @@ void canData::rpmProcess(QByteArray p)
     }
 }
 
+//bit defs start from the RIGHT
 void canData::bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int index)
 {
     QStringList bytes;
@@ -281,6 +286,36 @@ void canData::fuelProcess(QByteArray p)
     }
 }
 
+void canData::gearProcess(QByteArray p)
+{
+    if(p.length() < 7){
+        return;
+    } else {
+        QString byte1 = QString::number(static_cast<quint8>(p.at(6)), 2);
+        //add padding zeroes if needed
+        if(byte1.length() <8){
+            for(int i = byte1.length(); i<8; i++){
+                byte1.prepend("0");
+            }
+        }
+
+        //get last 4 bits of byte
+        byte1= byte1.remove(0, 5);
+        //qDebug() << "byte5 cut: " << byte1;
+
+        //qDebug() << "rpmByte:" << fuelByte;
+        int gear = byte1.toUInt(nullptr, 2);
+        QString status;
+        if(gear == 7 || gear ==0){
+            status = "N";
+        } else {
+            status = QString::number(gear);
+        }
+        //qDebug() << "fuel: " << fuel;
+        emit gearChanged(status);
+    }
+}
+
 //sends useful frame to be given a value and emitted
 void canData::processUsefulFrame(QCanBusFrame frame)
 {
@@ -293,6 +328,7 @@ void canData::processUsefulFrame(QCanBusFrame frame)
     //rpm processing is hard coded in, because its too complicated for config
     if(frame.frameId() == 321){
         rpmProcess(frame.payload());
+        gearProcess(frame.payload());
     }
 
     //fuel processing

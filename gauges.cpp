@@ -148,6 +148,8 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     QObject::connect(_data, &canData::clutchSwitch, this, &gauges::updateClutch);
     QObject::connect(_data, &canData::handbrake, this, &gauges::updateHandbrake);
     QObject::connect(_data, &canData::fuelChanged, this, &gauges::setFuelCAN);
+    QObject::connect(_data, &canData::cruiseStatusChanged, this, &gauges::updateCruiseStatus);
+    QObject::connect(_data, &canData::gearChanged, this, &gauges::updateGearFromCAN);
 
 
 
@@ -449,17 +451,7 @@ void gauges::findOdoIndex()
 //TODO: trigger this on clutch in. neutral detection
 void gauges::updateGear()
 {
-    if(g){
-        if(!clutch && !neutral && !reverse){
-            currentGear = g->calcGear(_rpm, _speed);
-            //qInfo() << "update gear: " << _rpm << " : " << speed;
-            geartext->setProperty("text", currentGear);
-        } else if (neutral && !reverse){
-            geartext->setProperty("text", "N");
-        }
 
-
-    }
 }
 
 //finds index in parameter array for each of the knock params
@@ -788,6 +780,7 @@ void gauges::updateTargetShiftRPM(uint rpm)
 
 void gauges::updateCruiseStatus(QString status)
 {
+    qDebug() << "cruise: " << status;
     if(status == "off"){
         cruiseEnabled = 0;
         cruiseActive = 0;
@@ -816,6 +809,13 @@ void gauges::updateCruiseSpeed(double speed)
         } else {
             cruiseText->setProperty("visible", false);
         }
+    }
+}
+
+void gauges::updateGearFromCAN(QString status)
+{
+    if(!reverse){
+        geartext->setProperty("text", status);
     }
 }
 

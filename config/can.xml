@@ -67,7 +67,7 @@
         <param name="Cruise Speed">
                 <id>864</id>
                 <byte length = "1">7</byte>
-                <conv>0.621371</conv>
+                <conv>1</conv>
                 <offset>0</offset>
         </param>
 	<param name="Lights">
@@ -145,6 +145,17 @@
 			<target name="6">6</target>
 		</targets>
 	</param>
+        <param name="CEL">
+                <id>865</id>
+                <byte length = "1">4</byte>
+                <bits>
+                        <bit>7</bit>
+                </bits>
+                <targets>
+                        <target name="cel">1</target>
+                        <target name="off">0</target>
+                </targets>
+        </param>
 	<param name="Handbrake">
 		<id>338</id>
 		<byte length = "1">6</byte>

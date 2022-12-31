@@ -53,6 +53,7 @@ public slots:
     void updateFuelBar(double value);
     void updateTargetShiftRPM(uint rpm);
     void updateCruiseSpeed(double speed);
+    void updateGearFromCAN(QString status);
 
 
 
