@@ -63,7 +63,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
 
     fuelResMin = 383;
     fuelResMax = 19;
-
+    fuelSamples = 0;
     fuelBarMin = 7;
 
     //initialize temp vars to avoid error
@@ -147,6 +147,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     QObject::connect(_data, &canData::neutralSwitch, this, &gauges::updateNeutral);
     QObject::connect(_data, &canData::clutchSwitch, this, &gauges::updateClutch);
     QObject::connect(_data, &canData::handbrake, this, &gauges::updateHandbrake);
+    QObject::connect(_data, &canData::fuelChanged, this, &gauges::setFuelCAN);
 
 
 
@@ -684,12 +685,15 @@ void gauges::updateCoolantGauge(double value)
 //averages fuel readings to prevent gauge jumpiness
 double gauges::getFuelAvg(double value)
 {
-    if(fuelSamples > 100){
+    if(fuelSamples > 5000){
         fuelSamples = 1;
+        //qDebug() << "100 samples";
         return fuelValueAvg;
     }
     fuelSamples = fuelSamples + 1;
-    return (fuelValueAvg + (1/fuelSamples)*(value-fuelValueAvg));
+    //qDebug() << "fuel avg: " << (fuelValueAvg + ((double)1/(double)fuelSamples)*(double)((double)value-(double)fuelValueAvg));
+    fuelValueAvg = (fuelValueAvg + ((double)1/(double)fuelSamples)*(double)((double)value-(double)fuelValueAvg));
+    return fuelValueAvg;
 }
 
 //updates the fuel gauge given percent fuel
