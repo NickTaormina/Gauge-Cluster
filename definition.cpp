@@ -164,6 +164,17 @@ void Definition::appendFormat(int i){
     format.append(i);
 }
 
+int Definition::getSignedVal(int i) const
+{
+    return signedVal.at(i);
+}
+
+void Definition::appendSignedVal(int i)
+{
+    signedVal.append(i);
+}
+
+
 
 
 

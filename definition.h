@@ -57,6 +57,9 @@ public:
     int getFormat(int i);
     void setFormat(QList<int> f);
     void appendFormat(int i);
+
+    int getSignedVal(int i) const;
+    void appendSignedVal(int i);
 private:
     QByteArray txBytes;
     QList<int> pID;
@@ -67,6 +70,8 @@ private:
     QList<int> invert;
     QList<QString> units;
     QList<int> format;
+
+    QList<int> signedVal;
 
 
 

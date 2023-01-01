@@ -171,11 +171,23 @@ void logger::parseECUResponse(QByteArray rxmsg)
                     //qInfo() << "conv" << definition->getConv(calcpos);
                     //qInfo() << "offset" << definition->getOffset(calcpos);
                     //qInfo() << "raw value" << fr.base10Value(rxmsg.at(i));
-                    if(definition->getInvert(calcpos) == 1){
-                        res[calcpos].setValue(fr.base10Value(rxmsg.at(i)), definition->getConv(calcpos), definition->getOffset(calcpos), definition->getInvert(calcpos));
+                    if(definition->getSignedVal(calcpos) == 1){
+                        //qDebug() << "signed: " << definition->getParamNames(calcpos);
+                        if(fr.base10Value(rxmsg.at(i)) >= 128){
+                            if(definition->getInvert(calcpos) == 1){
+                                res[calcpos].setValue(fr.base10Value(rxmsg.at(i)) - 255, definition->getConv(calcpos), definition->getOffset(calcpos), definition->getInvert(calcpos));
+                            } else {
+                                res[calcpos].setValue(fr.base10Value(rxmsg.at(i)) - 255, definition->getConv(calcpos), definition->getOffset(calcpos));
+                            }
+                        }
                     } else {
-                        res[calcpos].setValue(fr.base10Value(rxmsg.at(i)), definition->getConv(calcpos), definition->getOffset(calcpos));
+                        if(definition->getInvert(calcpos) == 1){
+                            res[calcpos].setValue(fr.base10Value(rxmsg.at(i)), definition->getConv(calcpos), definition->getOffset(calcpos), definition->getInvert(calcpos));
+                        } else {
+                            res[calcpos].setValue(fr.base10Value(rxmsg.at(i)), definition->getConv(calcpos), definition->getOffset(calcpos));
+                        }
                     }
+
                     i = i + 1;
                 } else if (definition->getRxBytes(calcpos) == 2){
                     QByteArray tmp = rxmsg.mid(i,2);

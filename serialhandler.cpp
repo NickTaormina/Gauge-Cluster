@@ -249,7 +249,7 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
             }
 
             if(payload.length() > 8){
-                qDebug() << "frame payload length error";
+                qDebug() << "frame payload length error: " << msg;
                 return frame;
             }
         }

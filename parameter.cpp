@@ -72,3 +72,13 @@ void parameter::setFormat(int i){
 int parameter::getFormat(){
     return format;
 }
+
+void parameter::setSigned(int i)
+{
+    signedVal = i;
+}
+
+int parameter::getSigned()
+{
+    return signedVal;
+}

@@ -59,7 +59,7 @@
 	<address length="6">F8 BB CA</address>
 	<response length="1">04</response>
 	<conversions>
-		<conversion units="degrees" expr="0.3515625" format="0.00" />
+                <conversion units="degrees" expr="0.3515625" format="0.00" signed="1"/>
 		<offset>0</offset>
 	</conversions>
 </ecuparam>
@@ -67,7 +67,7 @@
 	<address length="6">F8 BB DA</address>
 	<response length="1">04</response>
 	<conversions>
-		<conversion units="degrees" expr="0.3515625" format="0.00" />
+                <conversion units="degrees" expr="0.3515625" format="0.00" signed="1"/>
 		<offset>0</offset>
 	</conversions>
 </ecuparam>

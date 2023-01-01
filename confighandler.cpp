@@ -121,6 +121,12 @@ void configHandler::fillDefs(QStringList _selectedParams, Definition* def)
                                 } else {
                                     def->appendInvert(0);
                                 }
+                                if(conversion.hasAttribute("signed")){
+                                    //qDebug() << "set signed: " << param.attribute("name");
+                                    def->appendSignedVal(1);
+                                } else {
+                                    def->appendSignedVal(0);
+                                }
                                 qDebug() <<"*conv: " << conversion.attribute("expr").toDouble(nullptr);
                             } else if(conversion.tagName() == "offset"){
                                 def->appendOffset(conversion.text().toFloat(nullptr));

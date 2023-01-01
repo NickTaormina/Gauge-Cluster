@@ -916,7 +916,6 @@ void gauges::sweepDone(){
     sweepFinished = 1;
     boostGauge->setProperty("visible", true);
 }
-
 //updates the cluster clock
 void gauges::updateClock()
 {

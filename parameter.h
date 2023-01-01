@@ -27,6 +27,9 @@ public:
 
     void setFormat(int i);
     int getFormat();
+
+    void setSigned(int i);
+    int getSigned();
 signals:
     void valueChanged();
 private:
@@ -35,6 +38,7 @@ private:
     double value;
     QString unit;
     int format;
+    int signedVal;
 
 
 };

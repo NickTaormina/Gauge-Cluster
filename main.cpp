@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
     QObject::connect(&_canData, &canData::valueChanged, gauge, &gauges::updateCANParam);
     QObject::connect(&shand, &serialHandler::serialFrameReceived, &can, &canbus::receiveSerialFrame);
     QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
-    //log->startLogging();
+    log->startLogging();
 
     //qDebug() << "main call: " << _ecuComm.getFuelLevel();
 
