@@ -106,6 +106,7 @@ Window{
         Image {
             id: lightIndicator
             objectName:"lightIndicator"
+            property bool showBlue: false
             y: 76
             width: 64
             height: 64
@@ -120,6 +121,12 @@ Window{
             sourceSize.height: 64
             sourceSize.width: 64
             fillMode: Image.PreserveAspectFit
+            ColorOverlay{
+                visible: lightIndicator.showBlue
+                anchors.fill: lightIndicator
+                source: lightIndicator
+                color: "#284CED"
+            }
         }
         Text {
             id: neutralText

@@ -625,9 +625,9 @@ void gauges::updateCANParam(QString name, double value)
         temperatureText->setProperty("text", tr);
     } else if (name == "Boost"){
         double boost = value + 15;
-        qDebug() << "boost val: " << boost;
+        //qDebug() << "boost val: " << boost;
         boost = boost/(double)40;
-        qDebug() << "boost val: " << boost;
+        //qDebug() << "boost val: " << boost;
         boostGauge->setProperty("text", QString::number(value, 'f', 1));
         boostGauge->setProperty("value", QVariant(boost*100));
     }else if (name == "Accelerator Position"){
@@ -790,7 +790,7 @@ void gauges::updateTargetShiftRPM(uint rpm)
 
 void gauges::updateCruiseStatus(QString status)
 {
-    qDebug() << "cruise: " << status;
+    //qDebug() << "cruise: " << status;
     if(status == "off"){
         cruiseEnabled = 0;
         cruiseActive = 0;
@@ -965,40 +965,58 @@ void gauges::initUIElements()
 //updates the light indicator based on light status
 void gauges::updateLights(QString status)
 {
-    if(status == "on"){
-        //icon visible
-        lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
-        lightIndicator->setProperty("opacity", 1.0);
+    if(status == "parkOff"){
+        park = false;
     } else if (status == "park"){
-        //icon visible (dimmed)
-        lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
-        lightIndicator->setProperty("opacity", 0.7);
-    } else if (status == "flash" || status == "toggle") {
-        lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/highbeam.png");
-        lightIndicator->setProperty("opacity", 1.0);
-    } else{
-        //off: icon not visible
-        lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOff.svg");
+        park = true;
+    } else if (status == "off"){
+        lights = false;
+    } else if (status == "on"){
+        lights = true;
+        park = true;
+    } else if (status == "flashOff"){
+        flash = false;
+    } else if (status == "flash"){
+        flash = true;
     }
+
+
+    if(!flash){
+        lightIndicator->setProperty("visible", park);
+        lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/lightsOn.svg");
+        lightIndicator->setProperty("showBlue", false);
+
+    } else {
+         lightIndicator->setProperty("visible", true);
+         lightIndicator->setProperty("source", "file:///" + QCoreApplication::applicationDirPath() + "/resources/images/highbeam.png");
+         lightIndicator->setProperty("showBlue", true);
+    }
+
+    if(park && !lights){
+        lightIndicator->setProperty("opacity", 0.7);
+    } else {
+        lightIndicator->setProperty("opacity", 1.0);
+    }
+
 }
 
 //shows which turn signals are on/off
 void gauges::updateTurnSignals(QString status)
 {
+    qDebug() << status;
     if(status == "left"){
-        leftSignal->setProperty("visible", true);
-        rightSignal->setProperty("visible", false);
+        leftSignalBool = true;
+    } else if (status == "leftOff"){
+        leftSignalBool = false;
     } else if (status == "right"){
-        leftSignal->setProperty("visible", false);
-        rightSignal->setProperty("visible", true);
-    } else if (status == "hazard"){
-        leftSignal->setProperty("visible", true);
-        rightSignal->setProperty("visible", true);
-    } else{
-        //off
-        leftSignal->setProperty("visible", false);
-        rightSignal->setProperty("visible", false);
+        rightSignalBool= true;
+    } else if (status == "rightOff"){
+        rightSignalBool = false;
     }
+
+    leftSignal->setProperty("visible", leftSignalBool);
+    rightSignal->setProperty("visible", rightSignalBool);
+
 }
 
 //sets gear indicator to N when in neutral

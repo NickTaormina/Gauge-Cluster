@@ -242,7 +242,7 @@ private:
     weather _weather;
     paramDisplay* _paramDisplay;
 
-
+    //fuel variables
     int fuelResMin;
     int fuelResMax;
     int fuelSamples;
@@ -254,6 +254,14 @@ private:
     int cruiseSpeed;
     int cruiseEnabled;
     int cruiseActive;
+
+    //light variables
+    bool park;
+    bool lights;
+    bool flash;
+    bool flashToggle;
+    bool leftSignalBool;
+    bool rightSignalBool;
 
 
 

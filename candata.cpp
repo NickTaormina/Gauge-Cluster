@@ -218,7 +218,7 @@ void canData::bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int
 {
     QStringList bytes;
     bytes.append(_def[index].getBytes());
-    //qDebug() << "bit: " << _def[index].getName();
+    qDebug() << "bit: " << _def[index].getName();
     int length = b.length();
     //error checking for small payload
     if(p.length() < bytes.at(0).toInt(nullptr, 10)){
@@ -226,12 +226,15 @@ void canData::bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int
     } else {
         if(length == 1){
             int bitIndex = b.at(0).toInt(nullptr, 10);
-            QString bit = QString::number(p.at(bytes.at(0).toUInt(nullptr, 10)), 2);
+            QString bit = QString::number(static_cast<quint8>(p.at(bytes.at(0).toUInt(nullptr, 10))), 2);
             //qDebug() << bit;
             if(bit.length() < 8){
                 for(int i = bit.length(); i<8; i++){
                     bit.prepend("0");
                 }
+            }
+            if(_def[index].getName() == "Turn Signals"){
+                qDebug() << bit;
             }
             //qDebug() << "processed: " << bit;
             bitIndex = 8-bitIndex-1;
@@ -338,10 +341,10 @@ void canData::processUsefulFrame(QCanBusFrame frame)
     QByteArray payload = frame.payload();
     for(int i = 0; i<indexes.length(); i++){
         QMap<uint, QString> targets = _def[indexes.at(i)].getTargets();
-
+        qDebug() << "name: " << _def[indexes.at(i)].getName();
         if(!targets.isEmpty()){
             if(!_def[indexes.at(i)].getBits().isEmpty()){
-                bitProcess(targets, payload, _def[indexes.at(i)].getBits(), indexes.at(i));
+                bitProcess(targets, frame.payload(), _def[indexes.at(i)].getBits(), indexes.at(i));
             } else {
                 targetProcess(targets, payload, indexes.at(i));
             }
