@@ -26,6 +26,8 @@ public slots:
     void setTireDiameter(float td);
     uint calcNextGearRPM(int speed);
     uint calcDownshiftRPM(int speed);
+
+    void setCurrentGear(QString g);
 private:
 
     QList<float> ratios;

@@ -89,7 +89,7 @@ uint gear::calcNextGearRPM(int speed)
 }
 uint gear::calcDownshiftRPM(int speed)
 {
-    qDebug() << "downshift rpm: " << currentGear;
+    //qDebug() << "downshift rpm: " << currentGear;
     if(ratios.length()>0 && currentGear >1 && circumference !=1){
         float speedInFPM = (speed*5280)/(60);
         float wheelRPM = speedInFPM/circumference;
@@ -99,6 +99,15 @@ uint gear::calcDownshiftRPM(int speed)
     }
 
     return 0;
+}
+
+void gear::setCurrentGear(QString g)
+{
+    if(g != "N" && g!= "0"){
+        currentGear = g.toInt(nullptr, 10);
+    } else {
+        currentGear = 0;
+    }
 }
 
 

@@ -137,30 +137,6 @@
 			<target name="Low">14</target>
 		</targets>
 	</param>
-	<param name="Neutral Switch">
-		<id>321</id>
-		<byte length = "1">6</byte>
-		<targets>
-			<target name="Neutral">7</target>
-			<target name="Neutral">39</target>
-			<target name="Neutral">63</target>
-			<target name="Gear">0</target>
-		</targets>
-	</param>
-	<param name="Gear">
-		<id>321</id>
-		<byte length = "1">6</byte>
-		<targets>
-			<target name="Neutral">7</target>
-			<target name="Neutral">39</target>
-			<target name="1">1</target>
-			<target name="2">2</target>
-			<target name="3">3</target>
-			<target name="4">4</target>
-			<target name="5">5</target>
-			<target name="6">6</target>
-		</targets>
-	</param>
         <param name="CEL">
                 <id>865</id>
                 <byte length = "1">4</byte>

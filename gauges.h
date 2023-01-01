@@ -128,7 +128,6 @@ private:
     void findSpeedIndex();
     void findRPMIndex();
     void findOdoIndex();
-    void updateGear();
     void getKnockIndexes();
 
     void updateTrip();

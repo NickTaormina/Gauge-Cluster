@@ -451,12 +451,6 @@ void gauges::findOdoIndex()
     }
 }
 
-//TODO: trigger this on clutch in. neutral detection
-void gauges::updateGear()
-{
-
-}
-
 //finds index in parameter array for each of the knock params
 void gauges::getKnockIndexes()
 {
@@ -825,7 +819,16 @@ void gauges::updateCruiseSpeed(double speed)
 
 void gauges::updateGearFromCAN(QString status)
 {
-    if(!reverse){
+    //qDebug() << "status: " << status;
+    g->setCurrentGear(status);
+    if(status == "N" || status == "0"){
+        status = "N";
+        neutral = true;
+        //qDebug() << "neutral";
+    } else {
+        neutral = false;
+    }
+    if(!reverse && !clutch){
         geartext->setProperty("text", status);
     }
 }
@@ -1003,7 +1006,6 @@ void gauges::updateLights(QString status)
 //shows which turn signals are on/off
 void gauges::updateTurnSignals(QString status)
 {
-    qDebug() << status;
     if(status == "left"){
         leftSignalBool = true;
     } else if (status == "leftOff"){
@@ -1022,31 +1024,7 @@ void gauges::updateTurnSignals(QString status)
 //sets gear indicator to N when in neutral
 void gauges::updateNeutral(QString status)
 {
-    if(status == "Neutral"){
-        neutral = true;
-        //qDebug() << QDateTime::currentDateTime().toString("mm.ss") + ": neutral";
-        if(neutralText){
-            /*
-            neutralText->setProperty("visible", true);
-            neutralText->setProperty("text", "Neutral");
-            neutralText->setProperty("opacity", 1.0);*/
-        }
-        if(!reverse){
-            geartext->setProperty("text", "N");
-            return;
-        }
 
-    } else {
-        //qDebug() << QDateTime::currentDateTime().toString("mm.ss") + ": not";
-        neutral = false;
-        if(neutralText){
-            /*
-        neutralText->setProperty("visible", false);
-        neutralText->setProperty("text", "");
-        neutralText->setProperty("opacity", 0);*/
-        }
-        updateGear();
-    }
 }
 
 //sets gear indicator to R when in reverse
@@ -1058,7 +1036,6 @@ void gauges::updateReverse(QString status)
         geartext->setProperty("text", "R");
     } else {
         reverse = false;
-        updateGear();
     }
 }
 
@@ -1158,7 +1135,6 @@ void gauges::updateValue()
     if(speedIndex > -1){
         setOdometer();
         if(!neutral && !reverse){
-            updateGear();
         }
         updateTrip();
         showKnock();

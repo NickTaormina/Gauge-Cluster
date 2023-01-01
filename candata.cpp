@@ -40,6 +40,7 @@ void canData::fillData(canDef *def, int count)
        idList.append(_def[i].getFrameID());
     }
     idList.append(2024);
+    idList.append(321);
     qDebug() << "*can id list: " << idList;
 
 }
@@ -218,7 +219,7 @@ void canData::bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int
 {
     QStringList bytes;
     bytes.append(_def[index].getBytes());
-    qDebug() << "bit: " << _def[index].getName();
+    //qDebug() << "bit: " << _def[index].getName();
     int length = b.length();
     //error checking for small payload
     if(p.length() < bytes.at(0).toInt(nullptr, 10)){
@@ -232,9 +233,6 @@ void canData::bitProcess(QMap<uint, QString> t, QByteArray p, QStringList b, int
                 for(int i = bit.length(); i<8; i++){
                     bit.prepend("0");
                 }
-            }
-            if(_def[index].getName() == "Turn Signals"){
-                qDebug() << bit;
             }
             //qDebug() << "processed: " << bit;
             bitIndex = 8-bitIndex-1;
@@ -309,7 +307,7 @@ void canData::gearProcess(QByteArray p)
         //qDebug() << "rpmByte:" << fuelByte;
         int gear = byte1.toUInt(nullptr, 2);
         QString status;
-        if(gear == 7 || gear ==0){
+        if(gear == 7){
             status = "N";
         } else {
             status = QString::number(gear);
@@ -322,6 +320,7 @@ void canData::gearProcess(QByteArray p)
 //sends useful frame to be given a value and emitted
 void canData::processUsefulFrame(QCanBusFrame frame)
 {
+    //qDebug() << frame.toString();
     QList<int> indexes;
     for(int i = 0; i<defCount; i++){
         if(idList.at(i) == frame.frameId()){
@@ -341,7 +340,7 @@ void canData::processUsefulFrame(QCanBusFrame frame)
     QByteArray payload = frame.payload();
     for(int i = 0; i<indexes.length(); i++){
         QMap<uint, QString> targets = _def[indexes.at(i)].getTargets();
-        qDebug() << "name: " << _def[indexes.at(i)].getName();
+        //qDebug() << "name: " << _def[indexes.at(i)].getName();
         if(!targets.isEmpty()){
             if(!_def[indexes.at(i)].getBits().isEmpty()){
                 bitProcess(targets, frame.payload(), _def[indexes.at(i)].getBits(), indexes.at(i));
