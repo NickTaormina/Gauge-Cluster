@@ -251,7 +251,21 @@ Window{
 
 
 
-
+        CircularProgressBar{
+            id: boostGauge
+            objectName: "boostGauge"
+            visible: false
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 175
+            anchors.horizontalCenterOffset: -520
+            anchors.horizontalCenter: parent.horizontalCenter
+            progressWidth: 4
+            strokeBgWidth: 2
+            width: 75
+            height: 75
+            roundCap: false
+            enableDropShadow: true
+        }
         Rectangle {
             id: speedoHandler
             objectName: "speedoHandler"

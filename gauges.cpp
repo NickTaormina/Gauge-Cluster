@@ -118,6 +118,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     fuelBar = main->findChild<QObject*>("fuelBarImage", Qt::FindChildrenRecursively);
     coolantGauge = main->findChild<QObject*>("coolantBarImage", Qt::FindChildrenRecursively);
     throttleBar = main->findChild<QObject*>("throttleBar", Qt::FindChildrenRecursively);
+    boostGauge = main->findChild<QObject*>("boostGauge", Qt::FindChildrenRecursively);
 
     //finds ui parameter objects (from logger)
     statusRect = main->findChild<QObject*>("statusRect", Qt::FindChildrenRecursively);
@@ -622,7 +623,14 @@ void gauges::updateCANParam(QString name, double value)
     } else if (name == "Ambient Temp"){
         QString tr = QString::number(value) + " F";
         temperatureText->setProperty("text", tr);
-    } else if (name == "Accelerator Position"){
+    } else if (name == "Boost"){
+        double boost = value + 15;
+        qDebug() << "boost val: " << boost;
+        boost = boost/(double)40;
+        qDebug() << "boost val: " << boost;
+        boostGauge->setProperty("text", QString::number(value, 'f', 1));
+        boostGauge->setProperty("value", QVariant(boost*100));
+    }else if (name == "Accelerator Position"){
         accelPos = qRound(value);
         throttleBar->setProperty("value", QVariant(value/100));
         if(shiftTimer->isActive() && value > 25){
@@ -903,6 +911,7 @@ void gauges::fadeInGauges()
 //calls functions after gauge sweep (broken)
 void gauges::sweepDone(){
     sweepFinished = 1;
+    boostGauge->setProperty("visible", true);
 }
 
 //updates the cluster clock

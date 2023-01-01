@@ -196,6 +196,7 @@ private:
     QObject * coolantGauge;
     QObject * fuelBar;
     QObject * throttleBar;
+    QObject * boostGauge;
 
     //timers
     QTimer* timer;
