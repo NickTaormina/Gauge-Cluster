@@ -114,7 +114,7 @@ Item {
             anchors.verticalCenterOffset: 5
             rotation: -75
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: 15
+            anchors.horizontalCenterOffset: 16
 
             Image {
                 id: needlePic
