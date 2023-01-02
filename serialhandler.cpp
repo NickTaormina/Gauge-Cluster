@@ -121,7 +121,7 @@ void serialHandler::serialReceived()
     //qDebug() << "serial received" << serialString;
 
 
-    if(serialString.contains("\\")){
+    if(serialString.contains("\r")){
         rxbuffer.clear();
         //readSerial.append(serialString);
 
@@ -130,14 +130,14 @@ void serialHandler::serialReceived()
         qDebug() << "esp error";
         rxbuffer.clear();
     }
-    QStringList bufferSplit = serialString.split("\\");
+    QStringList bufferSplit = serialString.split("\r");
     //qDebug() << "serial: " << serialString;
     int cleared = 1;
     if(bufferSplit.length() > 1){
         for(int i = 0; i<bufferSplit.length()-1; i++){
             if(bufferSplit.at(i)!= ""){
 
-                if(bufferSplit.at(i).contains("R:") && !bufferSplit.at(i).contains("W")){
+                if(bufferSplit.at(i).contains("t") && !bufferSplit.at(i).contains("W")){
                     QCanBusFrame tmp = uartToFrame(bufferSplit.at(i));
                   // qInfo() << tmp.toString();
                     //qDebug() << bufferSplit.at(i);
@@ -146,7 +146,7 @@ void serialHandler::serialReceived()
                     }
 
                     //int len = bufferSplit.at(i).length();
-                    serialString.remove(bufferSplit.at(i)+"\\");
+                    serialString.remove(bufferSplit.at(i)+"\r");
 
                     if(i == bufferSplit.length()-2){
                         //qDebug() << "end";
@@ -204,15 +204,15 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
     //qDebug() << msg;
     QCanBusFrame frame;
     int i = 0;
-    if(msg.length() < 5){
+    if(msg.length() < 7){
         return frame;
     }
     //loop for frame id
     while(i < msg.length()){
-        if(msg.at(i) == "R"){
-            if(msg.at(i+1)==":"){
+        if(msg.at(i) == "t"){
+            //if(msg.at(i+1)==":"){
                 QString tmp;
-                int x = 2;
+                int x = 1;
                 if(!msg.at(i+x+2).isNull()){
                     tmp.append(msg.mid(i+x,3));
                     frame.setFrameId(tmp.toUInt(nullptr, 16));
@@ -222,19 +222,28 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
                 }
                 i = i+x+3;
                 break;
-            } else {
-                qDebug() << "invalid uart msg, R:";
-                return frame;
-            }
+            //} else {
+            //    qDebug() << "invalid uart msg, R:";
+            //    return frame;
+            //}
         }
         i = i + 1;
     }
 
+    QString tmp;
+    tmp.append(msg.at(i));
+    if(tmp.toUInt(nullptr, 10)*2 != msg.length() - i-1){
+        //qDebug() << "message length: " << msg.length() - i;
+        return frame;
+    }
+    i = i+1;
+
     QByteArray payload;
     //if(idList.contains(frame.frameId())){
     if(1){
-        if(!msg.at(i).isNull()){
+        if(msg.length() > i+1 && !msg.at(i).isNull()){
             int payLength = msg.length() - i;
+
             if(payLength % 2 == 0){
                 while(i<msg.length()){
                     QString tmp;
@@ -246,6 +255,9 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
                         break;
                     }
                 }
+            } else {
+                qDebug() << "frame byte error";
+                return frame;
             }
 
             if(payload.length() > 8){
@@ -266,35 +278,32 @@ QCanBusFrame serialHandler::uartToFrame(QString msg)
 //creates and sends the write message to the esp32
 void serialHandler::writeFrame(QCanBusFrame frame)
 {
-    QString serialMsg = "W: ";
-    QString id = "[" + QString::number(frame.frameId()) + "] ";
+    QString serialMsg = "";
+    QString id = QString::number(frame.frameId(),16);
+    QString length = QString::number(frame.payload().length(), 16);
     QString framePayload = fr.bytes2String(frame.payload()); //local copy of the payload
     QString payload; //formatted payload that will be sent
     int x = 0;
     for(int i = 0; i<=framePayload.length()-1; i = i+2){
-        payload.insert(x, "[");
-        QString tmp; //tmp used to turn 2 hex digits to dec
-        tmp.append(framePayload.at(i));
-        tmp.append(framePayload.at(i+1));
-        QString be = QString::number(fr.string2Uint(tmp));
-        uint b = fr.string2Uint(tmp);
-        int l = fr.numDigits(b);
-        payload.insert(x+1, be);
-        payload.insert(x+l+1, "] ");
-        x = x+l+3;
-        tmp.clear();
+        payload.append(framePayload.at(i));
+        payload.append(framePayload.at(i+1));
 
     }
     //qDebug() << "framepayload: " << framePayload.length();
     if(framePayload.length()<16){
-        for(int i = framePayload.length(); i < 16; i=i+2){
-            payload.insert(payload.length()-1, " [0]");
+        for(int i = framePayload.length()-1; i < 16; i++){
+            payload.insert(i, "0");
         }
     }
+    //qDebug() << "appending";
     serialMsg.append(id);
+    serialMsg.append(length);
     serialMsg.append(payload);
-    serialMsg.append("/");
-    //qDebug() << "serial write: " << serialMsg;
+    serialMsg = serialMsg.toUpper();
+    serialMsg.prepend("t");
+    serialMsg.append("\r");
+
+   // qDebug() << "serial write: " << serialMsg;
     /*QString ct = QString::number(counter, 10);
     QString msg = "W: [640] [1] [" + ct + "] [16] [0] [0] [0] [0] [0] /";
     //QString msg = "W: [642] [45] [" + ct + "] [0] [139] [139] [17] [42] [0] /";
