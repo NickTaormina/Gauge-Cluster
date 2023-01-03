@@ -19,6 +19,27 @@ canbus::canbus(QObject *parent, config *c, serialHandler* s)
     //sets up acknowledgement message for ecu
     ack.setFrameId(2016);
     ack.setPayload(fr.string2Bytes("3000000000000000"));
+
+    if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan"))) {
+        // plugin available
+        QString errorString;
+        _dev = QCanBus::instance()->createDevice(
+            QStringLiteral("socketcan"), QStringLiteral("can0"), &errorString);
+        if (!_dev) {
+            // Error handling goes here
+            qDebug() << errorString;
+        } else {
+            _dev->setConfigurationParameter(QCanBusDevice::BitRateKey, QVariant());
+            _dev->connectDevice();
+            QObject::connect(_dev,&QCanBusDevice::framesReceived,this,[this](){
+                QVector<QCanBusFrame> frames = _dev->readAllFrames();
+                for(int i = 0; i<frames.count(); i++){
+                    receiveSerialFrame(frames.at(i));
+                }
+            });
+        }
+
+    }
 }
 
 QCanBusDevice *canbus::dev()
@@ -72,7 +93,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
             if(numFrames <= 1){
                 QCanBusFrame frame = QCanBusFrame(frameID, bytes);
                // qDebug() << frame.toString();
-                serial->writeFrame(frame);
+                _dev->writeFrame(frame);
             } else {
                 int count = 0;
                  QCanBusFrame frame;
@@ -82,7 +103,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
                         payload.insert(0,16).toHex();
                         frame = QCanBusFrame(frameID, payload);
                         qInfo() << "writing start msg: " << frame.toString();
-                        serial->writeFrame(frame);
+                        _dev->writeFrame(frame);
                     } else {
                         payload.insert(0, 33+(count-1)).toHex();
                         queuedMessage.append(payload);
@@ -119,7 +140,7 @@ void canbus::sendQueuedMessage()
         QCanBusFrame frame = QCanBusFrame(2016, payload);
         qInfo() << "sending frame: " << frame.toString();
         QThread::msleep(5);
-        serial->writeFrame(frame);
+        _dev->writeFrame(frame);
 
 
 
@@ -142,10 +163,10 @@ void canbus::receiveSerialFrame(QCanBusFrame frame)
         //qDebug() << "written: " << frame.toString();
     }
     if(frame.frameId() == 2024){
-        //qDebug() << "ecu response: " << frame.toString();
+        qDebug() << "ecu response: " << frame.toString();
         if(frame.payload().at(0) == 16){
             //respond with ack message if ecu sends multipart
-            serial->writeFrame(ack);
+            _dev->writeFrame(ack);
         }
         if(frame.payload().at(0) == 48){
             //sends queued messages when ecu ack received
@@ -174,7 +195,7 @@ bool canbus::isConnected()
         }
     }
     else{
-        if(serial->isConnected()){
+        if(serial->isConnected() || _dev->state() == QCanBusDevice::ConnectedState){
             return true;
         }
     }

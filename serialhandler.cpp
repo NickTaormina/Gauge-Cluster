@@ -28,7 +28,7 @@ serialHandler::serialHandler(QObject *parent, config *c)
         }
 
         qDebug() << "* init serial settings";
-        serial->setBaudRate(2000000);
+        serial->setBaudRate(921600);
         serial->setDataBits(QSerialPort::Data8);
         serial->setParity(QSerialPort::NoParity);
         serial->setStopBits(QSerialPort::OneStop);
@@ -303,7 +303,7 @@ void serialHandler::writeFrame(QCanBusFrame frame)
     serialMsg.prepend("t");
     serialMsg.append("\r");
 
-   // qDebug() << "serial write: " << serialMsg;
+    qDebug() << "serial write: " << serialMsg;
     /*QString ct = QString::number(counter, 10);
     QString msg = "W: [640] [1] [" + ct + "] [16] [0] [0] [0] [0] [0] /";
     //QString msg = "W: [642] [45] [" + ct + "] [0] [139] [139] [17] [42] [0] /";

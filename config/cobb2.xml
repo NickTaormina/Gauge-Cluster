@@ -25,7 +25,7 @@
 </ecuparam>
 <ecuparam id="4" name="Battery" desc="P4">
 	<address length="4">00 00 1C</address>
-	<response length="2">04</response>
+        <response length="1">04</response>
 	<conversions>
 		<conversion units="Volts" expr="0.08" format="0.00" />
 		<offset>0</offset>

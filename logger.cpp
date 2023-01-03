@@ -19,7 +19,7 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
     qDebug() << "*logger object initialized";
     logging = 0;
     processing = 0;
-    loggerTimer->setInterval(75);
+    loggerTimer->setInterval(80);
     loggerTimer->setSingleShot(false);
     connect(loggerTimer, &QTimer::timeout, this, &logger::sendLogMessage);
     etimer.start();
@@ -43,7 +43,12 @@ void logger::sendLogMessage(){
             loggerTimer->start();
         }
             //send the bytes
-            can->writeFrames(fr.string2Uint("000007E0"), definition->getTxBytes());
+       // QByteArray test;
+        //test.append(0x01);
+        //test.append(0xAA);
+        //test.append(0x00);
+        //can->writeFrames(fr.string2Uint("000007E0"), test);
+          can->writeFrames(fr.string2Uint("000007E0"), definition->getTxBytes());
 
         } else {
             qDebug() << "error: no device or message";
