@@ -335,7 +335,7 @@ Window{
         Image {
             id: celImage
             objectName: "celImage"
-            visible: false
+            visible: true
             anchors.horizontalCenter: tach.horizontalCenter
             anchors.horizontalCenterOffset: 100
             anchors.verticalCenter: parent.verticalCenter
@@ -353,9 +353,66 @@ Window{
 
         }
         Image {
+            id: oilImage
+            objectName: "oilImage"
+            visible: true
+            anchors.horizontalCenter: tach.horizontalCenter
+            anchors.horizontalCenterOffset: 150
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 25
+            source: "file:///" + applicationDirPath + "/resources/images/engine-lowoil-warning-light.png"
+            width:  45
+            sourceSize.height: 256
+            sourceSize.width: 256
+            fillMode: Image.PreserveAspectFit
+            ColorOverlay {
+                anchors.fill: oilImage
+                source: oilImage
+                color: "#cc2c2c"
+            }
+        }
+        Image {
+            id: seatbeltImage
+            objectName: "seatbeltImage"
+            visible: true
+            anchors.horizontalCenter: tach.horizontalCenter
+            anchors.horizontalCenterOffset: 100
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: -25
+            source: "file:///" + applicationDirPath + "/resources/images/seatbelt-warning-light.png"
+            width:  50
+            sourceSize.height: 256
+            sourceSize.width: 256
+            fillMode: Image.PreserveAspectFit
+            ColorOverlay {
+                anchors.fill: seatbeltImage
+                source: seatbeltImage
+                color: "#cc2c2c"
+            }
+        }
+        Image {
+            id: tpmsImage
+            objectName: "tpmsImage"
+            visible: true
+            anchors.horizontalCenter: tach.horizontalCenter
+            anchors.horizontalCenterOffset: 150
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 75
+            source: "file:///" + applicationDirPath + "/resources/images/tire-pressure-light.png"
+            width:  45
+            sourceSize.height: 256
+            sourceSize.width: 256
+            fillMode: Image.PreserveAspectFit
+            ColorOverlay {
+                anchors.fill: tpmsImage
+                source: tpmsImage
+                color: "#ffcc00"
+            }
+        }
+        Image {
             id: brakeImage
             objectName: "brakeImage"
-            visible: false
+            visible: true
             anchors.horizontalCenter: tach.horizontalCenter
             anchors.horizontalCenterOffset: 100
             anchors.verticalCenter: parent.verticalCenter
@@ -365,6 +422,25 @@ Window{
             sourceSize.height: 256
             sourceSize.width: 256
             fillMode: Image.PreserveAspectFit
+        }
+        Image {
+            id: doorImage
+            objectName: "doorImage"
+            visible: true
+            anchors.horizontalCenter: tach.horizontalCenter
+            anchors.horizontalCenterOffset: 150
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: -25
+            source: "file:///" + applicationDirPath + "/resources/images/dooropen-warning-light.png"
+            width:  50
+            sourceSize.height: 256
+            sourceSize.width: 256
+            fillMode: Image.PreserveAspectFit
+            ColorOverlay {
+                anchors.fill: doorImage
+                source: doorImage
+                color: "#cc2c2c"
+            }
         }
         Rectangle{
             id: cruiseRect

@@ -56,6 +56,10 @@ public slots:
     void updateGearFromCAN(QString status);
 
     void showCEL(QString status);
+    void showTPMS(QString status);
+    void showSeatbelt(QString status);
+    void showOil(QString status);
+    void showDoor(QString status);
 
 
 
@@ -173,6 +177,10 @@ private:
     QObject * setImage;
     QObject * brakeImage;
     QObject * celImage;
+    QObject * oilImage;
+    QObject * seatbeltImage;
+    QObject * tpmsImage;
+    QObject * doorImage;
 
     //ui status objects
     QObject * leftSignal;

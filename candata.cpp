@@ -76,6 +76,14 @@ void canData::emitter(QString name, QString status)
         emit checkEngineLight(status);
     } else if (name == "Cruise" || name == "Cruise Active"){
         emit cruiseStatusChanged(status);
+    } else if (name == "TPMS"){
+        emit tpmsLight(status);
+    } else if (name == "Oil Light"){
+        emit oilLight(status);
+    } else if (name == "Seatbelt"){
+        emit seatbeltLight(status);
+    } else if (name == "Door"){
+        emit doorLight(status);
     }
 }
 

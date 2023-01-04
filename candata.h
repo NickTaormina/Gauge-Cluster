@@ -33,6 +33,11 @@ signals:
     void gearChanged(QString status);
     void cruiseStatusChanged(QString status);
     void checkEngineLight(QString status);
+    void oilLight(QString status);
+    void seatbeltLight(QString status);
+    void tpmsLight(QString status);
+    void doorLight(QString status);
+
 public slots:
     void receiveCanData(QCanBusFrame frame);
     void fillData(canDef* def, int count);

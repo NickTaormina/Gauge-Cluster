@@ -106,6 +106,10 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     setImage = main->findChild<QObject*>("setImage", Qt::FindChildrenRecursively);
     brakeImage = main->findChild<QObject*>("brakeImage", Qt::FindChildrenRecursively);
     celImage = main->findChild<QObject*>("celImage", Qt::FindChildrenRecursively);
+    oilImage = main->findChild<QObject*>("oilImage", Qt::FindChildrenRecursively);
+    seatbeltImage = main->findChild<QObject*>("seatbeltImage", Qt::FindChildrenRecursively);
+    tpmsImage = main->findChild<QObject*>("tpmsImage", Qt::FindChildrenRecursively);
+    doorImage = main->findChild<QObject*>("doorImage", Qt::FindChildrenRecursively);
 
     //finds ui status elements to control. ex: turn signals
     leftSignal = main->findChild<QObject*>("leftSignal", Qt::FindChildrenRecursively);
@@ -850,6 +854,42 @@ void gauges::showCEL(QString status)
         celImage->setProperty("visible", true);
     } else {
         celImage->setProperty("visible", false);
+    }
+}
+
+void gauges::showTPMS(QString status)
+{
+    if(status == "Warning"){
+        tpmsImage->setProperty("visible", true);
+    } else {
+        tpmsImage->setProperty("visible", false);
+    }
+}
+
+void gauges::showSeatbelt(QString status)
+{
+    if(status == "Unbuckled"){
+        seatbeltImage->setProperty("visible", true);
+    } else {
+        seatbeltImage->setProperty("visible", false);
+    }
+}
+
+void gauges::showOil(QString status)
+{
+    if(status == "Warning"){
+        oilImage->setProperty("visible", true);
+    } else {
+        oilImage->setProperty("visible", false);
+    }
+}
+
+void gauges::showDoor(QString status)
+{
+    if(status == "Open"){
+        doorImage->setProperty("visible", true);
+    } else {
+        doorImage->setProperty("visible", false);
     }
 }
 
