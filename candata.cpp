@@ -195,29 +195,9 @@ void canData::rpmProcess(QByteArray p)
     if(p.length() < 6){
         return;
     } else {
-        QString byte4 = QString::number(static_cast<quint8>(p.at(4)), 2);
-        //add padding zeroes if needed
-        if(byte4.length() <8){
-            for(int i = byte4.length(); i<8; i++){
-                byte4.prepend("0");
-            }
-        }
-        //qDebug() << "byte4: " << byte4;
-        QString byte5 = QString::number(static_cast<quint8>(p.at(5)), 2);
-       // qDebug() << "byte5 raw:" << byte5;
-        if(byte5.length() <8){
-            for(int i = byte5.length(); i<8; i++){
-                byte5.prepend("0");
-            }
-        }
-        //qDebug() << "byte5: " << byte5;
-        //get last 4 bits of byte 5
-        byte5 = byte5.remove(0, 3);
-        //qDebug() << "byte5 cut: " << byte5;
-
-        QString rpmByte = byte5+byte4;
-        //qDebug() << "rpmByte:" << rpmByte;
-        uint rpm = rpmByte.toUInt(nullptr, 2);
+        quint8 byte4 = static_cast<quint8>(p.at(4));
+        quint8 byte5 = static_cast<quint8>(p.at(5)) & 0x1F;
+        uint rpm = (byte5 << 8) | byte4;
         emit rpmChanged(rpm);
     }
 }
@@ -266,31 +246,11 @@ void canData::fuelProcess(QByteArray p)
     if(p.length() < 6){
         return;
     } else {
-        QString byte1 = QString::number(static_cast<quint8>(p.at(0)), 2);
-        //add padding zeroes if needed
-        if(byte1.length() <8){
-            for(int i = byte1.length(); i<8; i++){
-                byte1.prepend("0");
-            }
-        }
-        //qDebug() << "byte4: " << byte4;
-        QString byte2 = QString::number(static_cast<quint8>(p.at(1)), 2);
-       // qDebug() << "byte5 raw:" << byte5;
-        if(byte2.length() <8){
-            for(int i = byte2.length(); i<8; i++){
-                byte2.prepend("0");
-            }
-        }
-        //qDebug() << "byte5: " << byte5;
-        //get last 4 bits of byte 5
-        byte2 = byte2.remove(0, 4);
-        //qDebug() << "byte5 cut: " << byte5;
+        quint8 byte1 = static_cast<quint8>(p.at(0));
+        quint8 byte2 = static_cast<quint8>(p.at(1)) & 0x0F;
+        uint tmp = (byte2 << 8) | byte1;
 
-        QString fuelByte = byte2+byte1;
-        //qDebug() << "rpmByte:" << fuelByte;
-        float fuel = fuelByte.toUInt(nullptr, 2);
-        fuel = fuel/2;
-        //qDebug() << "fuel: " << fuel;
+        float fuel = (float)tmp/2;
         emit fuelChanged(fuel);
     }
 }
@@ -300,27 +260,15 @@ void canData::gearProcess(QByteArray p)
     if(p.length() < 7){
         return;
     } else {
-        QString byte1 = QString::number(static_cast<quint8>(p.at(6)), 2);
-        //add padding zeroes if needed
-        if(byte1.length() <8){
-            for(int i = byte1.length(); i<8; i++){
-                byte1.prepend("0");
-            }
-        }
+        int gear = static_cast<quint8>(p.at(6)) & 0x07;
 
-        //get last 4 bits of byte
-        byte1= byte1.remove(0, 5);
-        //qDebug() << "byte5 cut: " << byte1;
 
-        //qDebug() << "rpmByte:" << fuelByte;
-        int gear = byte1.toUInt(nullptr, 2);
         QString status;
         if(gear == 7){
             status = "N";
         } else {
             status = QString::number(gear);
         }
-        //qDebug() << "fuel: " << fuel;
         emit gearChanged(status);
     }
 }
