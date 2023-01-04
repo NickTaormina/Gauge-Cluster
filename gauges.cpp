@@ -169,12 +169,11 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     //fill trip & odo info and update display
     handler->fillTrip(&trA, "tripA");
     handler->fillTrip(&trB, "tripB");
-    qDebug() << "*trip A: " << trA.getTrip();
-    qDebug() << "*trip B: " << trB.getTrip();
+    qDebug() << "*trip A start: " << trA.getTripStart();
+    qDebug() << "*trip B start: " << trB.getTripStart();
     qDebug() << "*odometer: " << odoval;
     qDebug() << "*activeTrip: " << activeTrip;
     tripNum->setProperty("text", getActiveTripNum());
-    updateParamDisplay("Odometer", (double)odoval);
 
 
     //start the clock
@@ -215,7 +214,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
         _paramDisplay->initDisplay();
         _paramDisplay->setParamRename(rename);
 
-
+        qDebug() << "trip: " << trA.getTrip(81717.2);
 
 
 }
@@ -306,7 +305,6 @@ void gauges::setSpeedCAN(double spd)
             prevSpeed = _speed;
         }
         prevSpeedPos = pos;
-        updateTrip();
     }
 }
 
@@ -347,16 +345,10 @@ void gauges::setParamPointer(parameter *parameter, int length)
 {
     paramLength = length;
     par = parameter;
-    findSpeedIndex();
-    qDebug() << "*speed index: " << speedIndex;
-    findRPMIndex();
-    qDebug() << "*rpm index: " << rpmIndex;
-    findOdoIndex();
-    qDebug() << "*odo index: " << odoIndex;
-    getKnockIndexes();
+
     qDebug() << "*fkl index: " << fklIndex << "fbk index: " << fbkIndex << "dam index: " << damIndex;
 
-    QObject::connect(&par[rpmIndex], &parameter::valueChanged, this, &gauges::updateValue);
+    //QObject::connect(&par[rpmIndex], &parameter::valueChanged, this, &gauges::updateValue);
 
 
 
@@ -379,13 +371,13 @@ void gauges::resetTrip(QString tr) //TODO: multiple trips
 {
     qDebug()<< "*reset trip: " << tr;
     if(tr == "tripA"){
-        trA.resetTrip();
+        trA.resetTrip(odoval);
         tripNum->setProperty("text", getActiveTripNum());
-        emit tripUpdated("tripA", "0");
+        emit tripUpdated("tripA", QString::number(odoval));
     } else if (tr == "tripB"){
-        trB.resetTrip();
+        trB.resetTrip(odoval);
         tripNum->setProperty("text", getActiveTripNum());
-        emit tripUpdated("tripB", "0");
+        emit tripUpdated("tripB", QString::number(odoval));
     }
 
 }
@@ -425,39 +417,7 @@ void gauges::setFuelCAN(float fuel)
     updateFuelBar(value);
 }
 
-//finds the rpm parameter
-void gauges::findRPMIndex()
-{
-    rpmIndex = 0;
-    for(int i = 0; i < paramLength; i++){
-        if(par[i].getName().toUpper() == "ENGINE SPEED"){
-            rpmIndex = i;
-            break;
-        }
-    }
-}
-//finds the parameter for vehicle speed
-void gauges::findSpeedIndex()
-{
-    speedIndex = 0;
-    for(int i = 0; i < paramLength; i++){
-        if(par[i].getName().toUpper() == "VEHICLE SPEED"){
-            speedIndex = i;
-            break;
-        }
-    }
-}
-//finds the odometer reading parameter
-void gauges::findOdoIndex()
-{
-    odoIndex = 0;
-    for(int i = 0; i < paramLength; i++){
-        if(par[i].getName().toUpper() == "ODOMETER"){
-            odoIndex = i;
-            break;
-        }
-    }
-}
+
 
 //finds index in parameter array for each of the knock params
 void gauges::getKnockIndexes()
@@ -478,33 +438,18 @@ void gauges::getKnockIndexes()
 
 QString gauges::getActiveTripNum(){
     if(activeTrip == "tripA"){
-       return trA.getTrip();
+       return trA.getTrip(odoval);
     } else {
-        return trB.getTrip();
+        return trB.getTrip(odoval);
     }
 
 }
 
-void gauges::updateActiveTripDistance(int speed, qint64 time){
-    if(activeTrip == "tripA"){
-        trA.updateTripDistance(speed, time);
-    } else if(activeTrip == "tripB"){
-        trB.updateTripDistance(speed, time);
-    }
-}
 
 //updates the trip value in cluster
 void gauges::updateTrip()
 {
-    //qDebug() << "*speed: " << _speed << " elapsed time: " << elapsedTimer.elapsed();
-    updateActiveTripDistance(_speed, elapsedTimer.elapsed());
-    elapsedTimer.restart();
     tripNum->setProperty("text", getActiveTripNum());
-    //qDebug() << activeTrip << ": " << getActiveTripNum();
-    emit tripUpdated(activeTrip, getActiveTripNum());
-
-
-
 }
 
 //displays knock message if there is a knock event (fbk/fkl/dam not normal)
@@ -642,6 +587,8 @@ void gauges::updateCANParam(QString name, double value)
             updateTargetShiftRPM(g->calcDownshiftRPM(_speed));
         }
     } else if(name == "Odometer"){
+        odoval = value;
+        updateTrip();
         QString val = QString::number(value, 'f', 0);
         if(val.length() < 6){
             for(int x = val.length(); x<6; x++){
@@ -1191,8 +1138,8 @@ void gauges::startTest(){
 //sets the odometer text
 void gauges::setOdometer()
 {
+    /*
     int digits = 6;
-    int val = par[odoIndex].getValue();
     QString str = QString::number(val);
     int length = str.length();
     if(length < digits){
@@ -1201,13 +1148,13 @@ void gauges::setOdometer()
             str.prepend("0");
         }
     }
-    odotext->setProperty("text", (QVariant)str);
+    odotext->setProperty("text", (QVariant)str);*/
 }
 
 //DEPRECATED: updates all gauges based on ecu response data
 void gauges::updateValue()
 {
-    if(speedIndex > -1){
+    if(1){
         setOdometer();
         if(!neutral && !reverse){
         }
@@ -1218,19 +1165,19 @@ void gauges::updateValue()
 
 //controls the test sweep
 void gauges::changeValues(){
-    par[rpmIndex].setValue(rpmval);
+
     if(rpmval < maxRPM){
     rpmval = rpmval + 100;
     } else {
         rpmval = 0;
     }
-    par[speedIndex].setValue(speedval);
+
     if(speedval < maxSpeed-2){
         speedval = speedval + 2;
     } else {
         speedval = 0;
     }
-    par[odoIndex].setValue(odoval);
+
     setSpeedCAN(speedval);
     setRPMCAN(rpmval);
     //qDebug() << "rpm: " << rpmval;

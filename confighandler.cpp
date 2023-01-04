@@ -192,8 +192,8 @@ void configHandler::fillTrip(trip *tr, QString tripName)
             QDomElement trElement = xt.firstChild().toElement();
             while(!trElement.isNull()){
                 if(trElement.tagName() == tripName){
-                    tr->setMilesTraveled(trElement.text().toFloat(nullptr));
-                    qDebug() << "*trip " << trElement.tagName()<< " : " << trElement.text().toFloat(nullptr);
+                    tr->resetTrip(trElement.text().toDouble(nullptr));
+                    qDebug() << "*trip " << trElement.tagName()<< " : " << trElement.text().toDouble(nullptr);
                     break;
                 }
                 trElement = trElement.nextSibling().toElement();

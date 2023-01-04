@@ -10,17 +10,17 @@ class trip : public QObject
     Q_OBJECT
 public:
     explicit trip(QObject *parent = nullptr);
-    void updateTripDistance(int speed, qint64 time);
-    void setMilesTraveled(float m);
-    void resetTrip();
-    QString getTrip();
+    void resetTrip(double m);
+    QString getTrip(double odo);
+    QString getTripStart();
 
 signals:
 
 public slots:
 private:
-    float milesTraveled;
-    QDomDocument *xml;
+
+    double tripStart;
+
 
 
 };

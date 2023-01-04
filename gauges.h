@@ -82,7 +82,6 @@ public slots:
 
     void updateWeatherStatus();
     QString getActiveTripNum();
-    void updateActiveTripDistance(int speed, qint64 time);
     Q_INVOKABLE void switchActiveTrip();
     Q_INVOKABLE QString getShiftTimer();
 
@@ -98,9 +97,7 @@ private:
     int maxSpeed;
     int maxSpeedoRot;
     int minSpeedoRot;
-    int rpmIndex;
-    int speedIndex;
-    int odoIndex;
+
 
     //param values
     parameter * par;
@@ -129,9 +126,7 @@ private:
 
 
 
-    void findSpeedIndex();
-    void findRPMIndex();
-    void findOdoIndex();
+
     void getKnockIndexes();
 
     void updateTrip();
@@ -218,7 +213,7 @@ private:
     qint64 elapsed;
 
     int rpmval;
-    int odoval;
+    double odoval;
     int speedval;
     void changeValues();
     void updateSpeedText();
