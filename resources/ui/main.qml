@@ -185,7 +185,7 @@ Window{
             color: "#c8c8c8"
             text: qsTr("000000")
             font.pixelSize: 28
-            horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignRight
             verticalAlignment: Text.AlignVCenter
             font.family: "Michroma"
             fontSizeMode: Text.FixedSize
@@ -335,7 +335,7 @@ Window{
         Image {
             id: celImage
             objectName: "celImage"
-            visible: true
+            visible: false
             anchors.horizontalCenter: tach.horizontalCenter
             anchors.horizontalCenterOffset: 100
             anchors.verticalCenter: parent.verticalCenter
@@ -355,7 +355,7 @@ Window{
         Image {
             id: oilImage
             objectName: "oilImage"
-            visible: true
+            visible: false
             anchors.horizontalCenter: tach.horizontalCenter
             anchors.horizontalCenterOffset: 150
             anchors.verticalCenter: parent.verticalCenter
@@ -374,7 +374,7 @@ Window{
         Image {
             id: seatbeltImage
             objectName: "seatbeltImage"
-            visible: true
+            visible: false
             anchors.horizontalCenter: tach.horizontalCenter
             anchors.horizontalCenterOffset: 100
             anchors.verticalCenter: parent.verticalCenter
@@ -393,7 +393,7 @@ Window{
         Image {
             id: tpmsImage
             objectName: "tpmsImage"
-            visible: true
+            visible: false
             anchors.horizontalCenter: tach.horizontalCenter
             anchors.horizontalCenterOffset: 150
             anchors.verticalCenter: parent.verticalCenter
@@ -412,7 +412,7 @@ Window{
         Image {
             id: brakeImage
             objectName: "brakeImage"
-            visible: true
+            visible: false
             anchors.horizontalCenter: tach.horizontalCenter
             anchors.horizontalCenterOffset: 100
             anchors.verticalCenter: parent.verticalCenter
@@ -426,7 +426,7 @@ Window{
         Image {
             id: doorImage
             objectName: "doorImage"
-            visible: true
+            visible: false
             anchors.horizontalCenter: tach.horizontalCenter
             anchors.horizontalCenterOffset: 150
             anchors.verticalCenter: parent.verticalCenter

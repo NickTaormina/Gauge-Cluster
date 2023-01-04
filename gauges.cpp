@@ -56,7 +56,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     qDebug() << "*gauge sweep setting: " << initialGaugeSweep;
     shiftLightMin = cfg->getValue("generalShiftLightThreshold").toUInt(nullptr, 10);
     shiftLightFlashInterval = cfg->getValue("generalShiftLightFlashTimer").toUInt(nullptr, 10);
-    odoval = cfg->getValue("generalOdometer").toInt(nullptr, 10);
+    odoval = cfg->getValue("generalOdometer").toDouble(nullptr);
     activeTrip = cfg->getValue("generalActiveTrip");
     shiftTimerDuration = cfg->getValue("generalShiftTargetTimer").toInt(nullptr, 10);
     qDebug() << "shift timer duration: " << shiftTimerDuration;
@@ -167,6 +167,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
 
 
     //fill trip & odo info and update display
+    updateCANParam("Odometer", odoval);
     handler->fillTrip(&trA, "tripA");
     handler->fillTrip(&trB, "tripB");
     qDebug() << "*trip A start: " << trA.getTripStart();
@@ -174,6 +175,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     qDebug() << "*odometer: " << odoval;
     qDebug() << "*activeTrip: " << activeTrip;
     tripNum->setProperty("text", getActiveTripNum());
+
 
 
     //start the clock
@@ -214,7 +216,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
         _paramDisplay->initDisplay();
         _paramDisplay->setParamRename(rename);
 
-        qDebug() << "trip: " << trA.getTrip(81717.2);
+
 
 
 }
@@ -589,14 +591,18 @@ void gauges::updateCANParam(QString name, double value)
     } else if(name == "Odometer"){
         odoval = value;
         updateTrip();
-        QString val = QString::number(value, 'f', 0);
+        QString val = QString::number(qFloor(value), 'f', 0);
         if(val.length() < 6){
             for(int x = val.length(); x<6; x++){
                 val.prepend("0");
             }
         }
         if(val != odotext->property("text").toString()){
-            emit odometerUpdated(val);
+            emit odometerUpdated(QString::number(value,'f',1));
+            int ind = val.indexOf("-");
+            if(ind > -1){
+                val.remove(ind,1);
+            }
             odotext->setProperty("text", QVariant(val));
         }
     }

@@ -22,11 +22,21 @@ void trip::resetTrip(double m)
 
 QString trip::getTrip(double odo)
 {
-    return QString::number(odo-tripStart);
+    QString val = QString::number(odo-tripStart, 'f', 1);
+    int ind = val.indexOf("-");
+    if(ind > -1){
+        val.remove(ind,1);
+    }
+    return val;
 }
 
 QString trip::getTripStart()
 {
-    return QString::number(tripStart);
+    QString val = QString::number(tripStart, 'f', 1);
+    int ind = val.indexOf("-");
+    if(ind > -1){
+        val.remove(ind,1);
+    }
+    return val;
 }
 
