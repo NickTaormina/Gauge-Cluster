@@ -163,7 +163,7 @@ void canbus::receiveSerialFrame(QCanBusFrame frame)
         //qDebug() << "written: " << frame.toString();
     }
     if(frame.frameId() == 2024){
-        qDebug() << "ecu response: " << frame.toString();
+        //qDebug() << "ecu response: " << frame.toString();
         if(frame.payload().at(0) == 16){
             //respond with ack message if ecu sends multipart
             _dev->writeFrame(ack);

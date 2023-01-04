@@ -270,6 +270,13 @@ private:
     bool leftSignalBool;
     bool rightSignalBool;
 
+    //door variables
+    bool driverDoor;
+    bool passengerDoor;
+    bool rearPassengerDoor;
+    bool rearDriverDoor;
+    bool trunkDoor;
+
 
 
 signals:

@@ -157,6 +157,10 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     QObject::connect(_data, &canData::cruiseStatusChanged, this, &gauges::updateCruiseStatus);
     QObject::connect(_data, &canData::gearChanged, this, &gauges::updateGearFromCAN);
     QObject::connect(_data, &canData::checkEngineLight, this, &gauges::showCEL);
+    QObject::connect(_data, &canData::oilLight, this, &gauges::showOil);
+    QObject::connect(_data, &canData::tpmsLight, this, &gauges::showTPMS);
+    QObject::connect(_data, &canData::seatbeltLight, this, &gauges::showSeatbelt);
+    QObject::connect(_data, &canData::doorLight, this, &gauges::showDoor);
 
 
 
@@ -592,7 +596,7 @@ void gauges::updateParamDisplay(QString name, double value)
 {
 
     if(name == "Odometer"){
-           QString val = QString::number(value, 'f', 0);
+          /* QString val = QString::number(value, 'f', 0);
            if(val.length() < 6){
                for(int x = val.length(); x<6; x++){
                    val.prepend("0");
@@ -601,7 +605,7 @@ void gauges::updateParamDisplay(QString name, double value)
            if(val != odotext->property("text").toString()){
                emit odometerUpdated(val);
                odotext->setProperty("text", QVariant(val));
-           }
+           }*/
        } else {
            _paramDisplay->updateValue(name, value);
        }
@@ -886,7 +890,28 @@ void gauges::showOil(QString status)
 
 void gauges::showDoor(QString status)
 {
-    if(status == "Open"){
+    if(status == "driver"){
+        driverDoor = true;
+    } else if (status == "driverClosed"){
+        driverDoor = false;
+    } else if(status == "passenger"){
+        passengerDoor = true;
+    } else if (status == "passengerClosed"){
+        passengerDoor = false;
+    } else if(status == "rearPassenger"){
+        rearPassengerDoor = true;
+    } else if (status == "rearPassengerClosed"){
+        rearPassengerDoor = false;
+    } else if(status == "rearDriver"){
+        rearDriverDoor = true;
+    } else if (status == "rearDriverClosed"){
+        rearDriverDoor = false;
+    } else if(status == "trunk"){
+        trunkDoor = true;
+    } else if (status == "trunkClosed"){
+        trunkDoor = false;
+    }
+    if(driverDoor || passengerDoor || rearPassengerDoor || rearDriverDoor || trunkDoor){
         doorImage->setProperty("visible", true);
     } else {
         doorImage->setProperty("visible", false);
