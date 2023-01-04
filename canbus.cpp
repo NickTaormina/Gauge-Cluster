@@ -106,6 +106,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
                         payload.insert(0,16).toHex();
                         frame = QCanBusFrame(frameID, payload);
                         qInfo() << "writing start msg: " << frame.toString();
+                        //qDebug() << "write: " << frame.toString();
                         _dev->writeFrame(frame);
                     } else {
                         payload.insert(0, 33+(count-1)).toHex();
@@ -142,8 +143,10 @@ void canbus::sendQueuedMessage()
         QByteArray payload = queuedMessage.mid(0+(8*count), 8); 
         QCanBusFrame frame = QCanBusFrame(2016, payload);
         qInfo() << "sending frame: " << frame.toString();
+        //qDebug() << "write: " << frame.toString();
         QThread::msleep(5);
         _dev->writeFrame(frame);
+
 
 
 

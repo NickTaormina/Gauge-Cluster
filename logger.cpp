@@ -19,7 +19,7 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
     qDebug() << "*logger object initialized";
     logging = 0;
     processing = 0;
-    loggerTimer->setInterval(80);
+    loggerTimer->setInterval(100);
     loggerTimer->setSingleShot(false);
     connect(loggerTimer, &QTimer::timeout, this, &logger::sendLogMessage);
     etimer.start();
@@ -31,7 +31,7 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
 void logger::sendLogMessage(){
     //qInfo() << "sending log message";
     //qDebug() << "log message";
-    qDebug() << "can connection: " << can->isConnected();
+   //qDebug() << "can connection: " << can->isConnected();
     if(!can->isConnected()){
         qDebug() << "can't log. no device";
         stopLogging();
@@ -204,10 +204,33 @@ void logger::parseECUResponse(QByteArray rxmsg)
                         res[calcpos].setValue(val, definition->getConv(calcpos), definition->getOffset(calcpos));
                     }
                     i = i + 2;
+                } else if (definition->getRxBytes(calcpos) == 3){
+                    QByteArray tmp = rxmsg.mid(i,3);
+                    int val = fr.base10Value(tmp);
+                    qDebug() << "raw 2 byte val: " << val;
+                    if(definition->getInvert(calcpos) == 1){
+                        res[calcpos].setValue(val, definition->getConv(calcpos), definition->getOffset(calcpos), definition->getInvert(calcpos));
+                    }else{
+                        res[calcpos].setValue(val, definition->getConv(calcpos), definition->getOffset(calcpos));
+                    }
+                    i = i + 3;
                 }
+                else if (definition->getRxBytes(calcpos) == 4){
+                                    QByteArray tmp = rxmsg.mid(i,4);
+                                    //qDebug() << "length 4";
+                                    //qDebug() << "raw 2 byte val: " << val;
+                                    if(definition->getType(calcpos) == "float"){
+                                        //qDebug() << "its a float";
+                                        res[calcpos].setValue(tmp, definition->getConv(calcpos), definition->getOffset(calcpos));
+                                    } else {
+                                        int val = fr.base10Value(tmp);
+                                        res[calcpos].setValue(val, definition->getConv(calcpos), definition->getOffset(calcpos));
+                                    }
+                                    i = i + 4;
+                                }
                 res[calcpos].setName(definition->getParamNames(calcpos));
                 res[calcpos].setUnit(definition->getUnit(calcpos));
-                //qDebug() << res[calcpos].getName() + ": " << res[calcpos].getValue();
+
                 emit paramUpdated(res[calcpos].getName(), res[calcpos].getValue());
 
                 calcpos++;

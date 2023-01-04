@@ -2,6 +2,7 @@
 #define PARAMETER_H
 
 #include <QObject>
+#include <QDataStream>
 
 class parameter : public QObject
 {
@@ -11,7 +12,7 @@ public:
     parameter(QObject *parent, int pid, QString name, double val);
     void setPID(int i);
     int getPID();
-
+float bytesToFloat(QByteArray bytes);
     void setName(QString n);
     QString getName();
 
@@ -23,6 +24,7 @@ public:
     double getValue(int val, double conv, float offset);
 
     void setValue(int val, double conv, float offset);
+    void setValue(QByteArray val, double conv, float offset);
     void setValue(int val, double conv, float offset, int invert);
 
     void setFormat(int i);
@@ -30,6 +32,8 @@ public:
 
     void setSigned(int i);
     int getSigned();
+
+
 signals:
     void valueChanged();
 private:

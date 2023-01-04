@@ -174,6 +174,18 @@ void Definition::appendSignedVal(int i)
     signedVal.append(i);
 }
 
+void Definition::appendType(QString t)
+{
+    type.append(t);
+}
+
+QString Definition::getType(int i)
+{
+    return type.at(i);
+}
+
+
+
 
 
 

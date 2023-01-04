@@ -9,7 +9,12 @@ frames::frames()
 
 //converts frame to readable numbers
 int frames::base10Value(QByteArray bytes){
-     return bytes.toHex().toUInt(nullptr, 16);
+    int val = 0;
+        for (int i = 0; i < bytes.size(); ++i) {
+            val = (val << 8) | (bytes.at(i) & 0xff);
+        }
+        return val;
+    // return bytes.toHex().toUInt(nullptr, 16);
 }
 
 //converts a single byte to decimal

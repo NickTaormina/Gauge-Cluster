@@ -175,4 +175,14 @@
 		<offset>0</offset>
 	</conversions>
 </ecuparam>
+<ecuparam id="23" name="Maf Corr Final" desc="P23">
+        <address length="9">F83CC4F83CC5F83CC6F83CC7</address>
+        <response length="4">07</response>
+        <conversions>
+                <conversion units="g/s" expr=".01667" format="0.00" type="float"/>
+                <offset>0</offset>
+        </conversions>
+</ecuparam>
 </definitions>
+
+

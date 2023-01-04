@@ -60,6 +60,12 @@ public:
 
     int getSignedVal(int i) const;
     void appendSignedVal(int i);
+
+    void appendType(QString t);
+    QString getType(int i);
+
+
+
 private:
     QByteArray txBytes;
     QList<int> pID;
@@ -72,6 +78,7 @@ private:
     QList<int> format;
 
     QList<int> signedVal;
+    QList<QString> type;
 
 
 

@@ -1,5 +1,6 @@
 #include "parameter.h"
 #include "qdebug.h"
+#include <qmath.h>
 parameter::parameter(QObject *parent)
     : QObject{parent}
 {
@@ -54,8 +55,29 @@ double parameter::getValue(int val, double conv, float offset){
     value = ((double)val*conv) + offset;
     return value;
 }
+
+
 void parameter::setValue(int val, double conv, float offset){
     value = ((double)val*conv) + offset;
+}
+
+float parameter::bytesToFloat(QByteArray bytes){
+    union {
+        unsigned char b[4];
+        float f;
+      } u;
+      u.b[0] = bytes.at(3);
+      u.b[1] = bytes.at(2);
+      u.b[2] = bytes.at(1);
+      u.b[3] = bytes.at(0);
+      return u.f;
+}
+void parameter::setValue(QByteArray val, double conv, float offset)
+{
+    float _f = parameter::bytesToFloat(val);
+   // qDebug() << "float: " << _f;
+    value = (double)_f*conv + offset;
+
 }
 void parameter::setValue(int val, double conv, float offset, int invert){
     if(invert == 1){

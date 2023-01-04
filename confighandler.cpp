@@ -121,6 +121,11 @@ void configHandler::fillDefs(QStringList _selectedParams, Definition* def)
                                 } else {
                                     def->appendInvert(0);
                                 }
+                                if(conversion.hasAttribute("type")){
+                                    def->appendType(conversion.attribute("type"));
+                                } else {
+                                    def->appendType("null");
+                                }
                                 if(conversion.hasAttribute("signed")){
                                     //qDebug() << "set signed: " << param.attribute("name");
                                     def->appendSignedVal(1);
