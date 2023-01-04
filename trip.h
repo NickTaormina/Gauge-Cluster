@@ -14,12 +14,15 @@ public:
     QString getTrip(double odo);
     QString getTripStart();
 
+
+
 signals:
 
 public slots:
 private:
 
     double tripStart;
+
 
 
 

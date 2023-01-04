@@ -203,6 +203,25 @@ void configHandler::fillTrip(trip *tr, QString tripName)
     }
 }
 
+void configHandler::fillEconomy(fueleconomy *fe)
+{
+    QDomElement xt = configXml.firstChild().firstChild().toElement();
+    while(!xt.isNull()){
+        if(xt.tagName() == "trip"){
+            QDomElement trElement = xt.firstChild().toElement();
+            while(!trElement.isNull()){
+                if(trElement.tagName() == "fuelStart"){
+                    fe->setOdometerTankStart(trElement.text().toDouble(nullptr));
+                    qDebug() << "*odo tank start " << trElement.tagName()<< " : " << trElement.text().toDouble(nullptr);
+                    break;
+                }
+                trElement = trElement.nextSibling().toElement();
+            }
+        }
+        xt = xt.nextSibling().toElement();
+    }
+}
+
 void configHandler::storeTrip(QString trip, QString val)
 {
     QFile f(configPath);

@@ -15,6 +15,7 @@
     <trip>
         <tripA>079501.1</tripA>
         <tripB>079505.4</tripB>
+        <fuelStart>081717</fuelStart>
     </trip>
     <gauges>
         <general>
