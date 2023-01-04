@@ -31,12 +31,15 @@ canbus::canbus(QObject *parent, config *c, serialHandler* s)
         } else {
             _dev->setConfigurationParameter(QCanBusDevice::BitRateKey, QVariant());
             _dev->connectDevice();
-            QObject::connect(_dev,&QCanBusDevice::framesReceived,this,[this](){
-                QVector<QCanBusFrame> frames = _dev->readAllFrames();
-                for(int i = 0; i<frames.count(); i++){
-                    receiveSerialFrame(frames.at(i));
-                }
-            });
+            if(_dev->state() == QCanBusDevice::ConnectedState){
+                qDebug() << "connected socketcan";
+                QObject::connect(_dev,&QCanBusDevice::framesReceived,this,[this](){
+                    QVector<QCanBusFrame> frames = _dev->readAllFrames();
+                    for(int i = 0; i<frames.count(); i++){
+                        receiveSerialFrame(frames.at(i));
+                    }
+                });
+            }
         }
 
     }

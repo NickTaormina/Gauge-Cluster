@@ -14,6 +14,7 @@
 #include <QSerialPortInfo>
 #include "serialhandler.h"
 #include "ecucomm.h"
+#include "fueleconomy.h"
 #include <QtGlobal>
 
 QString logPath;
@@ -118,6 +119,8 @@ int main(int argc, char *argv[])
     hand.fillTrip(&tr, "tripA");
     Definition def;
     defWindow defWin(nullptr, &def);
+    fueleconomy fe;
+    hand.fillEconomy(&fe);
 
     defWin.parseDefs();
     qDebug() << defWin.params();
@@ -152,7 +155,7 @@ int main(int argc, char *argv[])
     QObject* main = obj.at(0);
     QObject * statustext = main->findChild<QObject*>("statusText", Qt::FindChildrenRecursively);
 
-    gauges* gauge = new gauges(nullptr, main, &gr, &cfg[config::GAUGES], &hand, &_canData, &defWin);
+    gauges* gauge = new gauges(nullptr, main, &gr, &cfg[config::GAUGES], &hand, &_canData, &defWin, &fe);
     QObject::connect(log, &logger::setParams, gauge, &gauges::setParamPointer);
 
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
@@ -181,7 +184,7 @@ int main(int argc, char *argv[])
     QObject::connect(&_canData, &canData::valueChanged, gauge, &gauges::updateCANParam);
     QObject::connect(&shand, &serialHandler::serialFrameReceived, &can, &canbus::receiveSerialFrame);
     QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
-    log->startLogging();
+    //log->startLogging();
 
     //qDebug() << "main call: " << _ecuComm.getFuelLevel();
 

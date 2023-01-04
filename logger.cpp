@@ -31,11 +31,11 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
 void logger::sendLogMessage(){
     //qInfo() << "sending log message";
     //qDebug() << "log message";
+    qDebug() << "can connection: " << can->isConnected();
     if(!can->isConnected()){
         qDebug() << "can't log. no device";
         stopLogging();
         return;
-
     }
     if(definition->getTxLength() > 0){
        // //qInfo() << "tx bytes" << definition->getTxBytes().toHex();

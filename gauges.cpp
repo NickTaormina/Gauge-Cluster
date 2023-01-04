@@ -6,13 +6,14 @@ gauges::gauges(QObject *parent)
 {
 }
 
-gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configHandler *handler, canData *data, defWindow * defwin)
+gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configHandler *handler, canData *data, defWindow * defwin, fueleconomy * fe)
 {
     //store objects
     parent = nullptr;
     g = gear;
     _data = data;
     handbrake = false;
+    _fe = fe;
 
 
     //timers
@@ -168,6 +169,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
 
     //fill trip & odo info and update display
     updateCANParam("Odometer", odoval);
+    sessionStart = odoval;
     handler->fillTrip(&trA, "tripA");
     handler->fillTrip(&trB, "tripB");
     qDebug() << "*trip A start: " << trA.getTripStart();
@@ -653,12 +655,10 @@ void gauges::updateCoolantGauge(double value)
 //averages fuel readings to prevent gauge jumpiness
 double gauges::getFuelAvg(double value)
 {
-    if(fuelSamples > 5000){
-        fuelSamples = 1;
-        //qDebug() << "100 samples";
-        return fuelValueAvg;
+    if(fuelSamples < 5000){
+        fuelSamples++;
     }
-    fuelSamples = fuelSamples + 1;
+
     //qDebug() << "fuel avg: " << (fuelValueAvg + ((double)1/(double)fuelSamples)*(double)((double)value-(double)fuelValueAvg));
     fuelValueAvg = (fuelValueAvg + ((double)1/(double)fuelSamples)*(double)((double)value-(double)fuelValueAvg));
     return fuelValueAvg;

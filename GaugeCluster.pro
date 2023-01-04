@@ -16,6 +16,7 @@ SOURCES += main.cpp \
     defwindow.cpp \
     ecucomm.cpp \
     frames.cpp \
+    fueleconomy.cpp \
     gauges.cpp \
     gear.cpp \
     logger.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     defwindow.h \
     ecucomm.h \
     frames.h \
+    fueleconomy.h \
     gauges.h \
     gear.h \
     logger.h \

@@ -11,6 +11,7 @@
 #include "config.h"
 #include "candef.h"
 #include "candata.h"
+#include "fueleconomy.h"
 
 class configHandler : public QObject
 {
@@ -33,6 +34,7 @@ public slots:
     void fillDefs(QStringList _selectedParams, Definition* def);
     void fillGear(gear* g);
     void fillTrip(trip* tr, QString tripName);
+    void fillEconomy(fueleconomy * fe);
     void storeTrip(QString trip, QString val);
     void parseConfig();
     void fillCan(canDef * d);

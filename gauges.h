@@ -15,13 +15,15 @@
 #include "confighandler.h"
 #include "defwindow.h"
 #include "paramdisplay.h"
+#include "fueleconomy.h"
+
 
 class gauges : public QObject
 {
     Q_OBJECT
 public:
     explicit gauges(QObject *parent = nullptr);
-    gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configHandler *handler, canData *data, defWindow * defwin);
+    gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configHandler *handler, canData *data, defWindow * defwin, fueleconomy * fe);
 
 signals:
 void tripUpdated(QString trip, QString val);
@@ -139,6 +141,9 @@ private:
 
     double getFuelAvg(double value);
 
+    double sessionStart;
+    double sessionFuelLevel;
+
 
     //parameter display
     QString topLeftText;
@@ -243,6 +248,7 @@ private:
     canData * _data;
     weather _weather;
     paramDisplay* _paramDisplay;
+    fueleconomy * _fe;
 
     //fuel variables
     int fuelResMin;
