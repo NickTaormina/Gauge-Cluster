@@ -633,6 +633,17 @@ void gauges::updateCANParam(QString name, double value)
 
             updateTargetShiftRPM(g->calcDownshiftRPM(_speed));
         }
+    } else if(name == "Odometer"){
+        QString val = QString::number(value, 'f', 0);
+        if(val.length() < 6){
+            for(int x = val.length(); x<6; x++){
+                val.prepend("0");
+            }
+        }
+        if(val != odotext->property("text").toString()){
+            emit odometerUpdated(val);
+            odotext->setProperty("text", QVariant(val));
+        }
     }
 }
 
