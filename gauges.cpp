@@ -111,6 +111,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     seatbeltImage = main->findChild<QObject*>("seatbeltImage", Qt::FindChildrenRecursively);
     tpmsImage = main->findChild<QObject*>("tpmsImage", Qt::FindChildrenRecursively);
     doorImage = main->findChild<QObject*>("doorImage", Qt::FindChildrenRecursively);
+    fuelImage = main->findChild<QObject*>("fuelImage", Qt::FindChildrenRecursively);
 
     //finds ui status elements to control. ex: turn signals
     leftSignal = main->findChild<QObject*>("leftSignal", Qt::FindChildrenRecursively);
@@ -671,6 +672,11 @@ void gauges::updateFuelBar(double value)
     //QString text = QString::number(value);
     //fuelText->setProperty("text", text);
     if(fuelBar){
+        if(value < 0.15){
+            fuelImage->setProperty("visible", true);
+        } else {
+            fuelImage->setProperty("visible", false);
+        }
     QString filePath = "fuelBar";
     if(value < .05){
         bar = 0;

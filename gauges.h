@@ -181,6 +181,7 @@ private:
     QObject * seatbeltImage;
     QObject * tpmsImage;
     QObject * doorImage;
+    QObject * fuelImage;
 
     //ui status objects
     QObject * leftSignal;
