@@ -17,6 +17,12 @@
                 <conv>0.31</conv>
                 <offset>-15</offset>
         </param>
+        <param name="Fuel Consumption">
+                <id>864</id>
+                <byte length = "1">1</byte>
+                <conv>0.24726</conv>
+                <offset>0</offset>
+        </param>
 	<param name="Accelerator Position">
                 <id>320</id>
 		<byte length = "1">0</byte>

@@ -79,6 +79,7 @@ double fueleconomy::getMafCorr() const
 void fueleconomy::setMafCorr(double newMafCorr)
 {
     mafCorr = newMafCorr;
+    updateInstantMPG();
 }
 
 double fueleconomy::getAFR() const
@@ -89,6 +90,7 @@ double fueleconomy::getAFR() const
 void fueleconomy::setAFR(double newAFR)
 {
     AFR = newAFR;
+    updateInstantMPG();
 }
 
 int fueleconomy::getSpeed() const
