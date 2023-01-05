@@ -257,7 +257,11 @@ private:
     int fuelResMax;
     int fuelSamples;
     int fuelBarMin;
+    bool storedSample;
     double fuelValueAvg;
+    double fuelLevelStart;
+
+
 
 
     //cruise control

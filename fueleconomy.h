@@ -44,6 +44,12 @@ public:
     uint getRpm() const;
     void setRpm(uint newRpm);
 
+    double getTankLevelStart() const;
+    void setTankLevelStart(double newTankLevelStart);
+
+    double getInstantMPGFromCAN() const;
+    void setInstantMPGFromCAN(double newInstantMPGFromCAN);
+
 public slots:
 
 signals:
@@ -54,6 +60,7 @@ private:
     double tankMPG;
     double odometerStart;
     double odometerTankStart;
+    double tankLevelStart;
 
 
 
@@ -65,6 +72,10 @@ private:
     int speed;
     double fuelFlowRate;
     void updateInstantMPG();
+    int mpgSamples;
+    double mpgAvg;
+    double getMPGAvg(double value);
+    double instantMPGFromCAN;
 
 
 };

@@ -8,6 +8,7 @@ fueleconomy::fueleconomy(QObject *parent)
     speed = -1;
     rpm = -1;
     mpg = -1;
+    tankLevelStart = -1;
 }
 
 double fueleconomy::getFuelFlowRate() const
@@ -113,6 +114,39 @@ void fueleconomy::setRpm(uint newRpm)
     rpm = newRpm;
 }
 
+double fueleconomy::getTankLevelStart() const
+{
+    return tankLevelStart;
+}
+
+void fueleconomy::setTankLevelStart(double newTankLevelStart)
+{
+    tankLevelStart = newTankLevelStart;
+}
+double fueleconomy::getMPGAvg(double value)
+{
+    if(mpgSamples < 5){
+        mpgSamples++;
+    }
+    //qDebug() << "value: " << value << " : " << instantMPGFromCAN;
+    if(value <= 0){
+        value = instantMPGFromCAN;
+    }
+    value = (value + instantMPGFromCAN)/2;
+    mpgAvg = (mpgAvg + ((double)1/(double)mpgSamples)*(double)((double)value-(double)mpgAvg));
+    return mpgAvg;
+}
+
+double fueleconomy::getInstantMPGFromCAN() const
+{
+    return instantMPGFromCAN;
+}
+
+void fueleconomy::setInstantMPGFromCAN(double newInstantMPGFromCAN)
+{
+    instantMPGFromCAN = newInstantMPGFromCAN;
+    updateInstantMPG();
+}
 void fueleconomy::updateInstantMPG()
 {
     //grams fuel/second
@@ -124,7 +158,7 @@ void fueleconomy::updateInstantMPG()
     if(speed == 0){
         mpg = 0;
     } else {
-        mpg = 1/(((mafCorr/AFR)/(E10_DENSITY))/(speed/3600.0)/GALLON_TO_ML);
+        mpg = getMPGAvg(1/(((mafCorr/AFR)/(E10_DENSITY))/(speed/3600.0)/GALLON_TO_ML));
     }
 
 }

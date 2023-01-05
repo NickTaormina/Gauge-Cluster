@@ -66,6 +66,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     fuelResMax = 19;
     fuelSamples = 0;
     fuelBarMin = 7;
+    storedSample = false;
 
     //initialize temp vars to avoid error
     prevRPMPos = minTach;
@@ -179,6 +180,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     qDebug() << "*odometer: " << odoval;
     qDebug() << "*activeTrip: " << activeTrip;
     tripNum->setProperty("text", getActiveTripNum());
+    _fe->setOdometerStart(odoval);
 
 
 
@@ -348,6 +350,8 @@ void gauges::updateSpeedText(){
         }
     }
 }
+
+
 
 //sets parameter object for the cluster to read from
 void gauges::setParamPointer(parameter *parameter, int length)
@@ -555,7 +559,7 @@ void gauges::updateParamDisplay(QString name, double value)
         _fe->setAFR(value);
     }
 
-    mpgText->setProperty("text", QString::number(_fe->getMpg(), 'f', 1));
+    //mpgText->setProperty("text", QString::number(_fe->getMpg(), 'f', 1));
     _paramDisplay->updateValue(name, value);
 
 
@@ -607,6 +611,13 @@ void gauges::updateCANParam(QString name, double value)
             }
             odotext->setProperty("text", QVariant(val));
         }
+    } else if (name == "Fuel Consumption"){
+        if(_speed > 0 && value > 0){
+            _fe->setInstantMPGFromCAN(_speed/value);
+        } else {
+            _fe->setInstantMPGFromCAN(0);
+        }
+        mpgText->setProperty("text", QString::number(_fe->getMpg(), 'f', 1));
     }
 }
 
@@ -655,8 +666,19 @@ void gauges::updateCoolantGauge(double value)
 //averages fuel readings to prevent gauge jumpiness
 double gauges::getFuelAvg(double value)
 {
-    if(fuelSamples < 5000){
+    if(fuelSamples < 500){
         fuelSamples++;
+        if(fuelSamples == 500){
+            fuelLevelStart = fuelValueAvg;
+            if(fuelLevelStart > 0){
+                qDebug() << "*setting start fuel level: " << fuelValueAvg;
+                _fe->setTankLevelStart(fuelValueAvg);
+                storedSample = true;
+            } else {
+                storedSample = false;
+                fuelSamples = 1;
+            }
+        }
     }
 
     //qDebug() << "fuel avg: " << (fuelValueAvg + ((double)1/(double)fuelSamples)*(double)((double)value-(double)fuelValueAvg));
@@ -676,6 +698,10 @@ void gauges::updateFuelBar(double value)
             fuelImage->setProperty("visible", true);
         } else {
             fuelImage->setProperty("visible", false);
+        }
+
+        if(value > 0.99){
+            _fe->setOdometerTankStart(odoval);
         }
     QString filePath = "fuelBar";
     if(value < .05){
