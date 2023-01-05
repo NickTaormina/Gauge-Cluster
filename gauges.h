@@ -204,6 +204,7 @@ private:
     QObject * fuelBar;
     QObject * throttleBar;
     QObject * boostGauge;
+    QObject * mpgText;
 
     //timers
     QTimer* timer;

@@ -16,7 +16,7 @@ defWindow::defWindow(QObject *parent, Definition *d)
      //list of default params to monitor. rpm, speed, and odometer are required
      //TODO: move these to an initializastion function that can be used in clear
      //_selectedParams.append("AF Correction 1");
-     //_selectedParams.append("AF Learning 1");
+     _selectedParams.append("AF Learning 1");
      _selectedParams.append("AF Ratio");
      _selectedParams.append("Intake Manifold Temperature");
      //_selectedParams.append("Engine Speed");

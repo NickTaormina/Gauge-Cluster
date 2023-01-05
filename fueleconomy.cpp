@@ -3,7 +3,11 @@
 fueleconomy::fueleconomy(QObject *parent)
     : QObject{parent}
 {
-
+    mafCorr = -1;
+    AFR = -1;
+    speed = -1;
+    rpm = -1;
+    mpg = -1;
 }
 
 double fueleconomy::getFuelFlowRate() const
@@ -65,4 +69,60 @@ double fueleconomy::getOdometerTankStart() const
 void fueleconomy::setOdometerTankStart(double newOdometerTankStart)
 {
     odometerTankStart = newOdometerTankStart;
+}
+
+double fueleconomy::getMafCorr() const
+{
+    return mafCorr;
+}
+
+void fueleconomy::setMafCorr(double newMafCorr)
+{
+    mafCorr = newMafCorr;
+}
+
+double fueleconomy::getAFR() const
+{
+    return AFR;
+}
+
+void fueleconomy::setAFR(double newAFR)
+{
+    AFR = newAFR;
+}
+
+int fueleconomy::getSpeed() const
+{
+    return speed;
+}
+
+void fueleconomy::setSpeed(int newSpeed)
+{
+    speed = newSpeed;
+}
+
+uint fueleconomy::getRpm() const
+{
+    return rpm;
+}
+
+void fueleconomy::setRpm(uint newRpm)
+{
+    rpm = newRpm;
+}
+
+void fueleconomy::updateInstantMPG()
+{
+    //grams fuel/second
+    //ml fuel/s
+    //miles traveled per second
+    //ml per mile
+    //convert to gallons/mile
+    //gallons per mile to miles per gallon
+    if(speed == 0){
+        mpg = 0;
+    } else {
+        mpg = 1/(((mafCorr/AFR)/(E10_DENSITY))/(speed/3600.0)/GALLON_TO_ML);
+    }
+
 }

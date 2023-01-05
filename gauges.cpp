@@ -124,6 +124,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     coolantGauge = main->findChild<QObject*>("coolantBarImage", Qt::FindChildrenRecursively);
     throttleBar = main->findChild<QObject*>("throttleBar", Qt::FindChildrenRecursively);
     boostGauge = main->findChild<QObject*>("boostGauge", Qt::FindChildrenRecursively);
+    mpgText = main->findChild<QObject*>("mpgText", Qt::FindChildrenRecursively);
 
     //finds ui parameter objects (from logger)
     statusRect = main->findChild<QObject*>("statusRect", Qt::FindChildrenRecursively);
@@ -206,6 +207,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
         filter.append("Odometer");
         filter.append("Vehicle Speed");
         filter.append("Dynamic Advance Multiplier");
+        filter.append("Maf Corr Final");
 
         QMap<QString, QString> rename;
         rename.insert("AF Learning 1", "AF Learning");
@@ -237,6 +239,7 @@ void gauges::setRPMCAN(uint rpm)
             return;
         }*/
         _rpm = rpm;
+        _fe->setRpm(rpm);
         int diff = 0;
         double percent = (double)(rpm)/maxRPM;
         double pos;
@@ -281,6 +284,7 @@ void gauges::setRPMCAN(uint rpm)
 void gauges::setSpeedCAN(double spd)
 {
     _speed = spd;
+    _fe->setSpeed(_speed);
     if(sweepFinished == 1){
         if(speedTime->isActive()){
             speedTime->setInterval(5);
@@ -544,20 +548,15 @@ void gauges::sweepBack()
 void gauges::updateParamDisplay(QString name, double value)
 {
 
-    if(name == "Odometer"){
-          /* QString val = QString::number(value, 'f', 0);
-           if(val.length() < 6){
-               for(int x = val.length(); x<6; x++){
-                   val.prepend("0");
-               }
-           }
-           if(val != odotext->property("text").toString()){
-               emit odometerUpdated(val);
-               odotext->setProperty("text", QVariant(val));
-           }*/
-       } else {
-           _paramDisplay->updateValue(name, value);
-       }
+    if(name == "Maf Corr Final"){
+        _fe->setMafCorr(value);
+    } else if(name == "AF Ratio") {
+        _fe->setAFR(value);
+    }
+
+    mpgText->setProperty("text", QString::number(_fe->getMpg(), 'f', 1));
+    _paramDisplay->updateValue(name, value);
+
 
 
 }
