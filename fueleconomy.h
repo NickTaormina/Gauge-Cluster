@@ -56,7 +56,8 @@ public:
 
     void updateMPGNotMoving();
 
-    void getTripMPG(trip * tr);
+    void updateSessionMPG();
+    void updateTripMPG(trip * tr);
 
 public slots:
 

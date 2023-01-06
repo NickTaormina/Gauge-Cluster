@@ -127,7 +127,7 @@ void fueleconomy::setTankLevelStart(double newTankLevelStart)
 }
 double fueleconomy::getMPGAvg(double value)
 {
-    if(mpgSamples < 2){
+    if(mpgSamples < 5){
         mpgSamples++;
     }
     if(sessionSamples < 9007199254740993){
@@ -139,7 +139,7 @@ double fueleconomy::getMPGAvg(double value)
     }
     //value = (value + instantMPGFromCAN)/2;
     sessionAvg = (sessionAvg + ((double)1/(double)sessionSamples)*(double)((double)value-(double)sessionAvg));
-    qDebug() << "session avg: " << sessionAvg;
+    //qDebug() << "session avg: " << sessionAvg;
     mpgAvg = (mpgAvg + ((double)1/(double)mpgSamples)*(double)((double)value-(double)mpgAvg));
     return mpgAvg;
 }
@@ -159,9 +159,16 @@ void fueleconomy::updateMPGNotMoving()
     mpg = getMPGAvg(0);
 }
 
-void fueleconomy::getTripMPG(trip *tr)
+void fueleconomy::updateSessionMPG()
 {
-    qDebug() << tr->getTripSamples();
+
+}
+
+void fueleconomy::updateTripMPG(trip *tr)
+{
+    double tripAvg = tr->getTripMPG();
+    double samples = tr->getTripSamples();
+    tr->setTripMPG(tripAvg + ((double)1/(double)samples)*(double)((double)sessionAvg-(double)tripAvg));
 }
 
 double fueleconomy::getInstantMPGFromCAN() const
@@ -171,7 +178,7 @@ double fueleconomy::getInstantMPGFromCAN() const
 
 void fueleconomy::setInstantMPGFromCAN(double newInstantMPGFromCAN)
 {
-    qDebug() << newInstantMPGFromCAN;
+    //qDebug() << newInstantMPGFromCAN;
     instantMPGFromCAN = newInstantMPGFromCAN;
     updateInstantMPG();
 }

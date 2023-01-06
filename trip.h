@@ -16,13 +16,12 @@ public:
     QString getTripStart();
 
 
-
-    double getTripSamples() const;
-    void updateTripSamples();
-    void setTripSamples(double newTripSamples);
-
     double getTripMPG() const;
     void setTripMPG(double newTripMPG);
+
+    double getTripSamples();
+
+
 
 signals:
 
@@ -31,7 +30,6 @@ private:
     double tripDistance;
 
     double tripStart;
-    double tripSamples;
     double tripMPG;
 
 

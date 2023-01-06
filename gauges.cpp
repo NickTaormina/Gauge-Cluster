@@ -22,6 +22,8 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     speedTime = new QTimer(this);
     sweepTimer = new QTimer(this);
     shiftTimer = new QTimer(this);
+    mpgTimer = new QTimer(this);
+    mpgTimer->setInterval(30000);
     shiftLightTimer.setSingleShot(false);
     shiftTimer->setSingleShot(true);
     clockTimer.setInterval(1000);
@@ -127,6 +129,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     throttleBar = main->findChild<QObject*>("throttleBar", Qt::FindChildrenRecursively);
     boostGauge = main->findChild<QObject*>("boostGauge", Qt::FindChildrenRecursively);
     mpgText = main->findChild<QObject*>("mpgText", Qt::FindChildrenRecursively);
+    sessionText = main->findChild<QObject*>("sessionText", Qt::FindChildrenRecursively);
 
     //finds ui parameter objects (from logger)
     statusRect = main->findChild<QObject*>("statusRect", Qt::FindChildrenRecursively);
@@ -450,6 +453,7 @@ void gauges::getKnockIndexes()
     }
 }
 
+//gets/updates mileage of active trip
 QString gauges::getActiveTripNum(){
     if(activeTrip == "tripA"){
        return trA.getTrip(odoval);
@@ -458,6 +462,8 @@ QString gauges::getActiveTripNum(){
     }
 
 }
+
+
 
 
 //updates the trip value in cluster
@@ -597,9 +603,16 @@ void gauges::updateCANParam(QString name, double value)
         }
     } else if(name == "Odometer"){
         odoval = value;
+
         if(odoval > lastOdoval){
             lastOdoval = odoval;
-            _fe->getSessionAvg();
+            if(activeTrip == "tripA"){
+                _fe->updateTripMPG(&trA);
+                qDebug() << "A mpg: " << trA.getTripMPG();
+            } else {
+                _fe->updateTripMPG(&trB);
+                qDebug() << "B mpg: " << trB.getTripMPG();
+            }
         }
         updateTrip();
 
@@ -617,7 +630,7 @@ void gauges::updateCANParam(QString name, double value)
             }
             odotext->setProperty("text", QVariant(val));
         }
-    } else if (name == "Fuel Consumption"){
+    } else if (name == "Fuel Consumption" && _rpm > 0){
         if(_speed > 0 && value > 0){
             _fe->setInstantMPGFromCAN(_speed/value);
         } else if (_speed > 0){
@@ -632,6 +645,7 @@ void gauges::updateCANParam(QString name, double value)
         } else {
             mpgText->setProperty("text", "0.0");
         }
+        sessionText->setProperty("text", QString::number(_fe->getSessionAvg(), 'f', 1));
     }
 }
 

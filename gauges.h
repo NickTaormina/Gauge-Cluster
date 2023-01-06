@@ -206,6 +206,7 @@ private:
     QObject * throttleBar;
     QObject * boostGauge;
     QObject * mpgText;
+    QObject * sessionText;
 
     //timers
     QTimer* timer;
@@ -216,6 +217,7 @@ private:
     QTimer shiftLightTimer;
     QTimer clockTimer;
     QTimer * shiftTimer;
+    QTimer * mpgTimer;
     QElapsedTimer elapsedTimer;
     qint64 elapsed;
 

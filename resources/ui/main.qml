@@ -599,7 +599,22 @@ Window{
             objectName: "mpgText"
             anchors.horizontalCenter: statusRect.horizontalCenter
             anchors.verticalCenter: statusRect.bottom
-            anchors.verticalCenterOffset: 0
+            anchors.verticalCenterOffset: -10
+            width: 200
+            height: 50
+            color: "#c5c5c5"
+            text: qsTr("0.0")
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            font.family: "Michroma"
+            font.pointSize: 12
+        }
+        Label {
+            id: sessionText
+            objectName: "sessionText"
+            anchors.horizontalCenter: statusRect.horizontalCenter
+            anchors.verticalCenter: statusRect.bottom
+            anchors.verticalCenterOffset: 10
             width: 200
             height: 50
             color: "#c5c5c5"

@@ -46,22 +46,6 @@ QString trip::getTripStart()
     return val;
 }
 
-double trip::getTripSamples() const
-{
-    qDebug() << "trip samples: " << (tripDistance*10);
-    return (tripDistance*10);
-}
-
-void trip::updateTripSamples()
-{
-    tripSamples++;
-}
-
-void trip::setTripSamples(double newTripSamples)
-{
-    tripSamples = newTripSamples;
-}
-
 double trip::getTripMPG() const
 {
     return tripMPG;
@@ -70,6 +54,11 @@ double trip::getTripMPG() const
 void trip::setTripMPG(double newTripMPG)
 {
     tripMPG = newTripMPG;
+}
+
+double trip::getTripSamples()
+{
+    return tripDistance * 10;
 }
 
 
