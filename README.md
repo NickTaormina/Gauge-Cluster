@@ -1,5 +1,5 @@
 # Gauge-Cluster
-A QT-based gauge cluster for 15+ WRXs with a Cobb tuned ECU.
+A QT-based gauge cluster for 15+ WRXs with a Cobb tuned ECU. Allows for logging of Accessport and SSM parameters.
 
 Only tested on a 2018 usdm using cobb v361-based map.
 
@@ -15,13 +15,13 @@ ers. I got a vdisplay version from amazon that came with a controller board.
 
 ------Planned features------
 
--linux compatitbility
+(done)linux compatitbility
 
--logging
+(done)logging
 
--real time fuel economy
+(done)real time fuel economy
 
--shift light
+(done)shift light
 
 -multiple gauge layouts
 
@@ -29,7 +29,7 @@ ers. I got a vdisplay version from amazon that came with a controller board.
 
 -music 
 
--dtc 
+(partial)dtc 
 
 -on the fly map switching with connection to tgv
 
