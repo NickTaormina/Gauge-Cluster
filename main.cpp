@@ -160,6 +160,7 @@ int main(int argc, char *argv[])
 
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
 
+
     defWin.fillDefs();
     qDebug() << "*reponse length: " << def.getRxMessageLength();
     rootContext->setContextProperty("gauge", gauge); //sets access to gauge class in qml
@@ -184,6 +185,7 @@ int main(int argc, char *argv[])
     QObject::connect(&_canData, &canData::valueChanged, gauge, &gauges::updateCANParam);
     QObject::connect(&shand, &serialHandler::serialFrameReceived, &can, &canbus::receiveSerialFrame);
     QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
+    QObject::connect(&defWin, &defWindow::paramsChanged, gauge, &gauges::redrawParamDisplay);
     //log->startLogging();
 
     //qDebug() << "main call: " << _ecuComm.getFuelLevel();

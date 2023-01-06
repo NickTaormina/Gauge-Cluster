@@ -14,6 +14,8 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     _data = data;
     handbrake = false;
     _fe = fe;
+    _defWin = defwin;
+    _main = main;
 
 
     //timers
@@ -206,28 +208,27 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
 
 
 
-    QStringList paramList = defwin->selectedParams();
+    QStringList paramList = _defWin->selectedParams();
 
-        paramList.append("Oil Temp");
+    paramList.append("Oil Temp");
 
 
-        QStringList filter;
-        filter.append("Odometer");
-        filter.append("Vehicle Speed");
-        filter.append("Dynamic Advance Multiplier");
-        filter.append("Maf Corr Final");
 
-        QMap<QString, QString> rename;
-        rename.insert("AF Learning 1", "AF Learning");
-        rename.insert("Intake Manifold Temperature", "Intake Temp");
-        rename.insert("Dynamic Advance Multiplier", "DAM");
-        rename.insert("Feedback Knock Correction", "FBK");
-        rename.insert("Fine Knock Learn", "FKL");
-    _paramDisplay = new paramDisplay(statusRect, qmlEngine(main), paramList);
-        _paramDisplay->setFilterList(filter, 0);
-        _paramDisplay->initDisplay();
-        _paramDisplay->setParamRename(rename);
+    QStringList filter;
+    filter.append("Odometer");
+    filter.append("Vehicle Speed");
+    filter.append("Dynamic Advance Multiplier");
+    filter.append("Maf Corr Final");
 
+    QMap<QString, QString> rename;
+    rename.insert("AF Learning 1", "AF Learning");
+    rename.insert("Intake Manifold Temperature", "Intake Temp");
+    rename.insert("Dynamic Advance Multiplier", "DAM");
+    rename.insert("Feedback Knock Correction", "FBK");
+    rename.insert("Fine Knock Learn", "FKL");
+    _paramDisplay = new paramDisplay(statusRect, qmlEngine(_main), paramList);
+    _paramDisplay->setFilterList(filter, 1);
+    _paramDisplay->setParamRename(rename);
 
 
 
@@ -935,6 +936,28 @@ void gauges::showDoor(QString status)
     } else {
         doorImage->setProperty("visible", false);
     }
+}
+
+void gauges::redrawParamDisplay()
+{
+
+    QStringList params = _defWin->selectedParams();
+    params.append("Oil Temp");
+    QStringList filter;
+    filter.append("Odometer");
+    filter.append("Vehicle Speed");
+    filter.append("Dynamic Advance Multiplier");
+    filter.append("Maf Corr Final");
+
+    QMap<QString, QString> rename;
+    rename.insert("AF Learning 1", "AF Learning");
+    rename.insert("Intake Manifold Temperature", "Intake Temp");
+    rename.insert("Dynamic Advance Multiplier", "DAM");
+    rename.insert("Feedback Knock Correction", "FBK");
+    rename.insert("Fine Knock Learn", "FKL");
+    _paramDisplay->setFilterList(filter, 0);
+    _paramDisplay->setParamList(params, 1);
+    _paramDisplay->setParamRename(rename);
 }
 
 

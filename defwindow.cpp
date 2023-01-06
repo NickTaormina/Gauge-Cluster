@@ -55,6 +55,7 @@ void defWindow::parseDefs()
 void defWindow::fillDefs(){
     handle.fillDefs(_selectedParams, def);
     emit defsFilled();
+    emit paramsChanged();
 
 }
 

@@ -160,6 +160,7 @@ Item {
 
         Rectangle {
             id: bottomMinMaxSep
+            objectName: "bottomSep"
             x: -21
             y: 128
             visible: bottomMin.visible

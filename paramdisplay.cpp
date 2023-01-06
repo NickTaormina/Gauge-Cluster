@@ -104,7 +104,9 @@ QStringList paramDisplay::getParamList()
 //sets the list of monitored params
 void paramDisplay::setParamList(QStringList l, int reinit)
 {
+    qDebug() << "param list: " << l;
     if(l != paramList){
+        qDebug() << "param list reset";
         paramList = l;
         if(reinit == 1){
             reInitialize();
@@ -146,6 +148,7 @@ void paramDisplay::initDisplay()
     clearLists();
     filterParamList();
     calcNumObjects();
+    qDebug() << "num objects: " << numObjects;
     int width = totalWidth/numObjects;
     if(width > maxWidth){
         width = maxWidth;
@@ -190,8 +193,7 @@ void paramDisplay::initDisplay()
     if(fontSize < 8) {
         fontSize = 8;
     }
-    qDebug() << "fontSize: " << fontSize;
-    qDebug() << "fontSize2: " << fontSize*1.7;
+
     QFont labelFont = paramLabels.at(0)->property("font").value<QFont>();
     labelFont.setPointSize(fontSize);
     QFont valueFont = paramValues.at(0)->property("font").value<QFont>();
@@ -216,11 +218,12 @@ void paramDisplay::initDisplay()
             return;
         }
     }
-
     int count = paramList.count();
     if(count % 2 != 0){
         QObject * horizBar = paramBaseObjects.at(numObjects-1)->findChild<QObject*>("horizRect", Qt::FindChildrenRecursively);
         horizBar->setProperty("visible", false);
+        QObject * minBar = paramBaseObjects.at(numObjects - 1)->findChild<QObject*>("bottomSep", Qt::FindChildrenRecursively);
+        minBar->setProperty("visible", false);
         QObject * rect = paramBaseObjects.at(numObjects-1)->findChild<QObject*>("textRectTop", Qt::FindChildrenRecursively);
 
         qvariant_cast<QObject*>(
@@ -242,6 +245,7 @@ void paramDisplay::filterParamList()
     for(int i = 0; i<filterList.count(); i++){
         if(paramList.contains(filterList.at(i))){
             paramList.removeOne(filterList.at(i));
+            qDebug() << "removing: " << filterList.at(i);
         }
     }
 }
@@ -249,19 +253,7 @@ void paramDisplay::filterParamList()
 void paramDisplay::reInitialize()
 {
     filterParamList();
-    if(paramList.count() == paramLabels.count()){
-        qDebug() << "similar list";
-        int count = paramList.count();
-        for(int i = 0; i<count; i++){
-            paramLabels.at(i)->setProperty("text", paramList.at(i));
-        }
-        if(count % 2 != 0){
-            paramLabels.at(count)->setProperty("text", "");
-            paramValues.at(count)->setProperty("text", "");
-        }
-    } else {
-        initDisplay();
-    }
+    initDisplay();
 
 }
 
@@ -285,6 +277,12 @@ void paramDisplay::clearLists()
     paramBaseObjects.clear();
     paramLabels.clear();
     paramValues.clear();
+    minLabels.clear();
+    maxLabels.clear();
+    minValues.clear();
+    maxValues.clear();
+    filterList.clear();
+    renameList.clear();
 }
 
 void paramDisplay::swapTest()

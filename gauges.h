@@ -63,7 +63,7 @@ public slots:
     void showOil(QString status);
     void showDoor(QString status);
 
-
+    void redrawParamDisplay();
 
     void flashShiftLight(uint rpm);
     void showShiftLight();
@@ -90,6 +90,7 @@ public slots:
     void fadeInGauges();
 private:
 
+    QObject * _main;
     //gauges constants
     int minRPM;
     int maxRPM;
@@ -257,6 +258,7 @@ private:
     weather _weather;
     paramDisplay* _paramDisplay;
     fueleconomy * _fe;
+    defWindow * _defWin;
 
     //fuel variables
     int fuelResMin;
