@@ -130,6 +130,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     boostGauge = main->findChild<QObject*>("boostGauge", Qt::FindChildrenRecursively);
     mpgText = main->findChild<QObject*>("mpgText", Qt::FindChildrenRecursively);
     sessionText = main->findChild<QObject*>("sessionText", Qt::FindChildrenRecursively);
+    mpgBar = main->findChild<QObject*>("mpgBar", Qt::FindChildrenRecursively);
 
     //finds ui parameter objects (from logger)
     statusRect = main->findChild<QObject*>("statusRect", Qt::FindChildrenRecursively);
@@ -642,8 +643,10 @@ void gauges::updateCANParam(QString name, double value)
         }
         if(_fe->getMpg() > 0){
             mpgText->setProperty("text", QString::number(_fe->getMpg(), 'f', 1));
+            mpgBar->setProperty("value", QVariant((_fe->getMpg()/76)));
         } else {
             mpgText->setProperty("text", "0.0");
+            mpgBar->setProperty("value", QVariant((0)));
         }
         sessionText->setProperty("text", QString::number(_fe->getSessionAvg(), 'f', 1));
     }

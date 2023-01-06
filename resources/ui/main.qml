@@ -593,6 +593,50 @@ Window{
 
 
         }
+        Slider {
+            id: mpgSlider
+            objectName: "mpgBar"
+            anchors.horizontalCenter: statusRect.horizontalCenter
+            anchors.verticalCenter: statusRect.bottom
+            anchors.verticalCenterOffset: -20
+            width: 250
+            height: 20
+            rotation: 0
+            wheelEnabled: false
+            focusPolicy: Qt.NoFocus
+            hoverEnabled: false
+            enabled: false
+            orientation: Qt.Horizontal
+            value: 0
+            to: 1
+            from: 0
+
+            background: Rectangle{
+                anchors.verticalCenter: parent.verticalCenter
+
+                y: parent.topPadding + parent.availableHeight/2 - height/2
+                implicitWidth: parent.width
+                implicitHeight: parent.height
+                width: parent.availableWidth
+                height: implicitHeight
+                color: "#00111111"
+                border.width: 2
+                border.color: "#333333"
+                radius: 2
+            }
+
+            Rectangle {
+                y: 1
+                height: parent.height - 2*1
+                width: parent.visualPosition*parent.width
+                color: "#445544"
+                radius: 2
+            }
+            handle: Rectangle {
+                implicitWidth: 0
+                implicitHeight: 0
+            }
+        }
 
         Label {
             id: mpgText

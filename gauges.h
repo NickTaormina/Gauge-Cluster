@@ -207,6 +207,8 @@ private:
     QObject * boostGauge;
     QObject * mpgText;
     QObject * sessionText;
+    QObject * mpgBar;
+
 
     //timers
     QTimer* timer;
