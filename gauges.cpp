@@ -131,6 +131,7 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     mpgText = main->findChild<QObject*>("mpgText", Qt::FindChildrenRecursively);
     sessionText = main->findChild<QObject*>("sessionText", Qt::FindChildrenRecursively);
     mpgBar = main->findChild<QObject*>("mpgBar", Qt::FindChildrenRecursively);
+    sessionMPGGauge = main->findChild<QObject*>("sessionMPGGauge", Qt::FindChildrenRecursively);
 
     //finds ui parameter objects (from logger)
     statusRect = main->findChild<QObject*>("statusRect", Qt::FindChildrenRecursively);
@@ -634,6 +635,7 @@ void gauges::updateCANParam(QString name, double value)
     } else if (name == "Fuel Consumption" && _rpm > 0){
         if(_speed > 0 && value > 0){
             _fe->setInstantMPGFromCAN(_speed/value);
+
         } else if (_speed > 0){
             _fe->setInstantMPGFromCAN(99);
         } else {
@@ -641,6 +643,7 @@ void gauges::updateCANParam(QString name, double value)
             _fe->updateMPGNotMoving();
 
         }
+        //qDebug() << _fe->getInstantMPGFromCAN();
         if(_fe->getMpg() > 0){
             mpgText->setProperty("text", QString::number(_fe->getMpg(), 'f', 1));
             mpgBar->setProperty("value", QVariant((_fe->getMpg()/76)));
@@ -648,7 +651,8 @@ void gauges::updateCANParam(QString name, double value)
             mpgText->setProperty("text", "0.0");
             mpgBar->setProperty("value", QVariant((0)));
         }
-        sessionText->setProperty("text", QString::number(_fe->getSessionAvg(), 'f', 1));
+        sessionMPGGauge->setProperty("value", QVariant(_fe->getSessionAvg()));
+        sessionMPGGauge->setProperty("text", QString::number(_fe->getSessionAvg(), 'f', 1));
     }
 }
 
@@ -1006,6 +1010,7 @@ void gauges::fadeInGauges()
 void gauges::sweepDone(){
     sweepFinished = 1;
     boostGauge->setProperty("visible", true);
+    sessionMPGGauge->setProperty("visible", true);
 }
 //updates the cluster clock
 void gauges::updateClock()

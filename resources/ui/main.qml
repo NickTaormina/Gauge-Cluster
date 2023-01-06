@@ -273,6 +273,23 @@ Window{
             roundCap: false
             enableDropShadow: true
         }
+        CircularProgressBar{
+            id: sessionMPGGauge
+            objectName: "sessionMPGGauge"
+            visible: false
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 175
+            anchors.horizontalCenterOffset: -440
+            anchors.horizontalCenter: parent.horizontalCenter
+            progressWidth: 4
+            strokeBgWidth: 2
+            progressColor: "#445544"
+            width: 75
+            height: 75
+            maxValue:50
+            roundCap: false
+            enableDropShadow: true
+        }
         Rectangle {
             id: speedoHandler
             objectName: "speedoHandler"
@@ -598,7 +615,7 @@ Window{
             objectName: "mpgBar"
             anchors.horizontalCenter: statusRect.horizontalCenter
             anchors.verticalCenter: statusRect.bottom
-            anchors.verticalCenterOffset: -20
+            anchors.verticalCenterOffset: -15
             width: 250
             height: 20
             rotation: 0
@@ -641,6 +658,7 @@ Window{
         Label {
             id: mpgText
             objectName: "mpgText"
+            visible: false
             anchors.horizontalCenter: statusRect.horizontalCenter
             anchors.verticalCenter: statusRect.bottom
             anchors.verticalCenterOffset: -10
@@ -656,6 +674,7 @@ Window{
         Label {
             id: sessionText
             objectName: "sessionText"
+            visible: false
             anchors.horizontalCenter: statusRect.horizontalCenter
             anchors.verticalCenter: statusRect.bottom
             anchors.verticalCenterOffset: 10

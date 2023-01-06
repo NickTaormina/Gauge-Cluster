@@ -208,6 +208,7 @@ private:
     QObject * mpgText;
     QObject * sessionText;
     QObject * mpgBar;
+    QObject * sessionMPGGauge;
 
 
     //timers

@@ -133,8 +133,7 @@ double fueleconomy::getMPGAvg(double value)
     if(sessionSamples < 9007199254740993){
         sessionSamples++;
     }
-    //qDebug() << "value: " << value << " : " << instantMPGFromCAN;
-    if(value < 0){
+    if(mafCorr <= 0){
         value = instantMPGFromCAN;
     }
     //value = (value + instantMPGFromCAN)/2;
