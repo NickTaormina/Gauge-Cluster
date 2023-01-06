@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "QDebug"
+#include "trip.h"
 
 class fueleconomy : public QObject
 {
@@ -50,6 +51,13 @@ public:
     double getInstantMPGFromCAN() const;
     void setInstantMPGFromCAN(double newInstantMPGFromCAN);
 
+    double getSessionAvg() const;
+    void setSessionAvg(double newSessionAvg);
+
+    void updateMPGNotMoving();
+
+    void getTripMPG(trip * tr);
+
 public slots:
 
 signals:
@@ -76,6 +84,13 @@ private:
     double mpgAvg;
     double getMPGAvg(double value);
     double instantMPGFromCAN;
+
+    //session vars
+    double sessionSamples;
+    double sessionAvg;
+
+
+
 
 
 };

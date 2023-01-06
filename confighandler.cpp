@@ -199,7 +199,9 @@ void configHandler::fillTrip(trip *tr, QString tripName)
                 if(trElement.tagName() == tripName){
                     tr->resetTrip(trElement.text().toDouble(nullptr));
                     qDebug() << "*trip " << trElement.tagName()<< " : " << trElement.text().toDouble(nullptr);
-                    break;
+                } else if (trElement.tagName() == tripName + "MPG"){
+                    tr->setTripMPG(trElement.text().toDouble());
+                    qDebug() << trElement.tagName() << ": " << tr->getTripMPG();
                 }
                 trElement = trElement.nextSibling().toElement();
             }
@@ -256,6 +258,35 @@ void configHandler::storeTrip(QString trip, QString val)
     configXml.save(stream, 4);
     f.close();
 
+}
+
+void configHandler::storeTripMPG(QString trip, double mpg)
+{
+    QFile f(configPath);
+    f.open(QIODevice::ReadWrite);
+    QDomElement xt = configXml.firstChild().firstChild().toElement();
+    QDomElement tr;
+    while(!xt.isNull()){
+        if(xt.tagName() == "trip"){
+            tr = xt.firstChild().toElement();
+            while(!tr.isNull()){
+                if(tr.tagName() == trip + "MPG"){
+                    QDomElement newNode = configXml.createElement(trip + "MPG");
+                    QDomText newText = configXml.createTextNode(QString::number(mpg));
+                    newNode.appendChild(newText);
+                    xt.replaceChild(newNode, tr);
+                } else {
+                    tr = tr.nextSibling().toElement();
+                }
+            }
+        }
+        xt = xt.nextSibling().toElement();
+    }
+    f.resize(0);
+    QTextStream stream;
+    stream.setDevice(&f);
+    configXml.save(stream, 4);
+    f.close();
 }
 
 

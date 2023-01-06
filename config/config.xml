@@ -14,7 +14,9 @@
     </logger>
     <trip>
         <tripA>079501.1</tripA>
+        <tripAMPG>26.5</tripAMPG>
         <tripB>079505.4</tripB>
+        <tripBMPG>28.3</tripBMPG>
         <fuelStart>081717</fuelStart>
     </trip>
     <gauges>

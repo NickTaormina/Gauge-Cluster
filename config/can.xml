@@ -47,6 +47,39 @@
                 <conv>1</conv>
                 <offset>-50</offset>
         </param>
+        <param name="Traction Control">
+                <id>211</id>
+                <byte length = "1">0</byte>
+                <bits>
+                        <bit>3</bit>
+                </bits>
+                <targets>
+                        <target name="trackMode">1</target>
+                        <target name="trackModeOff">0</target>
+                </targets>
+        </param>
+        <param name="Traction Control">
+                <id>211</id>
+                <byte length = "1">3</byte>
+                <bits>
+                        <bit>0</bit>
+                </bits>
+                <targets>
+                        <target name="TCOn">1</target>
+                        <target name="TCOff">0</target>
+                </targets>
+        </param>
+        <param name="Airbag">
+                <id>882</id>
+                <byte length = "1">2</byte>
+                <bits>
+                        <bit>0</bit>
+                </bits>
+                <targets>
+                        <target name="Warning">1</target>
+                        <target name="Off">0</target>
+                </targets>
+        </param>
         <param name="Cruise">
                 <id>864</id>
                 <byte length = "1">5</byte>

@@ -19,7 +19,7 @@ logger::logger(QObject *parent, canbus *bus, parameter* par, Definition* def) : 
     qDebug() << "*logger object initialized";
     logging = 0;
     processing = 0;
-    loggerTimer->setInterval(100);
+    loggerTimer->setInterval(25);
     loggerTimer->setSingleShot(false);
     connect(loggerTimer, &QTimer::timeout, this, &logger::sendLogMessage);
     etimer.start();

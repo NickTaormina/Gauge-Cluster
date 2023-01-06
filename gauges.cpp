@@ -157,7 +157,6 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
     QObject::connect(_data, &canData::neutralSwitch, this, &gauges::updateNeutral);
     QObject::connect(_data, &canData::clutchSwitch, this, &gauges::updateClutch);
     QObject::connect(_data, &canData::handbrake, this, &gauges::updateHandbrake);
-    QObject::connect(_data, &canData::fuelChanged, this, &gauges::setFuelCAN);
     QObject::connect(_data, &canData::cruiseStatusChanged, this, &gauges::updateCruiseStatus);
     QObject::connect(_data, &canData::gearChanged, this, &gauges::updateGearFromCAN);
     QObject::connect(_data, &canData::checkEngineLight, this, &gauges::showCEL);
@@ -171,8 +170,9 @@ gauges::gauges(QObject *parent, QObject * main, gear* gear, config* cfg, configH
 
 
     //fill trip & odo info and update display
-    updateCANParam("Odometer", odoval);
     sessionStart = odoval;
+    lastOdoval = odoval;
+    updateCANParam("Odometer", odoval);
     handler->fillTrip(&trA, "tripA");
     handler->fillTrip(&trB, "tripB");
     qDebug() << "*trip A start: " << trA.getTripStart();
@@ -415,6 +415,7 @@ void gauges::toggleThrottleBar()
 
 void gauges::setFuelCAN(float fuel)
 {
+    //qDebug() << "resistance: " << fuel;
     double value;
     int diff = fuelResMin-fuelResMax;
     value = (double)(fuel-fuelResMax)/(double)diff;
@@ -596,7 +597,12 @@ void gauges::updateCANParam(QString name, double value)
         }
     } else if(name == "Odometer"){
         odoval = value;
+        if(odoval > lastOdoval){
+            lastOdoval = odoval;
+            _fe->getSessionAvg();
+        }
         updateTrip();
+
         QString val = QString::number(qFloor(value), 'f', 0);
         if(val.length() < 6){
             for(int x = val.length(); x<6; x++){
@@ -614,10 +620,18 @@ void gauges::updateCANParam(QString name, double value)
     } else if (name == "Fuel Consumption"){
         if(_speed > 0 && value > 0){
             _fe->setInstantMPGFromCAN(_speed/value);
+        } else if (_speed > 0){
+            _fe->setInstantMPGFromCAN(99);
         } else {
             _fe->setInstantMPGFromCAN(0);
+            _fe->updateMPGNotMoving();
+
         }
-        mpgText->setProperty("text", QString::number(_fe->getMpg(), 'f', 1));
+        if(_fe->getMpg() > 0){
+            mpgText->setProperty("text", QString::number(_fe->getMpg(), 'f', 1));
+        } else {
+            mpgText->setProperty("text", "0.0");
+        }
     }
 }
 

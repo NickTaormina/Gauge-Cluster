@@ -36,6 +36,7 @@ public slots:
     void fillTrip(trip* tr, QString tripName);
     void fillEconomy(fueleconomy * fe);
     void storeTrip(QString trip, QString val);
+    void storeTripMPG(QString trip, double mpg);
     void parseConfig();
     void fillCan(canDef * d);
     void swapTrip(QString trip);

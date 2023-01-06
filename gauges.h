@@ -221,6 +221,7 @@ private:
 
     int rpmval;
     double odoval;
+    double lastOdoval;
     int speedval;
     void changeValues();
     void updateSpeedText();

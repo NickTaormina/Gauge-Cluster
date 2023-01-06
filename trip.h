@@ -11,17 +11,28 @@ class trip : public QObject
 public:
     explicit trip(QObject *parent = nullptr);
     void resetTrip(double m);
+    double getTrip();
     QString getTrip(double odo);
     QString getTripStart();
 
 
 
+    double getTripSamples() const;
+    void updateTripSamples();
+    void setTripSamples(double newTripSamples);
+
+    double getTripMPG() const;
+    void setTripMPG(double newTripMPG);
+
 signals:
 
 public slots:
 private:
+    double tripDistance;
 
     double tripStart;
+    double tripSamples;
+    double tripMPG;
 
 
 
