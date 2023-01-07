@@ -261,7 +261,8 @@ Window{
         CircularProgressBar{
             id: boostGauge
             objectName: "boostGauge"
-            visible: false
+            visible: true
+            opacity:0
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 175
             anchors.horizontalCenterOffset: -520
@@ -276,7 +277,8 @@ Window{
         CircularProgressBar{
             id: sessionMPGGauge
             objectName: "sessionMPGGauge"
-            visible: false
+            visible: true
+            opacity: 0
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 175
             anchors.horizontalCenterOffset: -440
@@ -619,6 +621,7 @@ Window{
             width: 250
             height: 20
             rotation: 0
+            opacity: 0
             wheelEnabled: false
             focusPolicy: Qt.NoFocus
             hoverEnabled: false

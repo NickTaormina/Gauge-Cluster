@@ -1010,6 +1010,13 @@ void gauges::fadeInGauges()
         speedAnim->setEndValue(1.0);
         speedAnim->start();
     }
+    if(mpgBar){
+        QPropertyAnimation *speedAnim = new QPropertyAnimation(mpgBar, "opacity");
+        speedAnim->setDuration(500);
+        speedAnim->setStartValue(0);
+        speedAnim->setEndValue(1.0);
+        speedAnim->start();
+    }
 
     if(temperatureText){
         QPropertyAnimation *speedAnim = new QPropertyAnimation(temperatureText, "opacity");
@@ -1026,14 +1033,26 @@ void gauges::fadeInGauges()
         speedAnim->setEndValue(1.0);
         speedAnim->start();
     }
+    if(boostGauge){
+        QPropertyAnimation *speedAnim = new QPropertyAnimation(boostGauge, "opacity");
+        speedAnim->setDuration(500);
+        speedAnim->setStartValue(0);
+        speedAnim->setEndValue(1.0);
+        speedAnim->start();
+    }
+    if(sessionMPGGauge){
+        QPropertyAnimation *speedAnim = new QPropertyAnimation(sessionMPGGauge, "opacity");
+        speedAnim->setDuration(500);
+        speedAnim->setStartValue(0);
+        speedAnim->setEndValue(1.0);
+        speedAnim->start();
+    }
 
 }
 
 //calls functions after gauge sweep (broken)
 void gauges::sweepDone(){
     sweepFinished = 1;
-    boostGauge->setProperty("visible", true);
-    sessionMPGGauge->setProperty("visible", true);
 }
 //updates the cluster clock
 void gauges::updateClock()
