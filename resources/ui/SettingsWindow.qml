@@ -272,7 +272,7 @@ Rectangle {
     Button {
         id: openTestFileBtn
         x: 341
-        y: 187
+        y: 230
         width: 102
         height: 27
         text: qsTr("Open Log")
@@ -292,6 +292,7 @@ Rectangle {
             onAccepted: {
                 console.log("Selected file: " + fileDialog.fileUrl)
                 tester.testFileSelected(fileDialog.fileUrl)
+                settingsMainItem.destroy()
                 // Pass the file URL to your Qt program here
             }
             onRejected: console.log("File selection cancelled")

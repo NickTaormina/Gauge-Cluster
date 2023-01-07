@@ -161,7 +161,7 @@ void canbus::sendQueuedMessage()
 //sends messages based on frame content
 void canbus::receiveSerialFrame(QCanBusFrame frame)
 {
-    qInfo() << frame.toString();
+    //qInfo() << frame.toString();
     if(frame.frameId() == 321){
         //qDebug() << "frame: " << frame.toString();
     }

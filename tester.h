@@ -19,8 +19,10 @@ signals:
 public slots:
     void testFileSelected(QString url);
     void processFile(QString url);
+    QCanBusFrame extractFrame(const QByteArray &data);
 signals:
 private:
+    QThread * thread;
 };
 
 #endif // TESTER_H
