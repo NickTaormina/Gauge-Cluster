@@ -638,7 +638,7 @@ void gauges::updateCANParam(QString name, double value)
             _fe->setInstantMPGFromCAN(_speed/value);
 
         } else if (_speed > 0){
-            _fe->setInstantMPGFromCAN(99);
+            _fe->setInstantMPGFromCAN(45);
         } else {
             _fe->setInstantMPGFromCAN(0);
             _fe->updateMPGNotMoving();

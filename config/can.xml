@@ -80,6 +80,17 @@
                         <target name="Off">0</target>
                 </targets>
         </param>
+        <param name="Hill Assist">
+                <id>211</id>
+                <byte length = "1">1</byte>
+                <bits>
+                        <bit>7</bit>
+                </bits>
+                <targets>
+                        <target name="Warning">1</target>
+                        <target name="Off">0</target>
+                </targets>
+        </param>
         <param name="Cruise">
                 <id>864</id>
                 <byte length = "1">5</byte>

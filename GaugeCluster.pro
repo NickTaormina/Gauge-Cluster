@@ -23,6 +23,7 @@ SOURCES += main.cpp \
     parameter.cpp \
     paramdisplay.cpp \
     serialhandler.cpp \
+    tester.cpp \
     trip.cpp \
     weather.cpp
 
@@ -57,6 +58,7 @@ HEADERS += \
     parameter.h \
     paramdisplay.h \
     serialhandler.h \
+    tester.h \
     trip.h \
     weather.h
 

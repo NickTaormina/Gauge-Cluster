@@ -1,5 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Window 2.15
+import QtQuick.Dialogs 1.3
 
 Rectangle {
     id:settingsMainItem
@@ -267,6 +269,34 @@ Rectangle {
             gauge.toggleThrottleBar();
         }
     }
+    Button {
+        id: openTestFileBtn
+        x: 341
+        y: 187
+        width: 102
+        height: 27
+        text: qsTr("Open Log")
+        objectName: "openLogBtn"
+        background: Rectangle {
+            color: "#dbdbdb"
+            radius: 4
+        }
+        onClicked:{
+            fileDialog.open();
+        }
+    }
+
+    FileDialog {
+            id: fileDialog
+            title: "Select a file"
+            onAccepted: {
+                console.log("Selected file: " + fileDialog.fileUrl)
+                tester.testFileSelected(fileDialog.fileUrl)
+                // Pass the file URL to your Qt program here
+            }
+            onRejected: console.log("File selection cancelled")
+    }
+
 
 
 }

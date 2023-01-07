@@ -130,11 +130,13 @@ double fueleconomy::getMPGAvg(double value)
     if(mpgSamples < 5){
         mpgSamples++;
     }
-    if(sessionSamples < 9007199254740993){
+    if(sessionSamples < 9007199254740992){
         sessionSamples++;
     }
     if(mafCorr <= 0){
         value = instantMPGFromCAN;
+    } else if (value > 50){
+        value = 50;
     }
     //value = (value + instantMPGFromCAN)/2;
     sessionAvg = (sessionAvg + ((double)1/(double)sessionSamples)*(double)((double)value-(double)sessionAvg));
@@ -168,6 +170,7 @@ void fueleconomy::updateTripMPG(trip *tr)
     double tripAvg = tr->getTripMPG();
     double samples = tr->getTripSamples();
     tr->setTripMPG(tripAvg + ((double)1/(double)samples)*(double)((double)sessionAvg-(double)tripAvg));
+    qDebug() << "trip mpg:" << tr->getTripMPG();
 }
 
 double fueleconomy::getInstantMPGFromCAN() const

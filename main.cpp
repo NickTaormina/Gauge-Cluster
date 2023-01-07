@@ -16,6 +16,7 @@
 #include "ecucomm.h"
 #include "fueleconomy.h"
 #include <QtGlobal>
+#include "tester.h"
 
 QString logPath;
 QString framePath;
@@ -120,6 +121,7 @@ int main(int argc, char *argv[])
     Definition def;
     defWindow defWin(nullptr, &def);
     fueleconomy fe;
+    tester _tester;
     hand.fillEconomy(&fe);
 
     defWin.parseDefs();
@@ -161,9 +163,11 @@ int main(int argc, char *argv[])
     QObject::connect(&defWin, &defWindow::testSweep, gauge, &gauges::startTest);
 
 
+
     defWin.fillDefs();
     qDebug() << "*reponse length: " << def.getRxMessageLength();
     rootContext->setContextProperty("gauge", gauge); //sets access to gauge class in qml
+    rootContext->setContextProperty("tester", &_tester);
 
 
 
@@ -185,6 +189,7 @@ int main(int argc, char *argv[])
     QObject::connect(&_canData, &canData::valueChanged, gauge, &gauges::updateCANParam);
     QObject::connect(&shand, &serialHandler::serialFrameReceived, &can, &canbus::receiveSerialFrame);
     QObject::connect(&can, &canbus::ecuAck, &can, &canbus::sendQueuedMessage);
+    QObject::connect(&_tester, &tester::testFrameProcessed, &can, &canbus::receiveSerialFrame);
     QObject::connect(&defWin, &defWindow::paramsChanged, gauge, &gauges::redrawParamDisplay);
     //log->startLogging();
 

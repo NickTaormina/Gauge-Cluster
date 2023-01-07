@@ -105,7 +105,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
                     if(count == 0){
                         payload.insert(0,16).toHex();
                         frame = QCanBusFrame(frameID, payload);
-                        qInfo() << "writing start msg: " << frame.toString();
+                       // qInfo() << "writing start msg: " << frame.toString();
                         //qDebug() << "write: " << frame.toString();
                         _dev->writeFrame(frame);
                     } else {
@@ -116,7 +116,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
                     count++;
                 }
 
-                qInfo() << "queued msg: " << queuedMessage;
+               // qInfo() << "queued msg: " << queuedMessage;
 
 
             }
@@ -129,7 +129,7 @@ void canbus::writeFrames(uint frameID, QByteArray bytes)
 //sends the second "half" of the param request message after ecu acknowledgement
 void canbus::sendQueuedMessage()
 {
-    qInfo() << "sending queued msg";
+    //qInfo() << "sending queued msg";
     if(queuedMessage.length() <1){
         queuedMessage.clear();
         return;
@@ -142,7 +142,7 @@ void canbus::sendQueuedMessage()
         //if(!loop.isRunning()){
         QByteArray payload = queuedMessage.mid(0+(8*count), 8); 
         QCanBusFrame frame = QCanBusFrame(2016, payload);
-        qInfo() << "sending frame: " << frame.toString();
+        //qInfo() << "sending frame: " << frame.toString();
         //qDebug() << "write: " << frame.toString();
         QThread::msleep(5);
         _dev->writeFrame(frame);
@@ -161,15 +161,16 @@ void canbus::sendQueuedMessage()
 //sends messages based on frame content
 void canbus::receiveSerialFrame(QCanBusFrame frame)
 {
+    qInfo() << frame.toString();
     if(frame.frameId() == 321){
         //qDebug() << "frame: " << frame.toString();
     }
     if(frame.frameId() == 2016){
-        qInfo() << "written: " << frame.toString();
+        //qInfo() << "written: " << frame.toString();
         //qDebug() << "written: " << frame.toString();
     }
     if(frame.frameId() == 2024){
-       // qDebug() << "ecu response: " << frame.toString();
+        //qDebug() << "ecu response: " << frame.toString();
         if(frame.payload().at(0) == 16){
             //respond with ack message if ecu sends multipart
             _dev->writeFrame(ack);
@@ -179,7 +180,7 @@ void canbus::receiveSerialFrame(QCanBusFrame frame)
             emit ecuAck();
         } else {
             //sends ecu response to get processed into real data
-            qInfo() << "sending new frame for process";
+            //qInfo() << "sending new frame for process";
             emit ecuResponse(frame);
         }
 

@@ -21,7 +21,7 @@ defWindow::defWindow(QObject *parent, Definition *d)
      _selectedParams.append("Intake Manifold Temperature");
      //_selectedParams.append("Engine Speed");
     // _selectedParams.append("Vehicle Speed");
-     _selectedParams.append("Odometer");
+     //_selectedParams.append("Odometer");
      _selectedParams.append("Feedback Knock Correction");
      _selectedParams.append("Fine Knock Learn");
      _selectedParams.append("Maf Corr Final");
