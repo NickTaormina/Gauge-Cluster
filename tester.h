@@ -20,6 +20,7 @@ public slots:
     void testFileSelected(QString url);
     void processFile(QString url);
     QCanBusFrame extractFrame(const QByteArray &data);
+    void removeCharacters(const QString& fileName, const QString& characters);
 signals:
 private:
     QThread * thread;

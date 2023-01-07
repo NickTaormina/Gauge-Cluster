@@ -36,6 +36,8 @@ void tester::processFile(QString url)
     // Open the file
     url.remove("file:///");
     qDebug() << url;
+    removeCharacters(url, "");
+
     QFile file(url);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Error opening file";
@@ -44,18 +46,20 @@ void tester::processFile(QString url)
     // Read the file into a QByteArray
         QByteArray data = file.readAll();
 
+
         // Process the data in the array
         int index = 0;
         QList<QByteArray> lines = data.split('\n');
         while (index < lines.size()) {
             // Extract the next frame from the data
+            //qDebug() << lines.at(index);
             QCanBusFrame frame = extractFrame(lines.at(index));
-            if (frame.isValid()) {
+            if (frame.isValid() && frame.payload().count() >= 2 && frame.payload().count() < 9 && frame.frameId() != 0) {
                 emit testFrameProcessed(frame);
-                qDebug() << "test frame: " << frame.toString();
+                //qDebug() << "test frame: " << frame.toString();
             } else {
-                qDebug() << "Invalid frame: " << data.mid(index);
-                break;
+                //qDebug() << "Invalid frame: " << data.mid(index);
+                //break;
             }
             if(index % 10 == 0){
                 thread->msleep(5);
@@ -84,7 +88,7 @@ QCanBusFrame tester::extractFrame(const QByteArray& data){
             }
         }
 
-        if (fields.size() < 3) {
+        if (fields.count() < 5 || fields.count() > 13) {
             return QCanBusFrame();
         }
 
@@ -94,14 +98,16 @@ QCanBusFrame tester::extractFrame(const QByteArray& data){
         if (!ok) {
             return QCanBusFrame();
         }
-        quint8 length = fields[1].mid(1, fields[1].size() - 2).toUInt(&ok);
+        if(fields[1].length() >= 2){
+            quint8 length = fields[1].mid(1, 1).toUInt(&ok);
+        }
         if (!ok) {
             return QCanBusFrame();
         }
 
         // Extract the frame data from the remaining fields
         QByteArray frameData;
-        for (int i = 2; i < fields.size(); i++) {
+        for (int i = 2; i < fields.count(); i++) {
             frameData.append(static_cast<char>(fields[i].toUInt(&ok, 16)));
             if (!ok) {
                 return QCanBusFrame();
@@ -110,4 +116,37 @@ QCanBusFrame tester::extractFrame(const QByteArray& data){
 
         // Return the extracted frame
         return QCanBusFrame(id, frameData);
+}
+
+void tester::removeCharacters(const QString &fileName, const QString &characters)
+{
+    // Open the file
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
+            qDebug() << "Error opening file";
+            return;
+        }
+
+        // Read the contents of the file into a QByteArray
+        QByteArray data = file.readAll();
+
+        // Convert the QByteArray to a QString
+        QString str = QString::fromUtf8(data);
+
+        // Remove the characters from the QString
+        str.replace("\"     ", "");
+        str.replace("\"\n", "\n");
+        //str.replace("\"", "\n");
+        //remove the group of 5 spaces
+        str.remove(QRegularExpression("\\s{5,}"));
+
+        // Convert the modified QString back to a QByteArray
+        data = str.toUtf8();
+
+        // Write the modified QByteArray back to the file
+        file.seek(0);
+        file.write(data);
+
+        // Close the file
+        file.close();
 }
